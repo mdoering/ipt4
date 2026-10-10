@@ -35,6 +35,12 @@ final class HtmlTag {
     return this;
   }
 
+  /** An attribute the Struts template always writes, empty or not. */
+  HtmlTag always(String key, String value) {
+    attributes.put(key, value == null ? "" : value);
+    return this;
+  }
+
   HtmlTag flag(String key, boolean on) {
     if (on) {
       attributes.put(key, key);

@@ -10,3 +10,5 @@ C1:<@s.checkbox name="user.admin" cssClass="form-check-input" fieldValue="true" 
 C2:<@s.checkbox name="flag" value="false"/>
 L1:<@s.select id="org" class="form-select" name="org" list=options value="b" emptyOption=true/>
 L2:<@s.select name="lang" list=beans listKey="code" listValue="label" value="fr"/>
+U1:<@s.file name="file" cssClass="form-control" key="manage.resource.create.file" />
+U2:<@s.file id="custom-data-input" cssClass="d-none" />

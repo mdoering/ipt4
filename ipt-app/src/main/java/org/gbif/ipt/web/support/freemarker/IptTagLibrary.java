@@ -37,7 +37,8 @@ public final class IptTagLibrary implements TemplateHashModel {
         "property", new PropertyDirective(),
         "fielderror", new FieldErrorDirective(),
         "select", new SelectDirective(),
-        "checkbox", new CheckboxDirective());
+        "checkbox", new CheckboxDirective(),
+        "file", new FileDirective());
   }
 
   @Override
