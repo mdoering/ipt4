@@ -68,6 +68,11 @@ public class FreeMarkerProbeController {
       return "from page";
     }
 
+    // an action method, like ResourceFileAction.eml(): OGNL never resolved ${eml} to it
+    public String eml() {
+      return "success";
+    }
+
     public String getText(String key) {
       return "T:" + key;
     }

@@ -21,11 +21,15 @@ import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateCollectionModel;
 import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateMethodModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
 /** Template root: the Spring model first, then the page bean, then OGNL-style {@code get<Name>()} on the page bean. */
 final class PageFallbackHash extends SimpleHash {
+
+  /** The one page method templates call by bare name; OGNL resolved other bare names as properties only. */
+  private static final String GET_TEXT = "getText";
 
   private final SimpleHash base;
   private final Object page;
@@ -49,7 +53,7 @@ final class PageFallbackHash extends SimpleHash {
       return value;
     }
     value = pageModel.get(key);
-    if (value != null) {
+    if (value != null && (!(value instanceof TemplateMethodModel) || GET_TEXT.equals(key))) {
       return value;
     }
     Method getter = findGetter(page.getClass(), key);

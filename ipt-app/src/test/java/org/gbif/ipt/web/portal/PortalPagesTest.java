@@ -14,8 +14,7 @@
 package org.gbif.ipt.web.portal;
 
 import org.gbif.ipt.app.PortalFixture;
-import org.gbif.ipt.feedback.CollectingFeedback;
-import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
@@ -52,22 +51,12 @@ class PortalPagesTest {
   @Autowired ResourceManager resources;
   @Autowired ResourcePublicationManager publications;
   @Autowired UserAccountManager users;
+  @Autowired RegistrationManager registrations;
 
   /** res1 is published once, by IPT4, before the first test. */
   @BeforeEach
   void publishRes1() throws Exception {
-    Resource res1 = resources.get("res1");
-    if (res1.getLastPublished() != null && dataDir.resolve("resources/res1/eml-" + res1.getEmlVersion().toPlainString()
-        + ".xml").toFile().exists()) {
-      return;
-    }
-    CollectingFeedback feedback = new CollectingFeedback(null, users.get(PortalFixture.ADMIN));
-    publications.publish(res1, res1.getNextVersion(), feedback);
-    long deadline = System.currentTimeMillis() + 60_000;
-    while (publications.isLocked("res1", feedback) && System.currentTimeMillis() < deadline) {
-      Thread.sleep(100);
-    }
-    assertThat(feedback.getActionErrors()).isEmpty();
+    PortalFixture.publishRes1(dataDir, resources, publications, users, registrations);
   }
 
   private MvcResult get200(String url) throws Exception {

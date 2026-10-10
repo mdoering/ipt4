@@ -85,6 +85,11 @@ class TemplateShimTest {
   }
 
   @Test
+  void topLevelNamesAreNotActionMethods() throws Exception {
+    assertThat(render("/_probe/method")).contains("METHOD:none");
+  }
+
+  @Test
   void squareBracketSyntaxWorks() throws Exception {
     assertThat(render("/_probe/shim_square")).contains("S:created by <b>Bo</b> on 1999");
   }

@@ -60,6 +60,44 @@ public final class PortalFixture {
     return ipt4;
   }
 
+  /** Publishes res1 with IPT4, once per data dir. */
+  public static void publishRes1(Path dataDir, org.gbif.ipt.service.manage.ResourceManager resources,
+                                 org.gbif.ipt.service.manage.ResourcePublicationManager publications,
+                                 org.gbif.ipt.service.admin.UserAccountManager users,
+                                 org.gbif.ipt.service.admin.RegistrationManager registrations) throws Exception {
+    org.gbif.ipt.model.Resource res1 = resources.get("res1");
+    if (res1.getOrganisation() == null) {
+      // what the setup wizard installs; IPT 3 published public resources with an organisation only
+      org.gbif.ipt.model.Organisation none = registrations.get(org.gbif.ipt.config.Constants.DEFAULT_ORG_KEY);
+      if (none == null) {
+        none = new org.gbif.ipt.model.Organisation();
+        none.setName("No organisation");
+        none.setAlias("No organisation");
+        none.setCanHost(true);
+        none.setKey(org.gbif.ipt.config.Constants.DEFAULT_ORG_KEY.toString());
+        none.setPassword("password");
+        registrations.addAssociatedOrganisation(none);
+        registrations.save();
+      }
+      res1.setOrganisation(none);
+      resources.save(res1);
+    }
+    if (res1.getLastPublished() != null && dataDir.resolve("resources/res1/eml-" + res1.getEmlVersion().toPlainString()
+        + ".xml").toFile().exists()) {
+      return;
+    }
+    org.gbif.ipt.feedback.CollectingFeedback feedback =
+        new org.gbif.ipt.feedback.CollectingFeedback(null, users.get(ADMIN));
+    publications.publish(res1, res1.getNextVersion(), feedback);
+    long deadline = System.currentTimeMillis() + 60_000;
+    while (publications.isLocked("res1", feedback) && System.currentTimeMillis() < deadline) {
+      Thread.sleep(100);
+    }
+    if (!feedback.getActionErrors().isEmpty()) {
+      throw new IllegalStateException("Publishing res1 failed: " + feedback.getActionErrors());
+    }
+  }
+
   private static void copyResource(Path ipt4, String shortname, String status) throws IOException {
     Path dir = ipt4.resolve("resources/" + shortname);
     FileUtils.copyDirectory(ipt4.resolve("resources/res1").toFile(), dir.toFile());

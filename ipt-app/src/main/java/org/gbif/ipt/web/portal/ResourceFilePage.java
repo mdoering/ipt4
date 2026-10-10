@@ -276,7 +276,7 @@ public class ResourceFilePage extends PortalBasePage {
   }
 
   public String sourceLog() {
-    if (resource == null) {
+    if (resource == null || source == null) {
       return NOT_FOUND;
     }
     data = dataDir.sourceLogFile(resource.getShortname(), source.getName());
@@ -294,7 +294,7 @@ public class ResourceFilePage extends PortalBasePage {
     super.prepare();
     // look for source parameter
     String src = StringUtils.trimToNull(req.getParameter(Constants.REQ_PARAM_SOURCE));
-    if (StringUtils.isNotBlank(src)) {
+    if (StringUtils.isNotBlank(src) && resource != null) {
       source = resource.getSource(src);
     }
   }
