@@ -48,6 +48,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -112,7 +113,9 @@ public class ActionRunner {
 
   /** Struts' action file upload interceptor: the request's files go to the page before parameters are bound. */
   private List<UploadedFile> upload(ActionPage page, HttpServletRequest request) throws IOException {
-    if (!(page instanceof UploadedFilesAware aware) || !(request instanceof MultipartHttpServletRequest multipart)) {
+    // through request wrappers (e.g. DoSuffixFilter's)
+    MultipartHttpServletRequest multipart = WebUtils.getNativeRequest(request, MultipartHttpServletRequest.class);
+    if (!(page instanceof UploadedFilesAware aware) || multipart == null) {
       return List.of();
     }
     List<UploadedFile> files = new ArrayList<>();

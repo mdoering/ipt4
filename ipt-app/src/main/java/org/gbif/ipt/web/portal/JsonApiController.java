@@ -14,27 +14,21 @@
 package org.gbif.ipt.web.portal;
 
 import org.gbif.ipt.model.datatable.DatatableResult;
+import org.gbif.ipt.web.support.StrutsJson;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.web.support.action.ActionRunner;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import jakarta.servlet.http.HttpServletRequest;
-import tools.jackson.databind.MapperFeature;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * IPT 3's Struts JSON plugin results: bean properties in name order, {@code noCache}, and for inventory v2
@@ -42,18 +36,6 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @RestController
 public class JsonApiController {
-
-  private static final MediaType JSON_UTF8 = MediaType.parseMediaType("application/json;charset=UTF-8");
-
-  private static final JsonMapper STRUTS_JSON = JsonMapper.builder()
-      .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-      .defaultTimeZone(TimeZone.getDefault())
-      .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.ALWAYS))
-      .build();
-
-  private static final JsonMapper STRUTS_JSON_NO_NULLS = STRUTS_JSON.rebuild()
-      .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-      .build();
 
   private final ActionRunner runner;
   private final ObjectProvider<InventoryPage> inventoryPages;
@@ -75,7 +57,7 @@ public class JsonApiController {
   public ResponseEntity<byte[]> inventory() {
     InventoryPage page = inventoryPages.getObject();
     page.execute();
-    return json(STRUTS_JSON, Map.of("registeredResources", page.getInventory()));
+    return StrutsJson.json(Map.of("registeredResources", page.getInventory()));
   }
 
   @GetMapping("/inventory/v2/dataset")
@@ -85,7 +67,7 @@ public class JsonApiController {
     page.setStatus(status);
     page.setType(type);
     page.execute();
-    return json(STRUTS_JSON_NO_NULLS, Map.of("resources", page.getInventory()));
+    return StrutsJson.json(Map.of("resources", page.getInventory()), true);
   }
 
   /** Paging parameters IPT 3 parsed with {@code Integer.parseInt}; garbage there is a bad request, not a 500. */
@@ -106,23 +88,14 @@ public class JsonApiController {
     root.put("aaData", table.getData());
     root.put("iTotalDisplayRecords", table.getTotalDisplayRecords());
     root.put("iTotalRecords", table.getTotalRecords());
-    return json(STRUTS_JSON, root);
+    return StrutsJson.json(root);
   }
 
   @GetMapping("/api/health")
   public ResponseEntity<byte[]> health(HttpServletRequest request) throws Exception {
     HealthPage page = healthPages.getObject();
     runner.run(page, request, "execute", page::execute);
-    return json(STRUTS_JSON, Map.of("status", page.getStatus()));
+    return StrutsJson.json(Map.of("status", page.getStatus()));
   }
 
-  private static ResponseEntity<byte[]> json(JsonMapper mapper, Object root) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(JSON_UTF8);
-    // Struts' noCache
-    headers.setCacheControl("no-cache");
-    headers.setPragma("No-cache");
-    headers.setExpires(0);
-    return new ResponseEntity<>(mapper.writeValueAsBytes(root), headers, HttpStatus.OK);
-  }
 }

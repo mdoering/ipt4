@@ -471,9 +471,21 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
 
   @Override
   public String getSchemaIdentifier(String schemaName) {
-    String result = null;
+    // installed schemas first: IPT 3 asked the registry, so no resource could be created while it was unreachable
+    for (DataPackageSchema installed : list()) {
+      if (installed.getName().equals(schemaName)) {
+        return installed.getIdentifier();
+      }
+    }
 
-    List<DataPackageSchema> dataPackageSchemas = registryManager.getLatestDataPackageSchemas();
+    String result = null;
+    List<DataPackageSchema> dataPackageSchemas;
+    try {
+      dataPackageSchemas = registryManager.getLatestDataPackageSchemas();
+    } catch (RegistryException e) {
+      LOG.warn("Cannot look up data package schema {} in the registry: {}", schemaName, e.getMessage());
+      return null;
+    }
     for (DataPackageSchema dataPackageSchema : dataPackageSchemas) {
       if (dataPackageSchema.getName().equals(schemaName)) {
         result = dataPackageSchema.getIdentifier();

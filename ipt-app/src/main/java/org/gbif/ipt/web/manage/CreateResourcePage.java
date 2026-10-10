@@ -50,6 +50,7 @@ import jakarta.inject.Inject;
 import javax.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -202,7 +203,8 @@ public class CreateResourcePage extends PostActionPage implements UploadedFilesA
     }
 
     File content = (File) upload.getContent();
-    String originalName = StringUtils.trimToNull(upload.getOriginalName());
+    // the browser's file name without any path parts (IPT 3 used it as sent)
+    String originalName = StringUtils.trimToNull(FilenameUtils.getName(upload.getOriginalName()));
     String safeName = (originalName != null) ? originalName : "upload.bin";
 
     // the file to upload to
