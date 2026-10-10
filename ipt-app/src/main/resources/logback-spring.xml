@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Same files, pattern and rolling as IPT 3 (config/LoggingConfiguration.java), so the admin log viewer is unchanged. -->
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <springProperty scope="context" name="logDir" source="ipt.log-dir"/>
+  <property name="IPT_PATTERN" value="%-5p %d{dd-MMM-yyyy HH:mm:ss} [%c] - %m%n"/>
+
+  <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDir}/debug.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDir}/debug.log.%i</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>7</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>10MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${IPT_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="ADMIN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDir}/admin.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDir}/admin.log.%i</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>7</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>10MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${IPT_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <logger name="org.gbif" level="DEBUG">
+    <appender-ref ref="ADMIN_FILE"/>
+  </logger>
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="freemarker" level="WARN"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="DEBUG_FILE"/>
+  </root>
+</configuration>
