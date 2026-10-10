@@ -50,6 +50,7 @@ public class UserStore {
       return new ArrayList<>();
     }
     UsersFile content = mapper.readValue(file.toFile(), UsersFile.class);
+    DataDirJson.checkSchemaVersion(content.schemaVersion);
     return content.users == null ? new ArrayList<>() : content.users;
   }
 

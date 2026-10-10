@@ -126,7 +126,8 @@ public class ResourceLinker {
   }
 
   private static Term term(@Nullable Extension extension, @Nullable Term stub) {
-    if (stub == null || extension == null) {
+    // a key-only stand-in (e.g. while migrating) has no properties to resolve against
+    if (stub == null || extension == null || extension.getProperties() == null || extension.getProperties().isEmpty()) {
       return stub;
     }
     ExtensionProperty property = extension.getProperty(stub.qualifiedName());

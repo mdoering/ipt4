@@ -45,10 +45,11 @@ class DataDirFormatTest {
 
   @Test
   void markerMakesItAnIpt4DataDir() throws IOException {
-    DataDirFormat.writeMarker(dir, "4.0.0-SNAPSHOT", null);
+    DataDirFormat.writeMarker(dir, "4.0.0-SNAPSHOT", null, "check");
     assertThat(DataDirFormat.detect(dir)).isEqualTo(DataDirFormat.Kind.V4);
     assertThat(DataDirFormat.readMarker(dir).version()).isEqualTo(DataDirFormat.CURRENT_VERSION);
     assertThat(Files.readString(dir.resolve(DataDirFormat.MARKER))).contains("\"format\" : \"ipt\"");
+    assertThat(DataDirFormat.readMarker(dir).keyCheck()).isEqualTo("check");
   }
 
   @Test

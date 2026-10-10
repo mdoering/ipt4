@@ -638,6 +638,8 @@ public class ResourceManagerImplTest extends IptBaseTest {
     // create a new resource.
     assertThrows(ImportException.class,
         () -> resourceManager.create("res1", null, zippedResourceFolder, creator, baseAction));
+    // a failed import leaves nothing behind in the resources folder
+    assertFalse(new File(resourceDir, "res1").exists());
   }
 
   /**

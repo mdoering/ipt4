@@ -44,9 +44,11 @@ import org.gbif.ipt.model.InferredEmlTemporalCoverage;
 import org.gbif.ipt.model.InferredMetadata;
 import org.gbif.ipt.model.Ipt;
 import org.gbif.ipt.model.Organisation;
+import org.gbif.ipt.model.Password;
 import org.gbif.ipt.model.PropertyMapping;
 import org.gbif.ipt.model.Registration;
 import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.model.Source;
 import org.gbif.ipt.model.SqlSource;
 import org.gbif.metadata.eml.ipt.model.TaxonKeyword;
 import org.gbif.ipt.model.TextFileSource;
@@ -61,7 +63,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,6 +97,8 @@ public class LegacyXmlReader {
   }
 
   private final List<String> problems = new ArrayList<>();
+  private final Set<Password> undecryptable = Collections.newSetFromMap(new IdentityHashMap<>());
+  private final List<String> droppedSources = new ArrayList<>();
   private final XStream resources;
   private final XStream users;
   private final XStream registrationV1;
@@ -133,7 +141,49 @@ public class LegacyXmlReader {
   }
 
   public Resource readResource(InputStream in) throws IOException {
-    return (Resource) read(resources, in);
+    Resource resource = (Resource) read(resources, in);
+    for (Source source : resource.getSources()) {
+      if (source instanceof SqlSource sql && undecryptable.remove(passwordOf(sql, "password"))) {
+        droppedSources.add(sql.getName());
+      }
+    }
+    return resource;
+  }
+
+  /** Names of SQL sources read since the last call whose IPT 3 password could not be decrypted. */
+  public List<String> takeDroppedSecrets() {
+    List<String> copy = List.copyOf(droppedSources);
+    droppedSources.clear();
+    return copy;
+  }
+
+  private static Password passwordOf(Object owner, String field) {
+    for (Class<?> c = owner.getClass(); c != null; c = c.getSuperclass()) {
+      try {
+        Field f = c.getDeclaredField(field);
+        f.setAccessible(true);
+        return (Password) f.get(owner);
+      } catch (NoSuchFieldException e) {
+        // look in the superclass
+      } catch (IllegalAccessException e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private void reportUndecryptable(Organisation org) {
+    if (org == null) {
+      return;
+    }
+    if (undecryptable.remove(passwordOf(org, "password"))) {
+      problems.add("Organisation " + org.getName() + " (" + org.getKey() + "): its registry password could not be"
+          + " decrypted and was dropped; enter it again under Administration > Organisations");
+    }
+    if (undecryptable.remove(passwordOf(org, "agencyAccountPassword"))) {
+      problems.add("Organisation " + org.getName() + " (" + org.getKey() + "): its DOI agency account password could"
+          + " not be decrypted and was dropped; enter it again under Administration > Organisations");
+    }
   }
 
   public InferredMetadata readInferredMetadata(InputStream in) throws IOException {
@@ -175,8 +225,17 @@ public class LegacyXmlReader {
       result.setHostingOrganisation(reg.getHostingOrganisation());
       result.setIpt(reg.getIpt());
       result.setNetwork(reg.getNetwork());
+      reportUndecryptable(reg.getHostingOrganisation());
+      if (reg.getIpt() != null && undecryptable.remove(passwordOf(reg.getIpt(), "wsPassword"))) {
+        problems.add("The IPT's registry password could not be decrypted and was dropped; contact GBIF to reset it");
+      }
       while (true) {
         Organisation org = (Organisation) ois.readObject();
+        reportUndecryptable(org);
+        if (org.getKey() == null) {
+          problems.add("An associated organisation without key was skipped: " + org.getName());
+          continue;
+        }
         result.getAssociatedOrganisations().put(org.getKey().toString(), org);
       }
     } catch (EOFException e) {
@@ -321,7 +380,7 @@ public class LegacyXmlReader {
     x.registerConverter(StubConverters.schemas());
     x.registerConverter(StubConverters.tableNames());
     x.registerConverter(StubConverters.fields());
-    x.registerConverter(StubConverters.pbePasswords(pbe, problems::add));
+    x.registerConverter(StubConverters.pbePasswords(pbe, undecryptable::add));
     x.addDefaultImplementation(ExtensionProperty.class, Term.class);
     x.registerConverter(StubConverters.organisations());
     x.registerConverter(StubConverters.jdbc(jdbc));
@@ -354,7 +413,7 @@ public class LegacyXmlReader {
     x.omitField(Registration.class, "associatedOrganisations");
     x.alias("organisation", Organisation.class);
     x.alias("registry", Registration.class);
-    x.registerConverter(StubConverters.pbePasswords(pbe, problems::add));
+    x.registerConverter(StubConverters.pbePasswords(pbe, undecryptable::add));
     return x;
   }
 }

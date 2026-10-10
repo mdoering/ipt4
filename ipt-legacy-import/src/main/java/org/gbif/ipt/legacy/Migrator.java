@@ -14,6 +14,7 @@
 package org.gbif.ipt.legacy;
 
 import org.gbif.ipt.config.JdbcSupport;
+import org.gbif.ipt.model.DataPackageMapping;
 import org.gbif.ipt.model.ExtensionMapping;
 import org.gbif.ipt.model.InferredMetadata;
 import org.gbif.ipt.model.Registration;
@@ -96,13 +97,14 @@ public class Migrator {
         cipher = new SecretCipher(new byte[32]);
       } else {
         Files.createDirectories(target.resolve("config"));
-        cipher = SecretCipher.forConfigDir(target.resolve("config"), env);
+        cipher = SecretCipher.create(target.resolve("config"), env);
       }
       LegacyXmlReader reader = new LegacyXmlReader(JdbcSupport.fromClasspath());
       JsonResourcePersister persister = new JsonResourcePersister(cipher, JdbcSupport.fromClasspath(), new KeysOnly());
 
       migrateConfig(source, target, options, reader, cipher, report);
-      migrateResources(source, target, options, reader, persister, report);
+      Installed installed = Installed.in(source.resolve("config"));
+      migrateResources(source, target, options, reader, persister, installed, report);
       if (options.includeLogs()) {
         copyTree(source.resolve("logs"), target.resolve("logs"), options, report);
       }
@@ -117,7 +119,7 @@ public class Migrator {
         migratedFrom.put("path", source.toString());
         migratedFrom.put("migrated", Instant.now().toString());
         migratedFrom.put("errors", report.errors().size());
-        DataDirFormat.writeMarker(target, version(), migratedFrom);
+        DataDirFormat.writeMarker(target, version(), migratedFrom, cipher.keyCheck());
       }
       return report;
     } catch (IOException e) {
@@ -172,7 +174,8 @@ public class Migrator {
   }
 
   private void migrateResources(Path source, Path target, MigrationOptions options, LegacyXmlReader reader,
-                                JsonResourcePersister persister, MigrationReport report) throws IOException {
+                                JsonResourcePersister persister, Installed installed, MigrationReport report)
+      throws IOException {
     Path resources = source.resolve("resources");
     if (!Files.isDirectory(resources)) {
       report.warnings().add("No resources folder");
@@ -188,6 +191,7 @@ public class Migrator {
       MigrationReport.ResourceResult result;
       try {
         result = migrateResource(source, target, dir, out, shortname, options, reader, persister, report);
+        checkInstalled(shortname, dir, installed, reader, report);
       } catch (IOException | RuntimeException e) {
         LOG.error("Resource {} could not be migrated", shortname, e);
         result = new MigrationReport.ResourceResult(shortname, 0, 0, 0, 0, e.getMessage());
@@ -210,6 +214,10 @@ public class Migrator {
     Resource resource;
     try (InputStream in = Files.newInputStream(xml)) {
       resource = reader.readResource(in);
+    }
+    for (String sql : reader.takeDroppedSecrets()) {
+      report.warnings().add("Resource " + shortname + ": the password of SQL source " + sql + " could not be"
+          + " decrypted and was dropped; enter it again in the source's settings");
     }
     resource.setShortname(shortname);
     rewriteUrlSourceFiles(resource, source, target);
@@ -242,6 +250,61 @@ public class Migrator {
     }
     return new MigrationReport.ResourceResult(shortname, resource.getSources().size(), resource.getMappings().size(),
         resource.getAllDataPackageMappings().size(), resource.getVersionHistory().size(), null);
+  }
+
+  /** Extensions and data package schemas installed in the IPT 3 data dir (copied along with it). */
+  private record Installed(Set<String> rowTypes, Set<String> schemas) {
+
+    private static final Pattern ROW_TYPE = Pattern.compile("rowType\\s*=\\s*[\"']([^\"']+)[\"']");
+    private static final Pattern IDENTIFIER = Pattern.compile("\"identifier\"\\s*:\\s*\"([^\"]+)\"");
+
+    static Installed in(Path config) throws IOException {
+      return new Installed(scan(config.resolve(".extensions"), ".xml", ROW_TYPE),
+          scan(config.resolve(".dataPackages"), ".json", IDENTIFIER));
+    }
+
+    private static Set<String> scan(Path dir, String suffix, Pattern pattern) throws IOException {
+      Set<String> found = new java.util.HashSet<>();
+      if (Files.isDirectory(dir)) {
+        try (Stream<Path> files = Files.walk(dir)) {
+          for (Path f : files.filter(p -> p.toString().endsWith(suffix)).toList()) {
+            java.util.regex.Matcher m = pattern.matcher(Files.readString(f));
+            if (m.find()) {
+              found.add(m.group(1));
+            }
+          }
+        }
+      }
+      return found;
+    }
+  }
+
+  /**
+   * IPT4 (like IPT 3) does not load a resource whose extension or data package schema is not installed; say so now
+   * rather than letting the resource vanish at start-up.
+   */
+  private static void checkInstalled(String shortname, Path dir, Installed installed, LegacyXmlReader reader,
+                                     MigrationReport report) throws IOException {
+    Resource resource;
+    try (InputStream in = Files.newInputStream(dir.resolve(LEGACY_RESOURCE))) {
+      resource = reader.readResource(in);
+    }
+    reader.takeDroppedSecrets();
+    Set<String> missing = new java.util.TreeSet<>();
+    for (ExtensionMapping m : resource.getMappings()) {
+      if (m.getExtension() != null && !installed.rowTypes().contains(m.getExtension().getRowType())) {
+        missing.add(m.getExtension().getRowType());
+      }
+    }
+    for (DataPackageMapping m : resource.getAllDataPackageMappings()) {
+      if (m.getDataPackageSchema() != null && !installed.schemas().contains(m.getDataPackageSchema().getIdentifier())) {
+        missing.add(m.getDataPackageSchema().getIdentifier());
+      }
+    }
+    if (!missing.isEmpty()) {
+      report.warnings().add("Resource " + shortname + " uses " + String.join(", ", missing) + ", not installed in the"
+          + " IPT 3 data dir; IPT4 will not load this resource until they are installed");
+    }
   }
 
   /** IPT 3 stored the absolute path of URL sources' downloads; they move with the data dir. */

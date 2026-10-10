@@ -75,6 +75,14 @@ public final class DataDirJson {
   private DataDirJson() {
   }
 
+  /** Refuses data written by a newer IPT (its unknown fields would be lost on the next save). */
+  static void checkSchemaVersion(int version) {
+    if (version > SCHEMA_VERSION) {
+      throw new IllegalStateException("This file was written by a newer IPT (format " + version + ", this IPT reads "
+          + SCHEMA_VERSION + "). Use that IPT version or newer.");
+    }
+  }
+
   /** For {@code resource.json} and {@code inferred-metadata.json}. */
   public static JsonMapper resourceMapper(SecretCipher cipher, JdbcSupport jdbc) {
     SimpleModule refs = new SimpleModule("ipt-references");

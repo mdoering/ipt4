@@ -16,7 +16,6 @@ package org.gbif.ipt.persistence;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -47,6 +46,7 @@ public final class SecretCipher {
   private static final int IV_BYTES = 12;
   private static final int TAG_BITS = 128;
   private static final SecureRandom RANDOM = new SecureRandom();
+  private static final String KEY_CHECK = "ipt-secret-key-check";
 
   /** A secret could not be read: wrong key, corrupt value or unusable key. */
   public static class SecretCipherException extends RuntimeException {
@@ -68,32 +68,70 @@ public final class SecretCipher {
     this.key = new SecretKeySpec(key.clone(), "AES");
   }
 
-  /** The cipher for a data dir's config directory, from {@value #ENV_KEY} if set, otherwise the key file. */
-  public static SecretCipher forConfigDir(Path configDir, Map<String, String> env) throws IOException {
-    String fromEnv = env.get(ENV_KEY);
-    if (fromEnv != null && !fromEnv.isBlank()) {
-      try {
-        return new SecretCipher(Base64.getDecoder().decode(fromEnv.trim()));
-      } catch (IllegalArgumentException e) {
-        throw new SecretCipherException(ENV_KEY + " is not valid base64", e);
-      }
+  /**
+   * Makes the key of a new installation: the base64 value of {@value #ENV_KEY} if set, otherwise 32 random bytes
+   * written to {@value #KEY_FILE} (owner-only). An existing key file is never replaced.
+   */
+  public static SecretCipher create(Path configDir, Map<String, String> env) throws IOException {
+    SecretCipher fromEnv = fromEnv(env);
+    if (fromEnv != null) {
+      return fromEnv;
+    }
+    Path keyFile = configDir.resolve(KEY_FILE);
+    if (Files.exists(keyFile)) {
+      throw new SecretCipherException("Refusing to replace the existing secret key " + keyFile);
+    }
+    byte[] fresh = new byte[KEY_BYTES];
+    RANDOM.nextBytes(fresh);
+    AtomicFiles.write(keyFile, out -> out.write(fresh));
+    try {
+      Files.setPosixFilePermissions(keyFile, PosixFilePermissions.fromString("rw-------"));
+    } catch (UnsupportedOperationException e) {
+      // not a POSIX file system
+    }
+    return new SecretCipher(fresh);
+  }
+
+  /** The key of an existing installation: {@value #ENV_KEY} if set, otherwise {@value #KEY_FILE}; never made up. */
+  public static SecretCipher load(Path configDir, Map<String, String> env) throws IOException {
+    SecretCipher fromEnv = fromEnv(env);
+    if (fromEnv != null) {
+      return fromEnv;
     }
     Path keyFile = configDir.resolve(KEY_FILE);
     if (!Files.exists(keyFile)) {
-      byte[] fresh = new byte[KEY_BYTES];
-      RANDOM.nextBytes(fresh);
-      Files.createDirectories(configDir);
-      try {
-        Files.createFile(keyFile, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-------")));
-      } catch (UnsupportedOperationException e) {
-        Files.createFile(keyFile);
-      } catch (FileAlreadyExistsException e) {
-        return new SecretCipher(Files.readAllBytes(keyFile));
-      }
-      Files.write(keyFile, fresh);
-      return new SecretCipher(fresh);
+      throw new SecretCipherException("The secret key is missing: restore config/" + KEY_FILE
+          + " from the backup of this data directory, or set " + ENV_KEY + ". Without it the stored passwords cannot"
+          + " be read.");
     }
     return new SecretCipher(Files.readAllBytes(keyFile));
+  }
+
+  @Nullable
+  private static SecretCipher fromEnv(Map<String, String> env) {
+    String fromEnv = env.get(ENV_KEY);
+    if (fromEnv == null || fromEnv.isBlank()) {
+      return null;
+    }
+    try {
+      return new SecretCipher(Base64.getDecoder().decode(fromEnv.trim()));
+    } catch (IllegalArgumentException e) {
+      throw new SecretCipherException(ENV_KEY + " is not valid base64", e);
+    }
+  }
+
+  /** A value only this key can read back, stored in the data dir marker to recognise the key. */
+  public String keyCheck() {
+    return encrypt(KEY_CHECK);
+  }
+
+  /** Whether this is the key that wrote {@code keyCheck}. */
+  public boolean verifies(@Nullable String keyCheck) {
+    try {
+      return KEY_CHECK.equals(decrypt(keyCheck));
+    } catch (SecretCipherException e) {
+      return false;
+    }
   }
 
   public static boolean isEncrypted(@Nullable String value) {

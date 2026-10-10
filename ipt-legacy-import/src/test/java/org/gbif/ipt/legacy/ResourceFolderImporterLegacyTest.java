@@ -27,7 +27,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LegacyResourceFolderConverterTest {
+class ResourceFolderImporterLegacyTest {
 
   @TempDir
   Path tmp;
@@ -51,9 +51,9 @@ class LegacyResourceFolderConverterTest {
   @Test
   void convertsAnIpt3ResourceFolderInPlace() throws Exception {
     Path dir = unzip("res1-ipt3.zip");
-    LegacyResourceFolderConverter converter =
-        new LegacyResourceFolderConverter(new SecretCipher(new byte[32]), JdbcSupport.fromClasspath());
-    assertThat(converter.convert(dir.toFile())).isTrue();
+    ResourceFolderImporter converter =
+        new ResourceFolderImporter(new SecretCipher(new byte[32]), JdbcSupport.fromClasspath());
+    assertThat(converter.prepare(dir.toFile())).isEmpty();
     assertThat(dir.resolve("resource.xml")).doesNotExist();
     assertThat(dir.resolve("resource.json")).content().contains("\"extension\" : \"http://rs.tdwg.org/dwc/terms/Occurrence\"");
     assertThat(dir.resolve("eml.xml")).exists();
@@ -62,9 +62,9 @@ class LegacyResourceFolderConverterTest {
   @Test
   void leavesOtherFoldersAlone() throws Exception {
     Files.writeString(tmp.resolve("resource.json"), "{}");
-    LegacyResourceFolderConverter converter =
-        new LegacyResourceFolderConverter(new SecretCipher(new byte[32]), JdbcSupport.fromClasspath());
-    assertThat(converter.convert(tmp.toFile())).isFalse();
+    ResourceFolderImporter converter =
+        new ResourceFolderImporter(new SecretCipher(new byte[32]), JdbcSupport.fromClasspath());
+    assertThat(converter.prepare(tmp.toFile())).isEmpty();
     assertThat(tmp.resolve("resource.json")).hasContent("{}");
   }
 }

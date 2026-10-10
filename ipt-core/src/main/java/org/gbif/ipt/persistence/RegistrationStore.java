@@ -51,7 +51,9 @@ public class RegistrationStore {
     if (!Files.exists(file)) {
       return null;
     }
-    return mapper.readValue(file.toFile(), RegistrationFile.class).registration;
+    RegistrationFile content = mapper.readValue(file.toFile(), RegistrationFile.class);
+    DataDirJson.checkSchemaVersion(content.schemaVersion);
+    return content.registration;
   }
 
   public void save(Registration registration) throws IOException {

@@ -49,7 +49,7 @@ class MigratorTest {
   }
 
   private Resource loadJson(Path target, String shortname) throws Exception {
-    SecretCipher cipher = SecretCipher.forConfigDir(target.resolve("config"), Map.of());
+    SecretCipher cipher = SecretCipher.load(target.resolve("config"), Map.of());
     JsonResourcePersister persister = new JsonResourcePersister(cipher, JdbcSupport.fromClasspath(), new ReferenceLookup() {
       @Override
       public User user(String email) {
@@ -111,16 +111,38 @@ class MigratorTest {
   }
 
   @Test
+  void warnsAboutResourcesWhoseExtensionsAreNotInstalled() throws Exception {
+    MigrationReport report = new Migrator(Map.of()).migrate(from(), tmp.resolve("ipt4"), MigrationOptions.defaults());
+    // only the Occurrence extension is installed in the fixture data dir
+    assertThat(report.warnings())
+        .anySatisfy(w -> assertThat(w).contains("event").contains("http://rs.tdwg.org/dwc/terms/Event"))
+        .anySatisfy(w -> assertThat(w).contains("amphibians").contains("http://rs.gbif.org/terms/1.0/Image"))
+        .noneSatisfy(w -> assertThat(w).startsWith("Resource res1"));
+  }
+
+  @Test
+  void namesThePasswordsItCouldNotDecrypt() throws Exception {
+    MigrationReport report = new Migrator(Map.of()).migrate(from(), tmp.resolve("ipt4"), MigrationOptions.defaults());
+    // the fixture's hosting organisation password is not valid PBE output
+    assertThat(report.warnings()).anySatisfy(w -> assertThat(w)
+        .contains("Old Name Academy of Natural Sciences").contains("f9b67ad0-9c9b-11d9-b9db-b8a03c50a862"));
+  }
+
+  @Test
   void reencryptsSecretsWithTheNewKey() throws Exception {
     Path to = tmp.resolve("ipt4");
     new Migrator(Map.of()).migrate(from(), to, MigrationOptions.defaults());
-    SecretCipher cipher = SecretCipher.forConfigDir(to.resolve("config"), Map.of());
+    SecretCipher cipher = SecretCipher.load(to.resolve("config"), Map.of());
     String json = Files.readString(to.resolve("config/registration.json"));
     assertThat(json).contains("{aesgcm}").doesNotContain("PsQfBTu3GJfy00mWe2MyOg");
     Registration reg = new RegistrationStore(to.resolve("config/registration.json"), cipher).load();
     Registration legacy = new LegacyXmlReader().readRegistration(
         getClass().getResourceAsStream("/ipt3/config/registration2.xml"));
-    assertThat(reg.getHostingOrganisation().getPassword()).isEqualTo(legacy.getHostingOrganisation().getPassword());
+    // ZMD's passwords are valid PBE values (the others in the fixture are not, see namesThePasswordsItCouldNotDecrypt)
+    String zmd = "456058db-f70b-4005-97ad-e08570cf0c56";
+    assertThat(legacy.getAssociatedOrganisations().get(zmd).getPassword()).isNotBlank();
+    assertThat(reg.getAssociatedOrganisations().get(zmd).getPassword())
+        .isEqualTo(legacy.getAssociatedOrganisations().get(zmd).getPassword());
     assertThat(reg.getAssociatedOrganisations()).hasSameSizeAs(legacy.getAssociatedOrganisations());
   }
 
@@ -131,7 +153,7 @@ class MigratorTest {
     Ipt3Fixtures.copy("config/registration.xml", from.resolve("config/registration.xml"));
     Path to = tmp.resolve("ipt4");
     new Migrator(Map.of()).migrate(from, to, MigrationOptions.defaults());
-    SecretCipher cipher = SecretCipher.forConfigDir(to.resolve("config"), Map.of());
+    SecretCipher cipher = SecretCipher.load(to.resolve("config"), Map.of());
     Registration reg = new RegistrationStore(to.resolve("config/registration.json"), cipher).load();
     assertThat(reg.getIpt().getWsPassword()).isEqualTo("password");
     assertThat(to.resolve("config/registration.xml")).doesNotExist();

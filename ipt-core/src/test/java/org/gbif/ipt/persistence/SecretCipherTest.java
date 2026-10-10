@@ -34,7 +34,7 @@ class SecretCipherTest {
 
   @Test
   void roundTripsSecrets() throws IOException {
-    SecretCipher cipher = SecretCipher.forConfigDir(config, Map.of());
+    SecretCipher cipher = SecretCipher.create(config, Map.of());
     String stored = cipher.encrypt("s3cr3t ünïcode");
     assertThat(stored).startsWith("{aesgcm}").doesNotContain("s3cr3t");
     assertThat(cipher.decrypt(stored)).isEqualTo("s3cr3t ünïcode");
@@ -43,19 +43,19 @@ class SecretCipherTest {
 
   @Test
   void createsAnOwnerOnlyKeyFileAndReusesIt() throws IOException {
-    SecretCipher first = SecretCipher.forConfigDir(config, Map.of());
+    SecretCipher first = SecretCipher.create(config, Map.of());
     Path keyFile = config.resolve(SecretCipher.KEY_FILE);
     assertThat(Files.size(keyFile)).isEqualTo(32);
     assertThat(Files.getPosixFilePermissions(keyFile))
         .containsExactlyInAnyOrder(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE);
 
     String stored = first.encrypt("x");
-    assertThat(SecretCipher.forConfigDir(config, Map.of()).decrypt(stored)).isEqualTo("x");
+    assertThat(SecretCipher.load(config, Map.of()).decrypt(stored)).isEqualTo("x");
   }
 
   @Test
   void wrongKeyFailsLoudly() throws IOException {
-    String stored = SecretCipher.forConfigDir(config, Map.of()).encrypt("x");
+    String stored = SecretCipher.create(config, Map.of()).encrypt("x");
     SecretCipher other = new SecretCipher(new byte[32]);
     assertThatThrownBy(() -> other.decrypt(stored))
         .isInstanceOf(SecretCipher.SecretCipherException.class)
@@ -67,7 +67,7 @@ class SecretCipherTest {
     byte[] key = new byte[32];
     key[0] = 7;
     Map<String, String> env = Map.of(SecretCipher.ENV_KEY, Base64.getEncoder().encodeToString(key));
-    String stored = SecretCipher.forConfigDir(config, env).encrypt("x");
+    String stored = SecretCipher.create(config, env).encrypt("x");
     assertThat(new SecretCipher(key).decrypt(stored)).isEqualTo("x");
     assertThat(config.resolve(SecretCipher.KEY_FILE)).doesNotExist();
   }
@@ -75,8 +75,31 @@ class SecretCipherTest {
   @Test
   void rejectsKeysOfTheWrongLength() {
     Map<String, String> env = Map.of(SecretCipher.ENV_KEY, Base64.getEncoder().encodeToString(new byte[16]));
-    assertThatThrownBy(() -> SecretCipher.forConfigDir(config, env))
+    assertThatThrownBy(() -> SecretCipher.load(config, env))
         .isInstanceOf(SecretCipher.SecretCipherException.class);
+  }
+
+  @Test
+  void neverReplacesAnExistingKey() throws IOException {
+    SecretCipher.create(config, Map.of());
+    assertThatThrownBy(() -> SecretCipher.create(config, Map.of()))
+        .isInstanceOf(SecretCipher.SecretCipherException.class);
+  }
+
+  @Test
+  void loadingWithoutAKeyFails() {
+    assertThatThrownBy(() -> SecretCipher.load(config, Map.of()))
+        .isInstanceOf(SecretCipher.SecretCipherException.class)
+        .hasMessageContaining(SecretCipher.KEY_FILE).hasMessageContaining(SecretCipher.ENV_KEY);
+  }
+
+  @Test
+  void keyChecksTellRightFromWrongKeys() throws IOException {
+    SecretCipher cipher = SecretCipher.create(config, Map.of());
+    String check = cipher.keyCheck();
+    assertThat(SecretCipher.load(config, Map.of()).verifies(check)).isTrue();
+    assertThat(new SecretCipher(new byte[32]).verifies(check)).isFalse();
+    assertThat(cipher.verifies("garbage")).isFalse();
   }
 
   @Test

@@ -49,7 +49,8 @@ final class Ipt3Fixtures {
     copy("config/registration2.xml", dir.resolve("config/registration2.xml"));
     Files.writeString(dir.resolve("config/.gbifreg"), "DEVELOPMENT");
     Files.createDirectories(dir.resolve("config/.extensions"));
-    Files.writeString(dir.resolve("config/.extensions/occurrence.xml"), "<extension/>");
+    Files.writeString(dir.resolve("config/.extensions/occurrence.xml"),
+        "<extension xmlns=\"http://rs.gbif.org/extension/\" rowType=\"http://rs.tdwg.org/dwc/terms/Occurrence\"/>");
     Files.writeString(dir.resolve("config/users.xml"), """
         <users>
           <user email="admin@gbif.org" password="%s" firstname="Ada" lastname="Admin" role="Admin" lastLogin="2020-01-02 10:11:12.0 UTC"/>

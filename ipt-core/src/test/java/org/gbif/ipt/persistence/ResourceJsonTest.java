@@ -58,6 +58,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ResourceJsonTest {
 
@@ -337,6 +338,13 @@ class ResourceJsonTest {
     assertThat(loaded.getManagers()).containsExactly((User) null);
     assertThat(loaded.getAllDataPackageMappings().get(0).getDataPackageSchema()).isNull();
     assertThat(loaded.getAllDataPackageMappings().get(0).getFields().get(0).getField()).isNull();
+  }
+
+  @Test
+  void refusesResourcesWrittenByANewerIpt() throws Exception {
+    String json = save(resource()).replace("\"schemaVersion\" : 1", "\"schemaVersion\" : 99");
+    assertThatThrownBy(() -> load(json))
+        .hasMessageContaining("newer");
   }
 
   @Test

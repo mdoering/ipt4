@@ -15,10 +15,12 @@ package org.gbif.ipt.app;
 
 import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.persistence.DataDirFormat;
+import org.gbif.ipt.persistence.SecretCipher;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -44,10 +46,14 @@ public final class DataDirStartup {
     }
   }
 
+  /** An opened data dir and its verified secret key. */
+  public record Opened(DataDir dataDir, SecretCipher cipher) {
+  }
+
   private DataDirStartup() {
   }
 
-  public static DataDir open(@Nullable String location, String version) {
+  public static Opened open(@Nullable String location, String version, Map<String, String> env) {
     if (location == null || location.isBlank()) {
       throw new DataDirStartupException("No IPT data directory configured. Set the environment variable IPT_DATA_DIR"
           + " (or the property ipt.data-dir) to a directory the IPT may write to.");
@@ -60,14 +66,26 @@ public final class DataDirStartup {
           LOG.info("Setting up a new IPT data directory in {}", dir);
           DataDir dd = DataDir.buildFromString(dir.toString());
           dd.setDataDir(dir.toFile());
-          DataDirFormat.writeMarker(dir, version, null);
-          return dd;
+          SecretCipher cipher = SecretCipher.create(dir.resolve("config"), env);
+          DataDirFormat.writeMarker(dir, version, null, cipher.keyCheck());
+          return new Opened(dd, cipher);
         }
         case V4 -> {
           LOG.info("Using IPT data directory {}", dir);
+          DataDirFormat.Marker marker = DataDirFormat.readMarker(dir);
+          if (marker.version() > DataDirFormat.CURRENT_VERSION) {
+            throw new DataDirStartupException("The data directory " + dir + " was written by a newer IPT (format "
+                + marker.version() + "). Run that IPT version or newer.");
+          }
+          SecretCipher cipher = SecretCipher.load(dir.resolve("config"), env);
+          if (marker.keyCheck() != null && !cipher.verifies(marker.keyCheck())) {
+            throw new DataDirStartupException("The secret key (config/" + SecretCipher.KEY_FILE + " or "
+                + SecretCipher.ENV_KEY + ") does not match the one this data directory was written with. Restore the"
+                + " original key; the stored passwords cannot be read with another one.");
+          }
           DataDir dd = DataDir.buildFromString(dir.toString());
           clearTmp(dd);
-          return dd;
+          return new Opened(dd, cipher);
         }
         case IPT3 -> throw new DataDirStartupException("The data directory " + dir + " belongs to IPT 3. Copy it to a"
             + " new location with the IPT4 migration, then start IPT4 on the new directory:" + System.lineSeparator()
@@ -77,6 +95,8 @@ public final class DataDirStartup {
         default -> throw new DataDirStartupException("The directory " + dir + " is not empty and not an IPT data"
             + " directory. Point IPT_DATA_DIR to an IPT4 data directory or to an empty directory.");
       }
+    } catch (SecretCipher.SecretCipherException e) {
+      throw new DataDirStartupException(e.getMessage(), e);
     } catch (IOException e) {
       throw new DataDirStartupException("Cannot read the data directory " + dir + ": " + e.getMessage(), e);
     }

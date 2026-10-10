@@ -56,7 +56,8 @@ class CoreContextTest {
     copy("datadir-fixture/resource.json", "resources/res1/resource.json");
     copy("datadir-fixture/eml.xml", "resources/res1/eml.xml");
     copy("datadir-fixture/occurrence.txt", "resources/res1/sources/occurrence.txt");
-    DataDirFormat.writeMarker(dataDir, "test", null);
+    DataDirFormat.writeMarker(dataDir, "test", null,
+        org.gbif.ipt.persistence.SecretCipher.create(dataDir.resolve("config"), java.util.Map.of()).keyCheck());
     registry.add("ipt.data-dir", dataDir::toString);
   }
 

@@ -124,8 +124,11 @@ public final class StubConverters {
     return new Stub<>(JdbcSupport.JdbcInfo.class, false, JdbcSupport.JdbcInfo::getName, jdbc::get);
   }
 
-  /** Secrets IPT 3 encrypted with its built-in PBE key; read back in clear. Failures are reported, not thrown. */
-  public static Stub<Password> pbePasswords(PBEEncrypt pbe, Consumer<String> problems) {
+  /**
+   * Secrets IPT 3 encrypted with its built-in PBE key; read back in clear. A value that cannot be decrypted becomes an
+   * empty password, handed to {@code failed} so the caller can say whose it was.
+   */
+  public static Stub<Password> pbePasswords(PBEEncrypt pbe, Consumer<Password> failed) {
     return new Stub<>(Password.class, false, p -> {
       throw new UnsupportedOperationException("The importer only reads IPT 3 files");
     }, stored -> {
@@ -133,7 +136,7 @@ public final class StubConverters {
       try {
         p.password = pbe.decrypt(stored);
       } catch (PBEEncrypt.EncryptionException e) {
-        problems.accept("A stored password could not be decrypted and was dropped");
+        failed.accept(p);
       }
       return p;
     });

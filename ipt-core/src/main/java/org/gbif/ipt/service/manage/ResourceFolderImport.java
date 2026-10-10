@@ -15,17 +15,18 @@ package org.gbif.ipt.service.manage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
- * Converts, in place, a resource folder written by IPT 3 ({@code resource.xml}) into IPT4's format, so resource
- * folders exported from IPT 3 installations can still be imported. Provided by ipt-legacy-import.
+ * Makes an uploaded resource folder (copied from another IPT's data dir) loadable here: converts IPT 3's
+ * {@code resource.xml}, and drops stored secrets this installation's key cannot read. Provided by ipt-legacy-import.
  */
-public interface LegacyResourceConverter {
+public interface ResourceFolderImport {
 
-  LegacyResourceConverter NONE = dir -> false;
+  ResourceFolderImport NONE = dir -> List.of();
 
   /**
-   * @return true if the folder held an IPT 3 {@code resource.xml} and was converted
+   * @return the names of the sources whose stored password was dropped and must be entered again
    */
-  boolean convert(File resourceDir) throws IOException;
+  List<String> prepare(File resourceDir) throws IOException;
 }

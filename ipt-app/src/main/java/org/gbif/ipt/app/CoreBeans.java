@@ -32,7 +32,7 @@ import org.gbif.ipt.model.factory.DataSchemaFactory;
 import org.gbif.ipt.model.factory.ExtensionFactory;
 import org.gbif.ipt.model.factory.ThesaurusHandlingRule;
 import org.gbif.ipt.model.factory.VocabularyFactory;
-import org.gbif.ipt.legacy.LegacyResourceFolderConverter;
+import org.gbif.ipt.legacy.ResourceFolderImporter;
 import org.gbif.ipt.persistence.JsonResourcePersister;
 import org.gbif.ipt.persistence.ReferenceLookup;
 import org.gbif.ipt.persistence.SecretCipher;
@@ -48,7 +48,7 @@ import org.gbif.ipt.service.admin.impl.UserAccountManagerImpl;
 import org.gbif.ipt.service.admin.impl.VocabulariesManagerImpl;
 import org.gbif.ipt.service.file.DownloadFileManager;
 import org.gbif.ipt.service.file.FileStoreManager;
-import org.gbif.ipt.service.manage.LegacyResourceConverter;
+import org.gbif.ipt.service.manage.ResourceFolderImport;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.manage.impl.JsonServiceImpl;
 import org.gbif.ipt.service.manage.impl.MetadataReaderImpl;
@@ -151,8 +151,13 @@ public class CoreBeans {
   }
 
   @Bean
-  public DataDir dataDir(IptProperties props, ObjectProvider<BuildProperties> build) {
-    return DataDirStartup.open(props.dataDir(), version(build));
+  public DataDirStartup.Opened openedDataDir(IptProperties props, ObjectProvider<BuildProperties> build) {
+    return DataDirStartup.open(props.dataDir(), version(build), System.getenv());
+  }
+
+  @Bean
+  public DataDir dataDir(DataDirStartup.Opened opened) {
+    return opened.dataDir();
   }
 
   @Bean
@@ -166,9 +171,10 @@ public class CoreBeans {
     return cfg;
   }
 
+  /** Verified against the data dir marker at start-up (see {@link DataDirStartup}). */
   @Bean
-  public SecretCipher secretCipher(DataDir dataDir) throws IOException {
-    return SecretCipher.forConfigDir(dataDir.configDir().toPath(), System.getenv());
+  public SecretCipher secretCipher(DataDirStartup.Opened opened) {
+    return opened.cipher();
   }
 
   @Bean
@@ -224,10 +230,10 @@ public class CoreBeans {
     });
   }
 
-  /** Resource folders exported from IPT 3 can still be imported. */
+  /** Resource folders copied from IPT 3 or from another IPT4 can be imported. */
   @Bean
-  public LegacyResourceConverter legacyResourceConverter(SecretCipher cipher, JdbcSupport jdbc) {
-    return new LegacyResourceFolderConverter(cipher, jdbc);
+  public ResourceFolderImport resourceFolderImport(SecretCipher cipher, JdbcSupport jdbc) {
+    return new ResourceFolderImporter(cipher, jdbc);
   }
 
   @Bean

@@ -25,3 +25,6 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Vocabularies without registry | Installed vocabularies are only loaded when the GBIF registry answers; publishing then fails | Installed vocabularies are loaded anyway | An outage of the GBIF registry should not stop publishing | M1 |
 | Uploaded IPT 3 resource folders | Read with XStream allowing any Java type | Read with XStream limited to the IPT's own classes and JDK value types | Uploaded files must not be able to instantiate arbitrary classes | M1 |
 | Action messages | Rendered with `?interpret`, so FreeMarker code inside a message ran | Rendered as HTML without evaluation | Messages can contain user input (resource titles); no server-side template injection | M2 |
+| Secret key at start-up | n/a (one built-in key) | A data dir without its key, or with another key, refuses to start; the marker holds a key check | Stored passwords must never be silently lost | M1 |
+| Resource folders from another IPT | Imported with SQL passwords (same built-in key everywhere) | Imported; SQL passwords encrypted by the other installation are dropped with a warning | Each installation has its own key | M1 |
+| Data dirs of newer IPT versions | No check | Refused at start-up (and files of a newer format are not read) | Rolling back must not silently lose data | M1 |

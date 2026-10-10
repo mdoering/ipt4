@@ -48,7 +48,7 @@ public final class DataDirFormat {
 
   /** The marker's content. */
   public record Marker(String format, int version, String createdBy, String created,
-                       @Nullable Map<String, Object> migratedFrom) {
+                       @Nullable Map<String, Object> migratedFrom, @Nullable String keyCheck) {
   }
 
   private static final JsonMapper MAPPER = JsonMapper.builder()
@@ -81,9 +81,12 @@ public final class DataDirFormat {
     return Kind.UNKNOWN;
   }
 
-  public static void writeMarker(Path dir, String createdBy, @Nullable Map<String, Object> migratedFrom)
-      throws IOException {
-    Marker marker = new Marker("ipt", CURRENT_VERSION, createdBy, Instant.now().toString(), migratedFrom);
+  /**
+   * @param keyCheck {@link SecretCipher#keyCheck()} of the installation's key, so start-up recognises a wrong key
+   */
+  public static void writeMarker(Path dir, String createdBy, @Nullable Map<String, Object> migratedFrom,
+                                 @Nullable String keyCheck) throws IOException {
+    Marker marker = new Marker("ipt", CURRENT_VERSION, createdBy, Instant.now().toString(), migratedFrom, keyCheck);
     AtomicFiles.write(dir.resolve(MARKER), out -> MAPPER.writeValue(out, marker));
   }
 

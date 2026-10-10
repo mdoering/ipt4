@@ -99,6 +99,8 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
         loadDataDirConfig();
       } catch (InvalidConfigException e) {
         LOG.error("Configuration problems existing. Watch your data dir! {}", e.getMessage(), e);
+        // IPT 3 only logged this; the admin should see it
+        warnings.addStartupError("The IPT configuration could not be loaded completely: " + e.getMessage(), e);
       }
     } else {
       LOG.debug("IPT DataDir not configured - no configuration loaded");

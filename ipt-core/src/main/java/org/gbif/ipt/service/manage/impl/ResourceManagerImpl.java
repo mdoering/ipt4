@@ -46,7 +46,7 @@ import org.gbif.ipt.service.manage.ResourceLoadCallbacks;
 import org.gbif.ipt.service.manage.ResourceLoader;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.persistence.AtomicFiles;
-import org.gbif.ipt.service.manage.LegacyResourceConverter;
+import org.gbif.ipt.service.manage.ResourceFolderImport;
 import org.gbif.ipt.service.manage.ResourceLocks;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.registry.RegistryManager;
@@ -93,7 +93,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
 
   private final ResourceIndex resourceIndex = new ResourceIndex();
   private final ResourceLocks locks = new ResourceLocks();
-  private LegacyResourceConverter legacyResourceConverter = LegacyResourceConverter.NONE;
+  private ResourceFolderImport resourceFolderImport = ResourceFolderImport.NONE;
 
   private final RegistryManager registryManager;
   private final MetadataReader metadataReader;
@@ -259,7 +259,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
       };
     }
     // if decompression succeeded and archive is 'IPT Resource Folder' (IPT 3 folders are converted first)
-    else if (isIPTResourceFolder(convertedIfLegacy(archiveDir))) {
+    else if (isIPTResourceFolder(prepareImportedFolder(archiveDir, alog))) {
       resource = createFromIPTResourceFolder(shortname, archiveDir, creator, alog);
     }
     // if decompression succeeded, create resource depending on whether file was a 'DwC-A',
@@ -281,16 +281,18 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   /**
-   * Converts a resource folder exported from IPT 3 (with resource.xml) into IPT4's format.
+   * Makes a resource folder copied from another IPT loadable here (IPT 3 format, other installation's secrets).
    *
    * @return the folder
    */
-  private File convertedIfLegacy(File dir) throws ImportException {
+  private File prepareImportedFolder(File dir, ActionLogger alog) throws ImportException {
     try {
-      legacyResourceConverter.convert(dir);
+      for (String source : resourceFolderImport.prepare(dir)) {
+        alog.warn("manage.resource.create.secret.dropped", new String[] {source});
+      }
       return dir;
-    } catch (IOException e) {
-      throw new ImportException("Cannot read the IPT 3 resource configuration: " + e.getMessage(), e);
+    } catch (IOException | RuntimeException e) {
+      throw new ImportException("Cannot read the resource configuration: " + e.getMessage(), e);
     }
   }
 
@@ -314,6 +316,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   private Resource createFromIPTResourceFolder(String shortname, File folder, User creator, ActionLogger alog)
       throws AlreadyExistingException, ImportException {
     Resource res;
+    File dest = null;
     try {
 
       // shortname supplied is unique?
@@ -322,7 +325,10 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
       }
 
       // copy folder (renamed using shortname) to resources directory in data_dir
-      File dest = new File(dataDir.dataFile(DataDir.RESOURCES_DIR), shortname);
+      dest = new File(dataDir.dataFile(DataDir.RESOURCES_DIR), shortname);
+      if (dest.exists()) {
+        throw new AlreadyExistingException();
+      }
       FileUtils.copyDirectory(folder, dest);
 
       // proceed with resource creation (using destination folder in data_dir)
@@ -383,9 +389,12 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
 
     } catch (InvalidConfigException e) {
       alog.error(e.getMessage(), e);
+      // IPT 3 left the half-imported folder behind, so it failed to load on every restart
+      FileUtils.deleteQuietly(dest);
       throw new ImportException(e);
     } catch (IOException e) {
       alog.error("Could not copy resource folder into data directory: " + e.getMessage(), e);
+      FileUtils.deleteQuietly(dest);
       throw new ImportException(e);
     }
 
@@ -632,8 +641,8 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Inject
-  public void setLegacyResourceConverter(Optional<LegacyResourceConverter> converter) {
-    this.legacyResourceConverter = converter.orElse(LegacyResourceConverter.NONE);
+  public void setResourceFolderImport(Optional<ResourceFolderImport> folderImport) {
+    this.resourceFolderImport = folderImport.orElse(ResourceFolderImport.NONE);
   }
 
   @Override

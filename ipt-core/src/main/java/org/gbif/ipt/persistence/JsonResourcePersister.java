@@ -81,9 +81,11 @@ public class JsonResourcePersister implements ResourcePersister {
     return root;
   }
 
+  /** Refuses files of a newer IPT: reading and saving them here would drop what this version does not know. */
   private static JsonNode withoutSchemaVersion(JsonNode tree) {
     if (tree instanceof ObjectNode o) {
-      o.remove(SCHEMA_VERSION_FIELD);
+      JsonNode version = o.remove(SCHEMA_VERSION_FIELD);
+      DataDirJson.checkSchemaVersion(version == null ? 0 : version.asInt());
     }
     return tree;
   }
