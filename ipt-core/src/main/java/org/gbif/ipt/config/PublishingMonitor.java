@@ -54,9 +54,8 @@ public class PublishingMonitor {
   // wait at least this long after a failed auto-publication before retrying, to avoid re-attempting
   // publication on every monitor cycle right after a failure
   public static final int RETRY_DELAY_MS = 3 * 60 * 1000;
-  private static Thread monitorThread;
   private static final Logger LOG = LogManager.getLogger(PublishingMonitor.class);
-  private AtomicBoolean running;
+  private final AtomicBoolean running = new AtomicBoolean();
   private final ResourceManager resourceManager;
   private final ResourcePublicationManager resourcePublicationManager;
   private final AppConfig cfg;
@@ -77,26 +76,15 @@ public class PublishingMonitor {
   }
 
   /**
-   * Polls the queue and launches threads if possible.
+   * Called every {@link #MONITOR_INTERVAL_MS} ms by the application's scheduler (IPT 3 ran its own thread). Does
+   * nothing until {@link #start()} has been called.
    */
-  class QueueMonitor implements Runnable {
-
-    public QueueMonitor() {
-      running = new AtomicBoolean();
-    }
-
-    @Override
-    public void run() {
-      running.set(true);
-      while (running.get()) {
-        try {
-          monitorOnce();
-          // just poll once every 'interval' millisecond
-          Thread.sleep(MONITOR_INTERVAL_MS);
-        } catch (InterruptedException e) {
-          // should the thread have been interrupted, encountered when trying to sleep
-          LOG.error("Monitor thread has been interrupted!", e);
-        }
+  public void runScheduled() {
+    if (running.get()) {
+      try {
+        monitorOnce();
+      } catch (RuntimeException e) {
+        LOG.error("Publishing monitor failed", e);
       }
     }
   }
@@ -240,34 +228,17 @@ public class PublishingMonitor {
   }
 
   /**
-   * Start the publishing monitor thread itself.
-   */
-  private void startMonitorThread() {
-    monitorThread = new Thread(new QueueMonitor());
-    monitorThread.start();
-    LOG.debug("The monitor thread has started.");
-  }
-
-  /**
-   * Starts the publishing monitor once and only once.
+   * Starts the monitor: from now on {@link #runScheduled()} does its work.
    */
   public void start() {
-    if (monitorThread != null) {
-      if (!monitorThread.isAlive()) {
-        startMonitorThread();
-      } else {
-        LOG.error("The monitor thread is already running");
-      }
-    } else {
-      startMonitorThread();
-    }
+    running.set(true);
+    LOG.debug("The publishing monitor has started.");
   }
 
   /**
-   * Stops the publishing monitor.
+   * Stops the monitor.
    */
   public void stop() {
     running.set(false);
-    monitorThread = null;
   }
 }

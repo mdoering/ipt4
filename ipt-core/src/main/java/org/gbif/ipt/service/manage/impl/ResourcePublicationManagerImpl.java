@@ -53,6 +53,7 @@ import org.gbif.ipt.service.manage.ResourceMetadataInferringService;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
+import org.gbif.ipt.job.JobService;
 import org.gbif.ipt.task.Eml2Rtf;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackage;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
@@ -108,7 +109,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.zip.ZipFile;
@@ -152,8 +152,9 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   private final SimpleTextProvider textProvider;
   private final ResourceMetadataInferringService resourceMetadataInferringService;
 
-  private final ThreadPoolExecutor executor;
-  private final Map<String, Future<Map<String, Integer>>> processFutures = new HashMap<>();
+  private final JobService jobs;
+  // accessed by request threads, publication jobs and the publishing monitor
+  private final Map<String, Future<Map<String, Integer>>> processFutures = new ConcurrentHashMap<>();
   private final ListValuedMap<String, Date> processFailures = new ArrayListValuedHashMap<>();
   private final Map<String, LocalDate> lastLoggedFailures = new ConcurrentHashMap<>();
   private final Map<String, StatusReport> processReports = new ConcurrentHashMap<>();
@@ -182,7 +183,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     this.dwcDpFactory = dwcDpFactory;
     this.textProvider = textProvider;
     this.resourceMetadataInferringService = resourceMetadataInferringService;
-    this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cfg.getMaxThreads());
+    this.jobs = new JobService(cfg.getMaxThreads());
   }
 
   @Override
@@ -534,7 +535,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   private void generateDwca(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
     GenerateDwca worker = dwcaFactory.create(resource, this);
-    Future<Map<String, Integer>> f = executor.submit(worker);
+    Future<Map<String, Integer>> f = jobs.submit(resource.getShortname(), "publication", worker).future();
     processFutures.put(resource.getShortname(), f);
     // make sure we have at least a first report for this resource
     worker.report();
@@ -546,7 +547,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   private void generateDataPackage(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
     GenerateDataPackage worker = dataPackageFactory.create(resource, this);
-    Future<Map<String, Integer>> f = executor.submit(worker);
+    Future<Map<String, Integer>> f = jobs.submit(resource.getShortname(), "publication", worker).future();
     processFutures.put(resource.getShortname(), f);
     // make sure we have at least a first report for this resource
     worker.report();
@@ -558,7 +559,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   private void generateDwcDP(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
     GenerateDarwinCoreDataPackage worker = dwcDpFactory.create(resource, this);
-    Future<Map<String, Integer>> f = executor.submit(worker);
+    Future<Map<String, Integer>> f = jobs.submit(resource.getShortname(), "publication", worker).future();
     processFutures.put(resource.getShortname(), f);
     // make sure we have at least a first report for this resource
     worker.report();
@@ -1106,7 +1107,13 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
 
   @Override
   public ThreadPoolExecutor getExecutor() {
-    return executor;
+    return jobs.executor();
+  }
+
+  /** Cancels running publications and stops their threads; called by the container on shutdown. */
+  @Override
+  public void close() {
+    jobs.close();
   }
 
   @Override

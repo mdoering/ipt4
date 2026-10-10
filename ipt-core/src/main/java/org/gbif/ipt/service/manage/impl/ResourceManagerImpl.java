@@ -46,6 +46,7 @@ import org.gbif.ipt.service.manage.ResourceLoadCallbacks;
 import org.gbif.ipt.service.manage.ResourceLoader;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.persistence.AtomicFiles;
+import org.gbif.ipt.service.manage.ResourceLocks;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.utils.ActionLogger;
@@ -89,6 +90,7 @@ import static org.gbif.ipt.utils.MetadataUtils.metadataClassForType;
 public class ResourceManagerImpl extends BaseManager implements ResourceManager {
 
   private final ResourceIndex resourceIndex = new ResourceIndex();
+  private final ResourceLocks locks = new ResourceLocks();
 
   private final RegistryManager registryManager;
   private final MetadataReader metadataReader;
@@ -613,7 +615,19 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Override
+  public ResourceLocks getLocks() {
+    return locks;
+  }
+
+  @Override
   public synchronized void save(Resource resource) throws InvalidConfigException {
+    locks.withWrite(resource.getShortname(), () -> {
+      saveUnlocked(resource);
+      return null;
+    });
+  }
+
+  private void saveUnlocked(Resource resource) throws InvalidConfigException {
     File cfgFile = dataDir.resourceFile(resource);
     try {
       // persist data, replacing the file only once it is completely written

@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
  * Any service, Struts action, or scheduled job that needs to publish, register, restore, or check the publication
  * status of a resource should depend on this interface directly, rather than going through {@link ResourceManager}.
  */
-public interface ResourcePublicationManager {
+public interface ResourcePublicationManager extends AutoCloseable {
 
   /**
    * Cancels publishing.
@@ -246,6 +246,10 @@ public interface ResourcePublicationManager {
    * @return the ThreadPoolExecutor
    */
   ThreadPoolExecutor getExecutor();
+
+  /** Stops background publications. */
+  @Override
+  void close();
 
   /**
    * Return the Futures map, representing all publishing jobs that have been fired.

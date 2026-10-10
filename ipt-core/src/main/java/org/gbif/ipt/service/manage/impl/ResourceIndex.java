@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -44,9 +45,9 @@ import java.util.stream.Collectors;
 class ResourceIndex {
 
   // key=shortname in lower case, value=resource
-  private final Map<String, Resource> resources = new HashMap<>();
+  private final Map<String, Resource> resources = new ConcurrentHashMap<>();
   // simplified resources for home page (metadata from last published version!)
-  private final Map<String, ResourceSummaryView> publishedPublicResourceSummaries = new HashMap<>();
+  private final Map<String, ResourceSummaryView> publishedPublicResourceSummaries = new ConcurrentHashMap<>();
 
   /**
    * Adds/updates a resource in the index, keyed by its shortname (lower case).

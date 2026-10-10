@@ -43,6 +43,10 @@ import org.xml.sax.SAXException;
  */
 public interface ResourceManager {
 
+  /** Per-resource read/write locks; configuration changes take the write lock. */
+  ResourceLocks getLocks();
+
+
   /**
    * Create a new Resource.
    *

@@ -32,9 +32,8 @@ public class ExtensionMonitor {
 
   // 24h interval
   public static final int MONITOR_INTERVAL_MS = 86_400_000;
-  private static Thread monitorThread;
   private static final Logger LOG = LogManager.getLogger(ExtensionMonitor.class);
-  private AtomicBoolean running;
+  private final AtomicBoolean running = new AtomicBoolean();
   private final ExtensionManager extensionManager;
   private final RegistryManager registryManager;
 
@@ -44,75 +43,50 @@ public class ExtensionMonitor {
     this.registryManager = registryManager;
   }
 
-  class QueueMonitor implements Runnable {
-
-    public QueueMonitor() {
-      running = new AtomicBoolean();
+  /**
+   * Called every {@link #MONITOR_INTERVAL_MS} ms by the application's scheduler (IPT 3 ran its own thread): marks
+   * installed extensions that have a newer version in the registry. Does nothing until {@link #start()} was called.
+   */
+  public void runScheduled() {
+    if (!running.get()) {
+      return;
     }
+    try {
+      List<Extension> installedExtensions = extensionManager.list();
+      List<Extension> registeredExtensions = registryManager.getLatestExtensions();
 
-    @Override
-    public void run() {
-      running.set(true);
-      while (running.get()) {
-        try {
-          List<Extension> installedExtensions = extensionManager.list();
-          List<Extension> registeredExtensions = registryManager.getLatestExtensions();
-
-          for (Extension extension : installedExtensions) {
-            for (Extension rExtension : registeredExtensions) {
-              // check if registered extension is latest, and if it is, try to use it in comparison
-              if (extension.getRowType().equalsIgnoreCase(rExtension.getRowType())) {
-                Date installedExtensionIssuedDate = extension.getIssued();
-                Date latestExtensionIssuedDate = rExtension.getIssued();
-                if (installedExtensionIssuedDate == null && latestExtensionIssuedDate != null) {
-                  extension.setLatest(false);
-                } else if (latestExtensionIssuedDate != null && latestExtensionIssuedDate.compareTo(installedExtensionIssuedDate) > 0) {
-                  extension.setLatest(false);
-                }
-                break;
-              }
+      for (Extension extension : installedExtensions) {
+        for (Extension rExtension : registeredExtensions) {
+          // check if registered extension is latest, and if it is, try to use it in comparison
+          if (extension.getRowType().equalsIgnoreCase(rExtension.getRowType())) {
+            Date installedExtensionIssuedDate = extension.getIssued();
+            Date latestExtensionIssuedDate = rExtension.getIssued();
+            if (installedExtensionIssuedDate == null && latestExtensionIssuedDate != null) {
+              extension.setLatest(false);
+            } else if (latestExtensionIssuedDate != null && latestExtensionIssuedDate.compareTo(installedExtensionIssuedDate) > 0) {
+              extension.setLatest(false);
             }
+            break;
           }
-
-          // just poll once every 'interval' millisecond
-          Thread.sleep(MONITOR_INTERVAL_MS);
-        } catch (InterruptedException e) {
-          // should the thread have been interrupted, encountered when trying to sleep
-          LOG.error("Extension monitor thread has been interrupted!", e);
         }
       }
+    } catch (RuntimeException e) {
+      LOG.error("Cannot check the installed extensions against the registry", e);
     }
   }
 
   /**
-   * Start the extension monitor thread itself.
-   */
-  private void startMonitorThread() {
-    monitorThread = new Thread(new ExtensionMonitor.QueueMonitor());
-    monitorThread.start();
-    LOG.debug("The monitor thread has started.");
-  }
-
-  /**
-   * Starts the extension monitor once and only once.
+   * Starts the monitor: from now on {@link #runScheduled()} does its work.
    */
   public void start() {
-    if (monitorThread != null) {
-      if (!monitorThread.isAlive()) {
-        startMonitorThread();
-      } else {
-        LOG.error("The monitor thread is already running");
-      }
-    } else {
-      startMonitorThread();
-    }
+    running.set(true);
+    LOG.debug("The extension monitor has started.");
   }
 
   /**
-   * Stops the extension monitor.
+   * Stops the monitor.
    */
   public void stop() {
     running.set(false);
-    monitorThread = null;
   }
 }
