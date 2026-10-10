@@ -46,8 +46,7 @@ public class UrlMetadataPage {
 
   private String url;
 
-  public String execute() {
-    HttpServletResponse response = ServletActionContext.getResponse();
+  public String execute(HttpServletResponse response) {
     response.setContentType("application/json");
 
     if (url == null || url.isEmpty()) {

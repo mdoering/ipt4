@@ -79,7 +79,7 @@ import org.gbif.ipt.validation.DataPackageMetadataValidator;
 import org.gbif.ipt.validation.EmlValidator;
 import org.gbif.ipt.i18n.I18n;
 import org.gbif.ipt.validation.SectionErrorCollector;
-import org.gbif.ipt.i18n.StrutsI18n;
+import org.gbif.ipt.i18n.FeedbackI18n;
 import org.gbif.metadata.eml.InvalidEmlException;
 import org.gbif.metadata.eml.ipt.EmlFactory;
 import org.gbif.metadata.eml.ipt.model.Citation;
@@ -124,8 +124,8 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.struts2.action.UploadedFilesAware;
-import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.gbif.ipt.web.support.action.UploadedFilesAware;
+import org.gbif.ipt.web.support.action.UploadedFile;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 import org.xml.sax.SAXException;
 
@@ -1272,7 +1272,7 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
       // DwC-DP relies on EML too
       if (!isDataPackageResource() || resource.isDwcDp()) {
         errorCollector = new SectionErrorCollector();
-        I18n i18n = new StrutsI18n(this);
+        I18n i18n = new FeedbackI18n(this);
         validMetadata = emlValidator.areAllSectionsValid(resource, errorCollector, i18n);
 
         ActionValidationResult basicMetadataValidationResult

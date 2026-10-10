@@ -46,6 +46,14 @@ public final class ActionResults {
       ActionPage.NOT_FOUND, "portal/404",
       ActionPage.GONE, "portal/410");
 
+  /** The manage package's global results in IPT 3. */
+  public static final Map<String, String> MANAGE = Map.of(
+      ActionPage.NOT_FOUND, "manage/404",
+      ActionPage.NOT_ALLOWED, "manage/401",
+      ActionPage.CANCEL, "redirect:/manage/resource.do",
+      ActionPage.HOME, "redirect:/manage/home.do",
+      ActionPage.LOCKED, "redirect:/manage/locked.do");
+
   private ActionResults() {
   }
 

@@ -71,8 +71,9 @@ public class AppFilePage extends PortalBasePage {
     try {
       inputStream = new FileInputStream(data);
       // Set a Last-Modified header, even on 304 Not Modified responses.
-      // Round to the nearest second, as HTTP doesn't support milliseconds.
-      long lastModified = 1000 * ((data.lastModified() + 500) / 1000);
+      // Whole seconds, as HTTP has no milliseconds; rounded down, so it is never in the future (IPT 3 rounded to
+      // the nearest second, which a conditional GET with a future date then could not match)
+      long lastModified = 1000 * (data.lastModified() / 1000);
       response.setDateHeader("Last-Modified", lastModified);
 
       // see if we have a conditional get with If-Modified-Since header

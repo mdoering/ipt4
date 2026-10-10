@@ -46,8 +46,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ActionContext;
-import org.apache.struts2.ActionInvocation;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 
 import lombok.Getter;
@@ -507,8 +505,7 @@ public class DataPackageMappingPage extends ManagerBasePage {
   }
 
   private boolean isPrepareBeforeDelete() {
-    ActionInvocation invocation = ActionContext.getContext().getActionInvocation();
-    String actionMethod = invocation.getProxy().getMethod();
+    String actionMethod = getInvokedMethod();
     return "delete".equals(actionMethod);
   }
 

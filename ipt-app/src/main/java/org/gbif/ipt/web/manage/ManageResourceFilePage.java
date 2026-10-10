@@ -38,12 +38,12 @@ import lombok.Getter;
  * The Action responsible for serving datadir resource files.
  */
 @PageBean
-public class ResourceFilePage extends ManagerBasePage {
+public class ManageResourceFilePage extends ManagerBasePage {
 
   @Serial
   private static final long serialVersionUID = -3304799051086050164L;
 
-  private static final Logger LOG = LogManager.getLogger(ResourceFilePage.class);
+  private static final Logger LOG = LogManager.getLogger(ManageResourceFilePage.class);
 
   private final DataDir dataDir;
   @Getter
@@ -56,7 +56,7 @@ public class ResourceFilePage extends ManagerBasePage {
   protected String filename;
 
   @Inject
-  public ResourceFilePage(
+  public ManageResourceFilePage(
       PageContext ctx,
                             DataDir dataDir, ResourceManager resourceManager) {
     super(ctx, resourceManager);
@@ -112,14 +112,15 @@ public class ResourceFilePage extends ManagerBasePage {
     try {
       inputStream = new FileInputStream(data);
       // Set a Last-Modified header, even on 304 Not Modified responses.
-      // Round to the nearest second, as HTTP doesn't support milliseconds.
-      long lastModified = 1000 * ((data.lastModified() + 500) / 1000);
+      // Whole seconds, as HTTP has no milliseconds; rounded down, so it is never in the future
+      long lastModified = 1000 * (data.lastModified() / 1000);
       response.setDateHeader("Last-Modified", lastModified);
 
       // see if we have a conditional get with If-Modified-Since header
       try {
         long since = req.getDateHeader("If-Modified-Since");
-        if (since >= lastModified) {
+        // a date in the future is invalid and ignored (RFC 9110)
+        if (since >= lastModified && since <= System.currentTimeMillis()) {
           return NOT_MODIFIED;
         }
       } catch (IllegalArgumentException e) {

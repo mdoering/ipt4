@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Getter;
 
 @PageBean
-public class HomePage extends ActionPage {
+public class ManageHomePage extends ActionPage {
 
   @Serial
   private static final long serialVersionUID = -7395504502586148676L;
@@ -52,7 +52,7 @@ public class HomePage extends ActionPage {
   private List<Organisation> organisations;
 
   @Inject
-  public HomePage(
+  public ManageHomePage(
       PageContext ctx,
       ResourceDataTableViewManager resourceManager) {
     super(ctx);

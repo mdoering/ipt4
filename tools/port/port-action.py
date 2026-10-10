@@ -53,6 +53,22 @@ if re.search(r"\bextends ActionSupport\b", s):
     s = re.sub(r"(^package [\w.]+;\n)", r"\1\nimport org.gbif.ipt.web.support.action.ActionPage;", s, count=1,
                flags=re.M)
 s = s.replace("import org.apache.struts2.ServletActionContext;\n", "")
+# Struts upload and validation hooks have IPT4 twins in web.support.action
+s = s.replace("import org.apache.struts2.action.UploadedFilesAware;",
+              "import org.gbif.ipt.web.support.action.UploadedFilesAware;")
+s = s.replace("import org.apache.struts2.dispatcher.multipart.UploadedFile;",
+              "import org.gbif.ipt.web.support.action.UploadedFile;")
+s = s.replace("import org.apache.struts2.interceptor.ValidationErrorAware;",
+              "import org.gbif.ipt.web.support.action.ValidationErrorAware;")
+s = s.replace("ServletActionContext.getResponse()", "response")
+s = re.sub(r"^\s*HttpServletResponse response = response;\n", "", s, flags=re.M)
+s = s.replace("import org.gbif.ipt.i18n.StrutsI18n;", "import org.gbif.ipt.i18n.FeedbackI18n;")
+s = s.replace("import org.gbif.ipt.struts2.StrutsI18n;", "import org.gbif.ipt.i18n.FeedbackI18n;")
+s = s.replace("new StrutsI18n(this)", "new FeedbackI18n(this)")
+# the invoked method, which Struts read from the action invocation
+s = re.sub(r"ActionInvocation (\w+) = ActionContext\.getContext\(\)\.getActionInvocation\(\);\s*\n\s*String (\w+) = \1\.getProxy\(\)\.getMethod\(\);",
+           r"String \2 = getInvokedMethod();", s)
+s = s.replace("import org.apache.struts2.ActionContext;\n", "").replace("import org.apache.struts2.ActionInvocation;\n", "")
 s = s.replace("ServletActionContext.getRequest()", "req")
 # ActionPage provides cfg; ported constructors no longer receive one
 s = s.replace("    this.cfg = cfg;\n", "")

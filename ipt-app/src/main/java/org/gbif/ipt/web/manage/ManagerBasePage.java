@@ -13,7 +13,6 @@
  */
 package org.gbif.ipt.web.manage;
 
-import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
 import org.gbif.ipt.web.support.action.PostActionPage;
 import org.gbif.ipt.config.AppConfig;
@@ -29,12 +28,10 @@ import jakarta.inject.Inject;
 import java.io.Serial;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gbif.ipt.web.support.action.StrutsParameter;
 
 import lombok.Setter;
 
-@PageBean
-public class ManagerBasePage extends PostActionPage {
+public abstract class ManagerBasePage extends PostActionPage {
 
   @Serial
   private static final long serialVersionUID = -7385261456013846954L;
@@ -79,7 +76,10 @@ public class ManagerBasePage extends PostActionPage {
     }
   }
 
-  @StrutsParameter(depth = 8)
+  /**
+   * Not bindable: IPT 3 bound requests to the live resource to depth 8 (so {@code resource.creator.role} was postable).
+   * Pages list the single resource fields they bind in {@link #extraAllowedFields()}.
+   */
   public Resource getResource() {
     return resource;
   }

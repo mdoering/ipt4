@@ -61,6 +61,8 @@ public class ActionPage extends PageSupport implements Feedback {
   // a generic identifier for loading an object BEFORE parameters are bound
   public String id;
   protected boolean cancel = false;
+  // the page method this request runs, known from prepare() on (Struts: the action invocation's method)
+  private String invokedMethod;
 
   public ActionPage(PageContext ctx) {
     super(ctx);
@@ -78,6 +80,23 @@ public class ActionPage extends PageSupport implements Feedback {
   @Autowired
   public void setServletResponse(HttpServletResponse response) {
     this.response = response;
+  }
+
+  /** The page method this request runs (Struts: {@code ActionInvocation.getProxy().getMethod()}). */
+  public String getInvokedMethod() {
+    return invokedMethod;
+  }
+
+  void setInvokedMethod(String invokedMethod) {
+    this.invokedMethod = invokedMethod;
+  }
+
+  /**
+   * Property paths bindable in addition to the {@link StrutsParameter} ones, for single fields of objects the page
+   * does not own (e.g. {@code resource.coreType}).
+   */
+  protected List<String> extraAllowedFields() {
+    return List.of();
   }
 
   /** Called before request parameters are bound (Struts' Preparable). */

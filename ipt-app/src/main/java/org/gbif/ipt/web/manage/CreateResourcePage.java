@@ -53,8 +53,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.struts2.action.UploadedFilesAware;
-import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.gbif.ipt.web.support.action.UploadedFilesAware;
+import org.gbif.ipt.web.support.action.UploadedFile;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

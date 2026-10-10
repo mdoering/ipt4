@@ -16,6 +16,7 @@ package org.gbif.ipt.web.support;
 import org.gbif.ipt.app.IptProperties;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.ConfigWarnings;
+import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.service.admin.ConfigManager;
 import org.gbif.ipt.web.setup.SetupGuard;
 import org.gbif.ipt.web.support.feedback.DoSuffixFlashMapManager;
@@ -26,10 +27,12 @@ import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
 import org.gbif.ipt.web.support.page.GlobalModel;
 import org.gbif.ipt.web.support.page.PageContext;
 
+import java.io.File;
 import java.util.Locale;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +51,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration(proxyBeanMethods = false)
@@ -93,6 +97,17 @@ public class WebConfig implements WebMvcConfigurer {
     registration.addUrlPatterns("/*");
     registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 20);
     return registration;
+  }
+
+  /** Uploads larger than the threshold are written to the data dir's tmp/uploads, next to the stored uploads. */
+  @Bean
+  public MultipartConfigElement multipartConfigElement(MultipartProperties properties, DataDir dataDir) {
+    File dir = dataDir.tmpFile("uploads");
+    if (!dir.isDirectory() && !dir.mkdirs()) {
+      throw new IllegalStateException("Cannot create upload directory " + dir);
+    }
+    properties.setLocation(dir.getAbsolutePath());
+    return properties.createMultipartConfig();
   }
 
   @Bean(name = DispatcherServlet.FLASH_MAP_MANAGER_BEAN_NAME)
