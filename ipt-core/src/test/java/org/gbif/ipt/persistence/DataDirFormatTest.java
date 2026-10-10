@@ -52,6 +52,14 @@ class DataDirFormatTest {
   }
 
   @Test
+  void anInterruptedMigrationIsIncomplete() throws IOException {
+    Files.createDirectories(dir.resolve("config"));
+    Files.writeString(dir.resolve("config/ipt.properties"), "ipt.baseURL=http://x");
+    Files.write(dir.resolve("config/" + SecretCipher.KEY_FILE), new byte[32]);
+    assertThat(DataDirFormat.detect(dir)).isEqualTo(DataDirFormat.Kind.INCOMPLETE);
+  }
+
+  @Test
   void anythingElseIsUnknown() throws IOException {
     Files.writeString(dir.resolve("random.txt"), "hello");
     assertThat(DataDirFormat.detect(dir)).isEqualTo(DataDirFormat.Kind.UNKNOWN);

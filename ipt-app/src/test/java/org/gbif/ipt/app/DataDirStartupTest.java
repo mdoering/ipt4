@@ -69,6 +69,16 @@ class DataDirStartupTest {
   }
 
   @Test
+  void refusesHalfMigratedDataDirs() throws IOException {
+    Files.createDirectories(tmp.resolve("config"));
+    Files.writeString(tmp.resolve("config/ipt.properties"), "ipt.baseURL=http://x");
+    Files.write(tmp.resolve("config/.secret.key"), new byte[32]);
+    assertThatThrownBy(() -> DataDirStartup.open(tmp.toString(), "4.0.0"))
+        .isInstanceOf(DataDirStartup.DataDirStartupException.class)
+        .hasMessageContaining("did not finish");
+  }
+
+  @Test
   void refusesDirectoriesThatAreNoDataDir() throws IOException {
     Files.writeString(tmp.resolve("notes.txt"), "hello");
     assertThatThrownBy(() -> DataDirStartup.open(tmp.toString(), "4.0.0"))

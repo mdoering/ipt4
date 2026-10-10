@@ -32,6 +32,7 @@ import org.gbif.ipt.model.factory.DataSchemaFactory;
 import org.gbif.ipt.model.factory.ExtensionFactory;
 import org.gbif.ipt.model.factory.ThesaurusHandlingRule;
 import org.gbif.ipt.model.factory.VocabularyFactory;
+import org.gbif.ipt.legacy.LegacyResourceFolderConverter;
 import org.gbif.ipt.persistence.JsonResourcePersister;
 import org.gbif.ipt.persistence.ReferenceLookup;
 import org.gbif.ipt.persistence.SecretCipher;
@@ -47,6 +48,7 @@ import org.gbif.ipt.service.admin.impl.UserAccountManagerImpl;
 import org.gbif.ipt.service.admin.impl.VocabulariesManagerImpl;
 import org.gbif.ipt.service.file.DownloadFileManager;
 import org.gbif.ipt.service.file.FileStoreManager;
+import org.gbif.ipt.service.manage.LegacyResourceConverter;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.manage.impl.JsonServiceImpl;
 import org.gbif.ipt.service.manage.impl.MetadataReaderImpl;
@@ -220,6 +222,12 @@ public class CoreBeans {
         return schemas.getObject().get(identifier);
       }
     });
+  }
+
+  /** Resource folders exported from IPT 3 can still be imported. */
+  @Bean
+  public LegacyResourceConverter legacyResourceConverter(SecretCipher cipher, JdbcSupport jdbc) {
+    return new LegacyResourceFolderConverter(cipher, jdbc);
   }
 
   @Bean

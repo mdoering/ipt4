@@ -72,6 +72,8 @@ public final class DataDirStartup {
         case IPT3 -> throw new DataDirStartupException("The data directory " + dir + " belongs to IPT 3. Copy it to a"
             + " new location with the IPT4 migration, then start IPT4 on the new directory:" + System.lineSeparator()
             + "  java -jar ipt.jar migrate --from " + dir + " --to <new data directory>");
+        case INCOMPLETE -> throw new DataDirStartupException("The migration into " + dir + " did not finish. Delete"
+            + " the directory and run the migration again.");
         default -> throw new DataDirStartupException("The directory " + dir + " is not empty and not an IPT data"
             + " directory. Point IPT_DATA_DIR to an IPT4 data directory or to an empty directory.");
       }

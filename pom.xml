@@ -21,6 +21,7 @@
 
   <modules>
     <module>ipt-core</module>
+    <module>ipt-legacy-import</module>
     <module>ipt-app</module>
   </modules>
 
@@ -102,6 +103,11 @@
       <dependency>
         <groupId>org.gbif.ipt</groupId>
         <artifactId>ipt-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.gbif.ipt</groupId>
+        <artifactId>ipt-legacy-import</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

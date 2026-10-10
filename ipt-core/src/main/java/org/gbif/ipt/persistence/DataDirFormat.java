@@ -40,6 +40,8 @@ public final class DataDirFormat {
     V4,
     /** An IPT 3 data dir, which must be migrated with {@code ipt migrate} first. */
     IPT3,
+    /** A migration into this directory did not finish (it has a secret key but no marker). */
+    INCOMPLETE,
     /** Something else; the IPT refuses to touch it. */
     UNKNOWN
   }
@@ -68,6 +70,10 @@ public final class DataDirFormat {
       if (entries.allMatch(p -> p.getFileName().toString().startsWith("."))) {
         return Kind.EMPTY;
       }
+    }
+    // migrations create the key first and the marker last; IPT 3 never had a key
+    if (Files.isRegularFile(dir.resolve("config").resolve(SecretCipher.KEY_FILE))) {
+      return Kind.INCOMPLETE;
     }
     if (Files.isRegularFile(dir.resolve("config/ipt.properties")) || Files.isRegularFile(dir.resolve("config/users.xml"))) {
       return Kind.IPT3;

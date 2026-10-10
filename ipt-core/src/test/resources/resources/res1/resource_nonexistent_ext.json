@@ -13,6 +13,7 @@
   "managers" : [ "jcuadra@gbif.org" ],
   "mappings" : [ {
     "doiUsedForDatasetId" : false,
+    "extension" : "http://rs.tdwg.org/dwc/terms/OccurrenceExtensionThatDoesNotExist",
     "fields" : [ {
       "defaultValue" : "",
       "index" : 0,

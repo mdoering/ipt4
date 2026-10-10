@@ -15,6 +15,7 @@ package org.gbif.ipt.app;
 
 import org.gbif.dwc.terms.DwcTerm;
 import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.feedback.CollectingFeedback;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.persistence.DataDirFormat;
@@ -94,6 +95,20 @@ class CoreContextTest {
     assertThat(res1.getMappings()).hasSize(1);
     assertThat(res1.getMappings().get(0).getExtension()).isSameAs(extensions.get(DwcTerm.Occurrence.qualifiedName()));
     assertThat(res1.getEml().getTitle()).isNotBlank();
+  }
+
+  @Test
+  void createsResourcesFromIpt3ResourceFolders() throws Exception {
+    Path zip = Files.createTempFile("res1-ipt3", ".zip");
+    try (InputStream in = CoreContextTest.class.getClassLoader().getResourceAsStream("datadir-fixture/res1-ipt3.zip")) {
+      Files.copy(in, zip, StandardCopyOption.REPLACE_EXISTING);
+    }
+    User admin = users.get("admin@example.org");
+    Resource created = resources.create("fromipt3", null, zip.toFile(), admin, new CollectingFeedback(null, admin));
+    assertThat(created.getMappings()).hasSize(1);
+    assertThat(created.getMappings().get(0).getExtension()).isSameAs(extensions.get(DwcTerm.Occurrence.qualifiedName()));
+    assertThat(dataDir.resolve("resources/fromipt3/resource.json")).exists();
+    assertThat(dataDir.resolve("resources/fromipt3/resource.xml")).doesNotExist();
   }
 
   @Test

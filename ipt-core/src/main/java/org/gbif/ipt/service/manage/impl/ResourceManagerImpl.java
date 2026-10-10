@@ -46,6 +46,7 @@ import org.gbif.ipt.service.manage.ResourceLoadCallbacks;
 import org.gbif.ipt.service.manage.ResourceLoader;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.persistence.AtomicFiles;
+import org.gbif.ipt.service.manage.LegacyResourceConverter;
 import org.gbif.ipt.service.manage.ResourceLocks;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.registry.RegistryManager;
@@ -72,6 +73,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
@@ -91,6 +93,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
 
   private final ResourceIndex resourceIndex = new ResourceIndex();
   private final ResourceLocks locks = new ResourceLocks();
+  private LegacyResourceConverter legacyResourceConverter = LegacyResourceConverter.NONE;
 
   private final RegistryManager registryManager;
   private final MetadataReader metadataReader;
@@ -255,8 +258,8 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
         default -> throw new ImportException("Invalid file extension: " + fileExtension);
       };
     }
-    // if decompression succeeded and archive is 'IPT Resource Folder'
-    else if (isIPTResourceFolder(archiveDir)) {
+    // if decompression succeeded and archive is 'IPT Resource Folder' (IPT 3 folders are converted first)
+    else if (isIPTResourceFolder(convertedIfLegacy(archiveDir))) {
       resource = createFromIPTResourceFolder(shortname, archiveDir, creator, alog);
     }
     // if decompression succeeded, create resource depending on whether file was a 'DwC-A',
@@ -275,6 +278,20 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
     }
 
     return resource;
+  }
+
+  /**
+   * Converts a resource folder exported from IPT 3 (with resource.xml) into IPT4's format.
+   *
+   * @return the folder
+   */
+  private File convertedIfLegacy(File dir) throws ImportException {
+    try {
+      legacyResourceConverter.convert(dir);
+      return dir;
+    } catch (IOException e) {
+      throw new ImportException("Cannot read the IPT 3 resource configuration: " + e.getMessage(), e);
+    }
   }
 
   /**
@@ -612,6 +629,11 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   private Resource loadFromDir(File resourceDir, @Nullable User creator, ActionLogger alog) throws InvalidConfigException {
     return resourceLoader.load(resourceDir, creator, alog,
         ResourceLoadCallbacks.of(this::syncEmlWithResource, this::save));
+  }
+
+  @Inject
+  public void setLegacyResourceConverter(Optional<LegacyResourceConverter> converter) {
+    this.legacyResourceConverter = converter.orElse(LegacyResourceConverter.NONE);
   }
 
   @Override
