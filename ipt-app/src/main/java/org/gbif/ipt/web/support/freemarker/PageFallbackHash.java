@@ -1,0 +1,118 @@
+package org.gbif.ipt.web.support.freemarker;
+
+import freemarker.template.ObjectWrapper;
+import freemarker.template.SimpleHash;
+import freemarker.template.TemplateCollectionModel;
+import freemarker.template.TemplateHashModel;
+import freemarker.template.TemplateModel;
+import freemarker.template.TemplateModelException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
+/** Template root: the Spring model first, then the page bean, then OGNL-style {@code get<Name>()} on the page bean. */
+final class PageFallbackHash extends SimpleHash {
+
+  private final SimpleHash base;
+  private final Object page;
+  private final TemplateHashModel pageModel;
+
+  PageFallbackHash(SimpleHash base, Object page, ObjectWrapper wrapper) {
+    super(wrapper);
+    this.base = base;
+    this.page = page;
+    try {
+      this.pageModel = (TemplateHashModel) wrapper.wrap(page);
+    } catch (TemplateModelException e) {
+      throw new IllegalStateException("Cannot expose page bean " + page.getClass().getName(), e);
+    }
+  }
+
+  @Override
+  public TemplateModel get(String key) throws TemplateModelException {
+    TemplateModel value = base.get(key);
+    if (value != null) {
+      return value;
+    }
+    value = pageModel.get(key);
+    if (value != null) {
+      return value;
+    }
+    Method getter = findGetter(page.getClass(), key);
+    if (getter == null) {
+      return null;
+    }
+    try {
+      return getObjectWrapper().wrap(getter.invoke(page));
+    } catch (ReflectiveOperationException e) {
+      throw new TemplateModelException("Cannot read " + key + " from " + page.getClass().getName(), e);
+    }
+  }
+
+  /** Java beans name {@code getBaseURL()} "BaseURL"; OGNL (and so IPT 3 templates) call it {@code baseURL}. */
+  private static Method findGetter(Class<?> type, String key) {
+    if (key.isEmpty()) {
+      return null;
+    }
+    String capitalized = Character.toUpperCase(key.charAt(0)) + key.substring(1);
+    for (String name : List.of("get" + capitalized, "is" + capitalized)) {
+      try {
+        return type.getMethod(name);
+      } catch (NoSuchMethodException ignored) {
+        // try the next accessor name
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void put(String key, Object value) {
+    base.put(key, value);
+  }
+
+  @Override
+  public void put(String key, boolean value) {
+    base.put(key, value);
+  }
+
+  @Override
+  public void remove(String key) {
+    base.remove(key);
+  }
+
+  @Override
+  public boolean containsKey(String key) {
+    return base.containsKey(key);
+  }
+
+  @Override
+  public int size() {
+    return base.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return base.isEmpty();
+  }
+
+  @Override
+  public TemplateCollectionModel keys() {
+    return base.keys();
+  }
+
+  @Override
+  public TemplateCollectionModel values() {
+    return base.values();
+  }
+
+  @Override
+  public KeyValuePairIterator keyValuePairIterator() {
+    return base.keyValuePairIterator();
+  }
+
+  @Override
+  @SuppressWarnings({"rawtypes", "deprecation"})
+  public Map toMap() throws TemplateModelException {
+    return base.toMap();
+  }
+}
