@@ -1,0 +1,365 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.manage;
+
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.dwc.terms.Term;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.model.Extension;
+import org.gbif.ipt.model.ExtensionMapping;
+import org.gbif.ipt.model.ExtensionProperty;
+import org.gbif.ipt.model.PropertyMapping;
+import org.gbif.ipt.model.Vocabulary;
+import org.gbif.ipt.model.VocabularyConcept;
+import org.gbif.ipt.service.SourceException;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.admin.VocabulariesManager;
+import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.service.manage.SourceManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+
+import jakarta.inject.Inject;
+import java.io.Serial;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.gbif.ipt.web.support.action.StrutsParameter;
+
+import freemarker.ext.beans.SimpleMapModel;
+import lombok.Getter;
+
+@PageBean
+public class TranslationPage extends ManagerBasePage {
+
+  @Serial
+  private static final long serialVersionUID = -8350422710092468050L;
+
+  private static final Logger LOG = LogManager.getLogger(TranslationPage.class);
+
+  static class Translation {
+
+    private String rowType;
+    private Term term;
+    private TreeMap<String, String> sourceValues = new TreeMap<>();
+    private TreeMap<String, String> translatedValues = new TreeMap<>();
+
+    /**
+     * Return a map populated with all source value to translated value pairs.
+     */
+    public Map<String, String> getPersistentMap() {
+      Map<String, String> m = new HashMap<>();
+      for (Entry<String, String> translatedValueEntry : translatedValues.entrySet()) {
+        m.put(sourceValues.get(translatedValueEntry.getKey()), StringUtils.trimToEmpty(translatedValueEntry.getValue()));
+      }
+      return m;
+    }
+
+    /**
+     * @return map with original source values, e.g. {"k1", "Obs"}.
+     */
+    public Map<String, String> getSourceValues() {
+      return sourceValues;
+    }
+
+    /**
+     * @return map with translated values, e.g. {"k1", "Observation"}. Entries relate to entries in sourceValues by
+     * via their key.
+     */
+    public Map<String, String> getTranslatedValues() {
+      return translatedValues;
+    }
+
+    public void setTmap(String rowType, Term term, TreeMap<String, String> sourceValues,
+                        TreeMap<String, String> translatedValues) {
+      this.sourceValues = (sourceValues != null) ? sourceValues : new TreeMap<>();
+      this.translatedValues = (translatedValues != null) ? translatedValues : new TreeMap<>();
+      this.rowType = rowType;
+      this.term = term;
+    }
+  }
+
+  private final SourceManager sourceManager;
+  private final VocabulariesManager vocabManager;
+  @Getter
+  private Translation trans = new Translation();
+
+  protected static final String REQ_PARAM_TERM = "term";
+  protected static final String REQ_PARAM_ROWTYPE = "rowtype";
+  protected static final String REQ_PARAM_MAPPINGID = "mid";
+  // config
+  @Getter
+  private PropertyMapping field;
+  @Getter
+  private ExtensionProperty property;
+  private ExtensionMapping mapping;
+  @Getter
+  private SimpleMapModel vocabTerms;
+  @Getter
+  private Integer mid;
+
+  @Inject
+  public TranslationPage(
+      PageContext ctx,
+      ResourceManager resourceManager,
+      SourceManager sourceManager,
+      VocabulariesManager vocabManager) {
+    super(ctx, resourceManager);
+    this.sourceManager = sourceManager;
+    this.vocabManager = vocabManager;
+    defaultResult = SUCCESS;
+  }
+
+  /**
+   * Automatically map source values to the terms in a vocabulary. A match occurs when the source value matches
+   * against one of the vocabulary's term's name, preferred name, or alternate name.
+   *
+   * @return SUCCESS result, staying on the translation page
+   */
+  public String automap() {
+    if (property == null || property.getVocabulary() == null) {
+      addActionError(getText("manage.translation.cantfind.vocabulary"));
+    } else {
+      Vocabulary vocab = property.getVocabulary();
+      int count = 0;
+      for (Entry<String, String> sourceValueEntry : getSourceValuesMap().entrySet()) {
+        // only if not yet mapped
+        if (!getTmap().containsValue(sourceValueEntry.getValue())) {
+          VocabularyConcept vc = vocab.findConcept(sourceValueEntry.getValue());
+          if (vc != null) {
+            getTmap().put(sourceValueEntry.getKey(), vc.getIdentifier());
+            count++;
+          }
+        }
+      }
+      addActionMessage(getText("manage.translation.mapped.terms", new String[]{String.valueOf(count)}));
+    }
+    return SUCCESS;
+  }
+
+  /**
+   * Deletes the translation for the PropertyTerm. The sessionScoped translation must also be deleted, otherwise it
+   * will reappear on the next page visit. The source values get reloaded so they are populated on the next page visit.
+   *
+   * @return NONE result, going back to mapping page
+   */
+  @Override
+  public String delete() {
+    // proceed with deletion
+    if (field != null) {
+      // 1. ensure the translation map on the PropertyMapping (field) is empty
+      field.setTranslation(new TreeMap<>());
+      // 2. ensure the static sessionScoped translation for this rowType and ConceptTerm is empty
+      trans.setTmap(this.mapping.getExtension().getRowType(), property, new TreeMap<>(), new TreeMap<>());
+      // 3. save the resource
+      saveResource();
+      // 4. add msg to appear in the UI indicating the translation for this PropertyMapping has been deleted
+      addActionMessage(getText("manage.translation.deleted", new String[]{field.getTerm().toString()}));
+      // 5. reload source values, so they aren't empty on next page visit
+      reloadSourceValues();
+    } else {
+      LOG.error("User wanted to deleted translation for propertyMapping field, but field was null");
+    }
+
+    // capture rowType, needed in redirect
+    Extension ext = mapping.getExtension();
+    id = (ext != null) ? ext.getRowType() : null;
+
+    // leaves translation page, goes back to mapping page
+    return NONE;
+  }
+
+  @Override
+  public void prepare() {
+    super.prepare();
+    notFound = true;
+
+    try {
+      // get mapping sequence id from parameters as setters are not called yet
+      String midStr = StringUtils.trimToNull(req.getParameter(REQ_PARAM_MAPPINGID));
+      if (midStr != null) {
+        mid = Integer.valueOf(midStr);
+        mapping = resource.getMapping(req.getParameter(REQ_PARAM_ROWTYPE), mid);
+      }
+    } catch (Exception e) {
+      LOG.error("An exception was encountered: {}", e.getMessage(), e);
+    }
+    if (mapping != null) {
+      field = mapping.getField(req.getParameter(REQ_PARAM_TERM));
+      if (field != null) {
+        notFound = false;
+        property = mapping.getExtension().getProperty(field.getTerm());
+        if (property.getVocabulary() != null) {
+          Map<String, String> vocabTermsRawData =
+              vocabManager.getI18nVocab(property.getVocabulary().getUriString(), getLocaleLanguage(), true);
+          vocabTerms = new SimpleMapModel(vocabTermsRawData, null);
+        }
+        if (!isLoaded(mapping.getExtension().getRowType(), field.getTerm())) {
+          reloadSourceValues();
+        }
+
+        // empty translation before POST
+        if (isHttpPost()) {
+          trans.getTranslatedValues().clear();
+        }
+      }
+    }
+  }
+
+  /**
+   * Reload the source values, and display to the User this has happened.
+   *
+   * @return SUCCESS regardless of outcome
+   */
+  public String reload() {
+    reloadSourceValues();
+    // leaves the user on the translation page
+    return SUCCESS;
+  }
+
+  /**
+   * Clears the existing translation, reloads the source values, and repopulates existing translations.
+   * The key of each entry in the translation.sourceValues map, e.g. {{"k1", "obs"}, {"k2", "spe"}} corresponds to each
+   * entry in the translation.translatedValues map, e.g. {{"k1", "Observation"}, {"k2", "Specimen"}}.
+   */
+  void reloadSourceValues() {
+    try {
+      String midStr = StringUtils.trimToNull(req.getParameter(REQ_PARAM_MAPPINGID));
+      if (midStr != null) {
+        mid = Integer.valueOf(midStr);
+        mapping = resource.getMapping(req.getParameter(REQ_PARAM_ROWTYPE), mid);
+      }
+      // reinitialize translation, including maps
+      if (trans == null) {
+        trans = new Translation();
+      }
+      trans.setTmap(this.mapping.getExtension().getRowType(), property, new TreeMap<>(), new TreeMap<>());
+      // reload new values
+      int i = 1;
+      for (String val : sourceManager.inspectColumn(mapping.getSource(), field.getIndex(), 1000, 10000)) {
+        String key = "k" + i;
+        getSourceValuesMap().put(key, val);
+        i++;
+      }
+      // keep existing translations
+      if (field.getTranslation() != null) {
+        for (Entry<String, String> entry : field.getTranslation().entrySet()) {
+          // only keep entries with values mapped that exist in the newly reloaded map
+          if (entry.getValue() != null && getSourceValuesMap().containsValue(entry.getKey())) {
+            for (Entry<String, String> sourceValueEntry : getSourceValuesMap().entrySet()) {
+              if (sourceValueEntry.getValue().equals(entry.getKey())) {
+                getTmap().put(sourceValueEntry.getKey(), entry.getValue());
+              }
+            }
+          }
+        }
+      }
+      // bring it to user's attention, that the source values have been reloaded
+      addActionMessage(getText("manage.translation.reloaded.values",
+          new String[]{String.valueOf(getSourceValuesMap().size()), field.getTerm().toString()}));
+
+    } catch (SourceException e) {
+      // if an error has occurred, bring it to the user's attention
+      addActionError(getText("manage.translation.reloaded.fail",
+          new String[]{field.getTerm().toString(), e.getMessage()}));
+    }
+  }
+
+  /**
+   * Persist the translation for the PropertyTerm by saving the Resource anew, and display to the User this happened.
+   *
+   * @return NONE result, going back to mapping page
+   */
+  @Override
+  public String save() {
+    // put map with non-empty values back to field
+    field.setTranslation(trans.getPersistentMap());
+    // save entire resource config
+    saveResource();
+    id = mapping.getExtension().getRowType();
+    addActionMessage(getText("manage.translation.saved", new String[]{field.getTerm().toString()}));
+    return NONE;
+  }
+
+  public Map<String, String> getSourceValuesMap() {
+    return trans.getSourceValues();
+  }
+
+  @StrutsParameter(depth = 2)
+  public Map<String, String> getTmap() {
+    return trans.getTranslatedValues();
+  }
+
+  public int getVocabTermsSize() {
+    return vocabTerms != null ? vocabTerms.size() : 0;
+  }
+
+  public Set<String> getVocabTermsKeys() {
+    return vocabTerms != null && (vocabTerms.getWrappedObject() instanceof Map) ?
+        ((Map) vocabTerms.getWrappedObject()).keySet() : Collections.emptySet();
+  }
+
+  /**
+   * On submitting the translation form sets the translated values map, named "tmap".
+   *
+   * @param translatedValues map with translated values, whose key corresponds to translation.sourceValues map
+   */
+  @StrutsParameter(depth = 2)
+  public void setTmap(TreeMap<String, String> translatedValues) {
+    this.trans.translatedValues = (translatedValues != null) ? translatedValues : new TreeMap<>();
+  }
+
+  public void setField(PropertyMapping field) {
+    this.field = field;
+  }
+
+  public void setProperty(ExtensionProperty property) {
+    this.property = property;
+  }
+
+  /**
+   * setMapping method name interrupts with Struts2/freemarker page.
+   *
+   * @param mapping ExtensionMapping
+   */
+  public void setExtensionMapping(ExtensionMapping mapping) {
+    this.mapping = mapping;
+  }
+
+  /**
+   * Check whether the translation has been loaded already. Call to prevent reloading original source values each
+   * time translation page gets loaded, for example.
+   *
+   * @param rowType to which Term belongs
+   * @param term    Term
+   * @return true if the translation has been loaded already, false otherwise
+   */
+  public boolean isLoaded(String rowType, Term term) {
+    trans = (Translation) session.get(Constants.SESSION_DWC_TRANSLATION);
+    return trans != null
+        && trans.rowType != null
+        && trans.rowType.equals(rowType)
+        && trans.term != null
+        && trans.term.equals(term)
+        && trans.sourceValues != null;
+  }
+}

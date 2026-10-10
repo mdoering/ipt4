@@ -67,6 +67,8 @@ s = re.sub(r"\b(\w+)Action\b(?!Support|Context|Invocation|Logger|ErrorCollector|
            lambda m: m.group(1) + "Page" if m.group(1)[:1].isupper() and m.group(1) not in ("POST", "Base") else m.group(0),
            s)
 s = s.replace("import org.gbif.ipt.action.portal.", "import org.gbif.ipt.web.portal.")
+s = s.replace("import org.gbif.ipt.action.manage.", "import org.gbif.ipt.web.manage.")
+s = s.replace("import org.gbif.ipt.action.admin.", "import org.gbif.ipt.web.admin.")
 s = s.replace("org.gbif.ipt.web.portal.OrganizedTaxonomic", "org.gbif.ipt.model.metadata.OrganizedTaxonomic")
 if "OrganizedTaxonomicCoverage" in s and "import org.gbif.ipt.model.metadata.OrganizedTaxonomicCoverage;" not in s:
     s = re.sub(r"(^package [\w.]+;\n)", r"\1\nimport org.gbif.ipt.model.metadata.OrganizedTaxonomicCoverage;\n"
