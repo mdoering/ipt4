@@ -31,6 +31,7 @@
 
     <spring-boot.version>4.1.1</spring-boot.version>
     <archunit.version>1.5.1</archunit.version>
+    <commons-text.version>1.15.0</commons-text.version>
     <frictionless.tableschema-java.version>0.9.9-gbif-SNAPSHOT</frictionless.tableschema-java.version>
     <git-commit-id-maven-plugin.version>10.0.1</git-commit-id-maven-plugin.version>
 
@@ -78,6 +79,11 @@
         <groupId>com.tngtech.archunit</groupId>
         <artifactId>archunit-junit5</artifactId>
         <version>${archunit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${commons-text.version}</version>
       </dependency>
       <dependency>
         <groupId>io.frictionlessdata</groupId>
