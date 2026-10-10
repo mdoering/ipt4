@@ -1,0 +1,60 @@
+{
+  "schemaVersion" : 1,
+  "registration" : {
+    "associatedOrganisations" : {
+      "456058db-f70b-4005-97ad-e08570cf0c56" : {
+        "agencyAccountPrimary" : true,
+        "agencyAccountUsername" : "DK.KYLE",
+        "alias" : "ZMD",
+        "canHost" : true,
+        "doiPrefix" : "10.5072",
+        "doiRegistrationAgency" : "DATACITE",
+        "key" : "456058db-f70b-4005-97ad-e08570cf0c56",
+        "name" : "Zoological Museum Denmark",
+        "nodeKey" : "4ddd294f-02b7-4359-ac33-0806a9ca9c6b",
+        "nodeName" : "DanBIF - Danish Biodiversity Information Facility",
+        "primaryContactEmail" : "kbraak@gbif.org",
+        "primaryContactName" : "Kyle Braak",
+        "primaryContactType" : "administrative"
+      },
+      "f3e8e9a9-df60-40ca-bb71-7f49313b3150" : {
+        "alias" : "AAA1Organisation",
+        "canHost" : true,
+        "key" : "f3e8e9a9-df60-40ca-bb71-7f49313b3150",
+        "name" : "Old Name AAA1Organisation",
+        "nodeKey" : "dk",
+        "nodeName" : "Denmark",
+        "primaryContactEmail" : "gbifregistry@mailinator.com",
+        "primaryContactName" : "GBIF guy",
+        "primaryContactType" : "technical"
+      },
+      "f9b67ad0-9c9b-11d9-b9db-b8a03c50a862" : {
+        "alias" : "ACNS",
+        "canHost" : true,
+        "key" : "f9b67ad0-9c9b-11d9-b9db-b8a03c50a862",
+        "name" : "Old Name Academy of Natural Sciences"
+      }
+    },
+    "hostingOrganisation" : {
+      "alias" : "ACNS",
+      "canHost" : true,
+      "key" : "f9b67ad0-9c9b-11d9-b9db-b8a03c50a862",
+      "name" : "Old Name Academy of Natural Sciences",
+      "nodeKey" : "dk",
+      "nodeName" : "Denmark",
+      "primaryContactEmail" : "gbifregistry@mailinator.com",
+      "primaryContactName" : "GBIF guy",
+      "primaryContactType" : "technical"
+    },
+    "ipt" : {
+      "created" : "2012-09-15T13:41:04.514Z",
+      "description" : "description",
+      "key" : "812b7589-dac1-492c-bc77-4cc81ee2f339",
+      "name" : "Test IPT 15 Sept 2012",
+      "organisationKey" : "f3e8e9a9-df60-40ca-bb71-7f49313b3150",
+      "primaryContactEmail" : "kbraak@gbif.org",
+      "primaryContactName" : "kyle Braak",
+      "primaryContactType" : "technical"
+    }
+  }
+}

@@ -40,16 +40,6 @@ import org.gbif.ipt.model.TextFileSource;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.User.Role;
 import org.gbif.ipt.model.VersionHistory;
-import org.gbif.ipt.model.converter.ConceptTermConverter;
-import org.gbif.ipt.model.converter.DataPackageFieldConverter;
-import org.gbif.ipt.model.converter.DataPackageIdentifierConverter;
-import org.gbif.ipt.model.converter.ExtensionMappingConverter;
-import org.gbif.ipt.model.converter.TableSchemaNameConverter;
-import org.gbif.ipt.model.converter.ExtensionRowTypeConverter;
-import org.gbif.ipt.model.converter.JdbcInfoConverter;
-import org.gbif.ipt.model.converter.OrganisationKeyConverter;
-import org.gbif.ipt.model.converter.PasswordEncrypter;
-import org.gbif.ipt.model.converter.UserEmailConverter;
 import org.gbif.ipt.model.factory.ExtensionFactory;
 import org.gbif.ipt.model.factory.ThesaurusHandlingRule;
 import org.gbif.ipt.model.voc.IdentifierStatus;
@@ -57,6 +47,7 @@ import org.gbif.ipt.model.voc.PublicationMode;
 import org.gbif.ipt.model.voc.PublicationStatus;
 import org.gbif.ipt.service.ImportException;
 import org.gbif.ipt.service.InvalidFilenameException;
+import org.gbif.ipt.persistence.TestPersisters;
 import org.gbif.ipt.service.admin.DataPackageSchemaManager;
 import org.gbif.ipt.service.admin.ExtensionManager;
 import org.gbif.ipt.service.admin.RegistrationManager;
@@ -123,9 +114,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   // Mock classes
   private final AppConfig mockAppConfig = MockAppConfig.buildMock();
   private final UserAccountManager mockUserAccountManager = mock(UserAccountManager.class);
-  private final UserEmailConverter mockEmailConverter = new UserEmailConverter(mockUserAccountManager);
   private final RegistrationManager mockRegistrationManager = mock(RegistrationManager.class);
-  private final OrganisationKeyConverter mockOrganisationKeyConverter = new OrganisationKeyConverter(mockRegistrationManager);
   private final SourceManager mockSourceManager = mock(SourceManager.class);
   private final RegistryManager mockRegistryManager = MockRegistryManager.buildMock();
   private final VocabulariesManager mockVocabulariesManager = mock(VocabulariesManager.class);
@@ -199,8 +188,6 @@ public class ResourceManagerImplTest extends IptBaseTest {
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     ExtensionFactory extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);
     support = TestBeanProvider.provideJdbcSupport();
-    PasswordEncrypter passwordEncrypter = new PasswordEncrypter(TestBeanProvider.providePasswordEncryption());
-    JdbcInfoConverter jdbcConverter = new JdbcInfoConverter(support);
 
     // construct occurrence core Extension
     InputStream occurrenceCoreIs = ResourceManagerImplTest.class.getResourceAsStream("/extensions/dwc_occurrence.xml");
@@ -237,19 +224,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
             Map.entry("http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord", occurrenceCore),
             Map.entry("http://rs.gbif.org/terms/1.0/Image", simpleImage)));
 
-    ExtensionRowTypeConverter extensionRowTypeConverter = new ExtensionRowTypeConverter(extensionsHolder);
-    ConceptTermConverter conceptTermConverter = new ConceptTermConverter(extensionRowTypeConverter);
 
-    ResourceConvertersManager mockResourceConvertersManager = new ResourceConvertersManager(
-        mockEmailConverter,
-        mockOrganisationKeyConverter,
-        mock(ExtensionMappingConverter.class),
-        extensionRowTypeConverter,
-        conceptTermConverter,
-        mock(DataPackageIdentifierConverter.class),
-        mock(TableSchemaNameConverter.class),
-        mock(DataPackageFieldConverter.class),
-        jdbcConverter);
 
     ResourceVersioningService resourceVersioningService = new ResourceVersioningServiceImpl(mockedDataDir);
     ResourceTypeService resourceTypeService = new ResourceTypeServiceImpl(mockVocabulariesManager);
@@ -273,7 +248,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
     // mock finding dwca.zip file that does not exist
     when(mockedDataDir.resourceDwcaFile(anyString())).thenReturn(new File("dwca.zip"));
 
-    ResourcePersister resourcePersister = new XStreamResourcePersister(mockResourceConvertersManager, passwordEncrypter);
+    ResourcePersister resourcePersister = TestPersisters.json(mockUserAccountManager, mockRegistrationManager, extensionsHolder, mockSchemaManager, support);
 
     ResourceLoader resourceLoader = new ResourceLoaderImpl(
         mockAppConfig,
@@ -307,7 +282,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testCreateFromZippedFile() throws Exception {
     // retrieve sample zipped resource folder
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // mock finding resource.xml file
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
 
@@ -558,7 +533,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testCreateWithExtensionFromZippedFile() throws Exception {
     // retrieve sample zipped resource folder
-    File resourceXML = FileUtils.getClasspathFile("resources/amphibians/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/amphibians/resource.json");
     // mock finding resource.xml file
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
 
@@ -648,7 +623,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testCreateFromZippedFileNonexistentExtension() throws Exception {
     // retrieve sample zipped resource folder
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_nonexistent_ext.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_nonexistent_ext.json");
     // mock finding resource.xml file
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
 
@@ -850,7 +825,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testLoadFromDirResetAutoGeneratedIds() throws Exception {
     // retrieve resource.xml configuration file with occurrence core coreIdColumn mapping using auto-generated IDs
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_auto_ids.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_auto_ids.json");
     // mock finding resource.xml file
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
     when(mockedDataDir.dataFile(DataDir.RESOURCES_DIR)).thenReturn(resourceDir);
@@ -1059,7 +1034,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testListPublishedPublicVersions() throws Exception {
     // create a new resource using configuration file (resource.xml) that has version history
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_version_history.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_version_history.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
     File emlXML = FileUtils.getClasspathFile("resources/res1/eml.xml");
     when(mockedDataDir.resourceEmlFile(anyString(), any(BigDecimal.class))).thenReturn(emlXML);
@@ -1089,7 +1064,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testListPublishedRegisteredVersions() throws Exception {
     // create new resource from configuration file (resource.xml) that does not have version history
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
     File emlXML = FileUtils.getClasspathFile("resources/res1/eml.xml");
     when(mockedDataDir.resourceEmlFile(anyString(), any(BigDecimal.class))).thenReturn(emlXML);
@@ -1118,7 +1093,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
    */
   public Resource getNonRegisteredMetadataOnlyResource() throws Exception {
     // retrieve resource configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // copy to resource folder
     File copiedResourceXML = new File(resourceDir, DataDir.PERSISTENCE_FILENAME);
     org.apache.commons.io.FileUtils.copyFile(resourceXML, copiedResourceXML);
@@ -1186,7 +1161,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   public void testReconstructVersion() throws Exception {
     // create a new resource using configuration file (resource.xml) that has version history
     // and manually set organisation and a few Eml properties to mock new metadata entered for pending version
-    File cfgFile = org.gbif.utils.file.FileUtils.getClasspathFile("resources/res1/resource_version_history.xml");
+    File cfgFile = org.gbif.utils.file.FileUtils.getClasspathFile("resources/res1/resource_version_history.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(cfgFile);
     File resourceDirectory = cfgFile.getParentFile();
     assertTrue(resourceDirectory.isDirectory());
@@ -1248,7 +1223,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   public void testReconstructRegisteredVersion() throws Exception {
     // create a new resource using configuration file (resource.xml) that has version history
     // and manually set organisation and a few Eml properties to mock new metadata entered for pending version
-    File cfgFile = org.gbif.utils.file.FileUtils.getClasspathFile("resources/res1/resource_reg_version_history.xml");
+    File cfgFile = org.gbif.utils.file.FileUtils.getClasspathFile("resources/res1/resource_reg_version_history.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(cfgFile);
     File resourceDirectory = cfgFile.getParentFile();
     assertTrue(resourceDirectory.isDirectory());
@@ -1315,7 +1290,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   @Test
   public void testLoadPre2Point2Resource() throws Exception {
     // create new resource from configuration file (resource.xml) that does not have version history
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_v1_1.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_v1_1.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
 
     // mock returning eml-19.xml in temp directory
@@ -1399,7 +1374,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   public void testLoad() throws Exception {
     ResourceManagerImpl manager = spy(getResourceManagerImpl());
     // mock finding resource.xml file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     when(mockedDataDir.resourceFile(anyString())).thenReturn(resourceXML);
 
     doReturn(new ResourceSummaryView()).when(manager).toResourceSummaryViewReconstructed(any());

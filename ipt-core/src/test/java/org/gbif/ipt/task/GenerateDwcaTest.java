@@ -34,16 +34,6 @@ import org.gbif.ipt.model.Extension;
 import org.gbif.ipt.model.FileSource;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.User;
-import org.gbif.ipt.model.converter.ConceptTermConverter;
-import org.gbif.ipt.model.converter.DataPackageFieldConverter;
-import org.gbif.ipt.model.converter.DataPackageIdentifierConverter;
-import org.gbif.ipt.model.converter.ExtensionMappingConverter;
-import org.gbif.ipt.model.converter.TableSchemaNameConverter;
-import org.gbif.ipt.model.converter.ExtensionRowTypeConverter;
-import org.gbif.ipt.model.converter.JdbcInfoConverter;
-import org.gbif.ipt.model.converter.OrganisationKeyConverter;
-import org.gbif.ipt.model.converter.PasswordEncrypter;
-import org.gbif.ipt.model.converter.UserEmailConverter;
 import org.gbif.ipt.model.factory.ExtensionFactory;
 import org.gbif.ipt.model.factory.ThesaurusHandlingRule;
 import org.gbif.ipt.model.voc.IdentifierStatus;
@@ -64,7 +54,6 @@ import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.manage.ResourceTypeService;
 import org.gbif.ipt.service.manage.ResourceVersioningService;
 import org.gbif.ipt.service.manage.SourceManager;
-import org.gbif.ipt.service.manage.impl.ResourceConvertersManager;
 import org.gbif.ipt.service.manage.impl.ResourceImportServiceImpl;
 import org.gbif.ipt.service.manage.impl.ResourceLoaderImpl;
 import org.gbif.ipt.service.manage.impl.ResourceManagerImpl;
@@ -73,7 +62,7 @@ import org.gbif.ipt.service.manage.impl.ResourcePublicationManagerImpl;
 import org.gbif.ipt.service.manage.impl.ResourceTypeServiceImpl;
 import org.gbif.ipt.service.manage.impl.ResourceVersioningServiceImpl;
 import org.gbif.ipt.service.manage.impl.SourceManagerImpl;
-import org.gbif.ipt.service.manage.impl.XStreamResourcePersister;
+import org.gbif.ipt.persistence.TestPersisters;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.http.IptHttp;
@@ -184,7 +173,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFile() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // create resource from single source file (with empty line as last line)
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -261,7 +250,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFileDOIForDatasetID() throws Exception {
     // retrieve sample zipped resource XML configuration file, where setting "doi used for datasetID" has been turned on
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.json");
     // create resource from single source file
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_doi_dataset_id.txt");
     // set DOI
@@ -331,7 +320,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFileNoIdMapped() throws Exception {
     // retrieve sample zipped resource XML configuration file, with no id mapped
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_no_id_mapped.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_no_id_mapped.json");
     // create resource from single source file with an id column with non unique values (mapped to individual ID).
     // since the non unique ids aren't mapped to the core record identifier (occurrenceID) validation isn't triggered.
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_non_unique_ids.txt");
@@ -396,7 +385,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testValidateCoreFromSingleSourceFileMissingIds() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // create resource, with single source file that is missing occurrenceIDs
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_missing_ids.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -413,7 +402,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testValidateCoreFromSingleSourceFileNonUniqueIds() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // create resource, with single source file that has non-unique occurrenceIDs, regardless of case
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_non_unique_ids.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -430,7 +419,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testValidateCoreFromSingleSourceFileNonUniqueIdsCase() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // create resource, with single source file that has unique occurrenceIDs due when compared with case sensitivity
     // and non-unique occurrenceIDs when compared with case sensitivity
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_non_unique_ids_case.txt");
@@ -457,9 +446,7 @@ public class GenerateDwcaTest extends IptBaseTest {
    */
   private Resource getResource(@NotNull File resourceXML, @NotNull File sourceFile) throws Exception {
     UserAccountManager mockUserAccountManager = mock(UserAccountManager.class);
-    UserEmailConverter mockEmailConverter = new UserEmailConverter(mockUserAccountManager);
     RegistrationManager mockRegistrationManager = mock(RegistrationManager.class);
-    OrganisationKeyConverter mockOrganisationKeyConverter = new OrganisationKeyConverter(mockRegistrationManager);
     RegistryManager mockRegistryManager = MockRegistryManager.buildMock();
     VocabulariesManager mockVocabulariesManager = mock(VocabulariesManager.class);
     SimpleTextProvider mockSimpleTextProvider = mock(SimpleTextProvider.class);
@@ -472,8 +459,6 @@ public class GenerateDwcaTest extends IptBaseTest {
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     ExtensionFactory extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);
     JdbcSupport support = TestBeanProvider.provideJdbcSupport();
-    PasswordEncrypter passwordEncrypter = new PasswordEncrypter(TestBeanProvider.providePasswordEncryption());
-    JdbcInfoConverter jdbcConverter = new JdbcInfoConverter(support);
 
     DataPackageSchemaManager mockSchemaManager = mock(DataPackageSchemaManager.class);
 
@@ -500,8 +485,6 @@ public class GenerateDwcaTest extends IptBaseTest {
         Map.entry("http://rs.tdwg.org/dwc/terms/Event", eventCore),
         Map.entry("http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord", occurrenceCore)));
 
-    ExtensionRowTypeConverter extensionRowTypeConverter = new ExtensionRowTypeConverter(extensionsHolder);
-    ConceptTermConverter conceptTermConverter = new ConceptTermConverter(extensionRowTypeConverter);
 
     // mock finding resource.xml file
     when(mockDataDir.resourceFile(anyString())).thenReturn(resourceXML);
@@ -523,16 +506,6 @@ public class GenerateDwcaTest extends IptBaseTest {
     // create SourceManagerImpl
     mockSourceManager = new SourceManagerImpl(mock(AppConfig.class), mockDataDir, mock(FileStoreManager.class));
 
-    ResourceConvertersManager mockResourceConvertersManager = new ResourceConvertersManager(
-        mockEmailConverter,
-        mockOrganisationKeyConverter,
-        mock(ExtensionMappingConverter.class),
-        extensionRowTypeConverter,
-        conceptTermConverter,
-        mock(DataPackageIdentifierConverter.class),
-        mock(TableSchemaNameConverter.class),
-        mock(DataPackageFieldConverter.class),
-        jdbcConverter);
 
     ResourceVersioningService resourceVersioningService = new ResourceVersioningServiceImpl(mockDataDir);
     ResourceTypeService resourceTypeService = new ResourceTypeServiceImpl(mockVocabulariesManager);
@@ -544,7 +517,7 @@ public class GenerateDwcaTest extends IptBaseTest {
 
     Provider<ResourceManager> resourceManagerProvider = mock(Provider.class);
     when(resourceManagerProvider.get()).thenAnswer(invocation -> resourceManagerRef.get());
-    ResourcePersister resourcePersister = new XStreamResourcePersister(mockResourceConvertersManager, passwordEncrypter);
+    ResourcePersister resourcePersister = TestPersisters.json(mockUserAccountManager, mockRegistrationManager, extensionsHolder, mockSchemaManager, support);
 
     ResourceImportService resourceImportService = new ResourceImportServiceImpl(
         mockDataDir,
@@ -638,7 +611,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFileMissingBasisOfRecord() throws Exception {
     // retrieve sample zipped resource XML configuration file corresponding to occurrence_missing_bor.txt
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.json");
     // create resource from single source file
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_missing_bor.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -654,7 +627,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFileNonMatchingBasisOfRecord() throws Exception {
     // retrieve sample zipped resource XML configuration file corresponding to occurrence_missing_bor.txt
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_doi_dataset_id.json");
     // create resource from single source file
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_non_matching_bor.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -669,7 +642,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testGenerateCoreFromSingleSourceFileMissingBasisOfRecordMapping() throws Exception {
     // retrieve sample zipped resource XML configuration file corresponding to occurrence_missing_bor.txt
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_no_bor_mapped.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_no_bor_mapped.json");
     // create resource from single source file
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_no_bor_mapped.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -684,7 +657,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testMultiValueFieldDelimiterSet() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_multivalue.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_multivalue.json");
     // create resource from single source file
     File occurrence = FileUtils.getClasspathFile("resources/res1/occurrence_multivalue.txt");
     Resource resource = getResource(resourceXML, occurrence);
@@ -738,7 +711,7 @@ public class GenerateDwcaTest extends IptBaseTest {
   @Test
   public void testValidateEventCoreFromSingleSourceFileMissingOccurrenceExtension() throws Exception {
     // retrieve sample zipped resource XML configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_event_1.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource_event_1.json");
     // create sampling event resource, with single source file
     File event = FileUtils.getClasspathFile("resources/res1/event.txt");
     Resource resource = getResource(resourceXML, event);

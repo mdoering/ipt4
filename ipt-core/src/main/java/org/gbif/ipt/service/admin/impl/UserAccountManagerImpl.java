@@ -25,15 +25,10 @@ import org.gbif.ipt.service.InvalidConfigException;
 import org.gbif.ipt.service.InvalidConfigException.TYPE;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.ipt.utils.PBEEncrypt;
+import org.gbif.ipt.persistence.UserStore;
 
 import jakarta.inject.Inject;
-import java.io.EOFException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -43,35 +38,30 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.Strings;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Reads user accounts from a simple XStream managed xml file.
+ * Reads user accounts from {@code config/users.json}.
  */
 public class UserAccountManagerImpl extends BaseManager implements UserAccountManager {
 
   private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(12);
 
-  public static final String PERSISTENCE_FILE = "users.xml";
+  public static final String PERSISTENCE_FILE = UserStore.FILENAME;
   private final Map<String, User> users = new LinkedHashMap<>();
   private boolean allowSimplifiedAdminLogin = true;
   private String onlyAdminEmail;
-  private final XStream xstream = new XStream();
-  private PBEEncrypt encrypter;
+  private final UserStore store;
 
   private User setupUser;
 
   @Inject
   public UserAccountManagerImpl(
       AppConfig cfg,
-      DataDir dataDir,
-      PBEEncrypt encrypter) {
+      DataDir dataDir) {
     super(cfg, dataDir);
-    this.encrypter = encrypter;
-    defineXstreamMapping();
+    this.store = new UserStore(dataDir.configFile(PERSISTENCE_FILE).toPath());
   }
 
   private User addUser(User user) {
@@ -123,18 +113,6 @@ public class UserAccountManagerImpl extends BaseManager implements UserAccountMa
       addUser(user);
       save();
     }
-  }
-
-  private void defineXstreamMapping() {
-    xstream.addPermission(AnyTypePermission.ANY);
-    xstream.ignoreUnknownElements();
-    xstream.alias("user", User.class);
-    xstream.useAttributeFor(User.class, "email");
-    xstream.useAttributeFor(User.class, "password");
-    xstream.useAttributeFor(User.class, "firstname");
-    xstream.useAttributeFor(User.class, "lastname");
-    xstream.useAttributeFor(User.class, "role");
-    xstream.useAttributeFor(User.class, "lastLogin");
   }
 
   @Override
@@ -227,70 +205,26 @@ public class UserAccountManagerImpl extends BaseManager implements UserAccountMa
 
   @Override
   public void load() throws InvalidConfigException {
-    try (ObjectInputStream in = xstream.createObjectInputStream(
-        IptFileUtils.getUtf8Reader(dataDir.configFile(PERSISTENCE_FILE)))) {
+    try {
       users.clear();
-      while (true) {
-        try {
-          User u = (User) in.readObject();
-          addUser(u);
-        } catch (EOFException e) {
-          // end of file, expected exception!
-          break;
-        } catch (ClassNotFoundException e) {
-          LOG.error(e.getMessage(), e);
-        }
+      for (User u : store.load()) {
+        addUser(u);
       }
-
-      // first we have to check if there are users with old-fashioned passwords
-      boolean isOldPasswordsPresent = users.values()
-          .stream()
-          .map(User::getPassword)
-          .anyMatch(this::isOldEncryptedPassword);
-
-      // if so - update all passwords
-      if (isOldPasswordsPresent) {
-        LOG.info("There are old-fashioned encrypted passwords, start hashing them");
-        for (User user : users.values()) {
-          String pass = user.getPassword();
-          if (pass != null && isOldEncryptedPassword(pass)) {
-            String decrypted;
-            try {
-              decrypted = encrypter.decrypt(pass);
-              String hash = BCRYPT.encode(decrypted);
-              user.setPassword(hash);
-            } catch (PBEEncrypt.EncryptionException e) {
-              LOG.error("Cannot decrypt password for the user [{}]", user.getEmail(), e);
-            }
-          }
-        }
-
-        save();
+      if (users.isEmpty()) {
+        LOG.warn("No user accounts in {} (This is normal when first setting up a new datadir)", PERSISTENCE_FILE);
       }
-
-    } catch (FileNotFoundException e) {
-      LOG.warn("User accounts not existing, {} file missing  (This is normal when first setting up a new datadir)",
-          PERSISTENCE_FILE);
-    } catch (IOException e) {
+    } catch (IOException | RuntimeException e) {
       LOG.error(e.getMessage(), e);
       throw new InvalidConfigException(TYPE.USER_CONFIG, "Couldn't read user accounts: " + e.getMessage());
     }
   }
 
-  private boolean isOldEncryptedPassword(String pass) {
-    return !Strings.CS.startsWith(pass, "$2a$");
-  }
-
   @Override
   public synchronized void save() throws IOException {
     LOG.debug("Saving all {} user accounts...", users.size());
-    try (Writer userWriter = IptFileUtils.startNewUtf8File(dataDir.configFile(PERSISTENCE_FILE));
-         ObjectOutputStream out = xstream.createObjectOutputStream(userWriter, "users")) {
-      for (Entry<String, User> entry : users.entrySet()) {
-        out.writeObject(entry.getValue());
-      }
-    }
+    store.save(new ArrayList<>(users.values()));
   }
+
 
   @Override
   public void save(User user) throws IOException {

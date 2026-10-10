@@ -19,7 +19,7 @@ import org.gbif.ipt.config.ConfigWarnings;
 import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.Resource;
-import org.gbif.ipt.model.converter.PasswordEncrypter;
+import org.gbif.ipt.persistence.TestPersisters;
 import org.gbif.ipt.model.voc.IdentifierStatus;
 import org.gbif.ipt.model.voc.PublicationStatus;
 import org.gbif.ipt.service.AlreadyExistingException;
@@ -52,7 +52,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
-import com.thoughtworks.xstream.converters.ConversionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -108,13 +107,9 @@ public class RegistrationManagerImplTest extends IptMockBaseTest {
     resourcesList.add(r1);
     resourcesList.add(r2);
 
-    // mock returning registration.xml file
-    File registrationXML = FileUtils.getClasspathFile("config/registration.xml");
-    when(mockDataDir.configFile(RegistrationManagerImpl.PERSISTENCE_FILE_V1)).thenReturn(registrationXML);
-
-    // mock returning registration2.xml file
-    File registrationXML2 = FileUtils.getClasspathFile("config/registration2.xml");
-    when(mockDataDir.configFile(RegistrationManagerImpl.PERSISTENCE_FILE_V2)).thenReturn(registrationXML2);
+    // mock returning registration.json file (the IPT 3 registration2.xml fixture, converted)
+    File registrationJson = FileUtils.getClasspathFile("config/registration.json");
+    when(mockDataDir.configFile(RegistrationManagerImpl.PERSISTENCE_FILE)).thenReturn(registrationJson);
 
     // mock returning list of registered Organisation with local test resource
     mockHttpClient = mock(IptHttp.class);
@@ -135,8 +130,7 @@ public class RegistrationManagerImplTest extends IptMockBaseTest {
 
     // create instance of manager
     registrationManager =
-      new RegistrationManagerImpl(mockAppConfig, mockDataDir, mockRegistryManager,
-        mock(PasswordEncrypter.class));
+      new RegistrationManagerImpl(mockAppConfig, mockDataDir, mockRegistryManager, TestPersisters.CIPHER);
 
     // load associatedOrganisations, hostingOrganisation, etc
     registrationManager.load();
@@ -167,21 +161,6 @@ public class RegistrationManagerImplTest extends IptMockBaseTest {
     Organisation associated = registrationManager.get(RESOURCE1_ORGANISATION_KEY);
     assertEquals("New Name Academy of Natural Sciences", associated.getName());
     assertEquals(RESOURCE1_ORGANISATION_KEY, associated.getKey().toString());
-  }
-
-  /**
-   * Test migrating former registration configuration (registration.xml) to encrypted registration configuration
-   * (registration2.xml) but on converting a LegacyOrganization, the method fails because the LegacyOrganization is
-   * missing its mandatory key.
-   */
-  @Test
-  @Disabled("floating behaviour")
-  public void testEncryptRegistrationFailsOnOrganisationMissingKey() {
-    // mock returning registration.xml file, with organization missing name which is NotNull field
-    File registrationXML = FileUtils.getClasspathFile("config/registration_invalid.xml");
-    when(mockDataDir.configFile(RegistrationManagerImpl.PERSISTENCE_FILE_V1)).thenReturn(registrationXML);
-
-    assertThrows(ConversionException.class, () -> registrationManager.encryptRegistration());
   }
 
   /**

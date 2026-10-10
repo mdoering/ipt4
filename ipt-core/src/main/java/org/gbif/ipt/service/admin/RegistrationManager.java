@@ -137,11 +137,6 @@ public interface RegistrationManager {
   void save() throws IOException;
 
   /**
-   * Migrate former registration (registration.xml) into new registration (registration2.xml) with passwords encrypted.
-   */
-  void encryptRegistration();
-
-  /**
    * Update (from the Registry) metadata for all associated organizations in the IPT.
    */
   void updateAssociatedOrganisationsMetadata() throws IOException;

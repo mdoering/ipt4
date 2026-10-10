@@ -22,10 +22,8 @@ import org.gbif.ipt.model.Network;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.Registration;
 import org.gbif.ipt.model.Resource;
-import org.gbif.ipt.model.converter.PasswordEncrypter;
-import org.gbif.ipt.model.legacy.LegacyIpt;
-import org.gbif.ipt.model.legacy.LegacyOrganisation;
-import org.gbif.ipt.model.legacy.LegacyRegistration;
+import org.gbif.ipt.persistence.RegistrationStore;
+import org.gbif.ipt.persistence.SecretCipher;
 import org.gbif.ipt.model.voc.DOIRegistrationAgency;
 import org.gbif.ipt.service.AlreadyExistingException;
 import org.gbif.ipt.service.BaseManager;
@@ -37,14 +35,8 @@ import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.utils.IptFileUtils;
 
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -58,8 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 
 public class RegistrationManagerImpl extends BaseManager implements RegistrationManager {
 
@@ -67,21 +57,18 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
 
   private static final Comparator<Organisation> ORG_BY_NAME_ORD = (left, right) -> StringUtils.compare(left.getName(), right.getName());
 
-  public static final String PERSISTENCE_FILE_V1 = "registration.xml";
-  public static final String PERSISTENCE_FILE_V2 = "registration2.xml";
+  public static final String PERSISTENCE_FILE = RegistrationStore.FILENAME;
   private Registration registration = new Registration();
-  private final XStream xstreamV1 = new XStream();
-  private final XStream xstreamV2 = new XStream();
+  private final RegistrationStore store;
   private RegistryManager registryManager;
 
   public RegistrationManagerImpl(
       AppConfig cfg,
       DataDir dataDir,
       RegistryManager registryManager,
-      PasswordEncrypter passwordEncrypter) {
+      SecretCipher cipher) {
     super(cfg, dataDir);
-    defineXstreamMappingV1();
-    defineXstreamMappingV2(passwordEncrypter);
+    this.store = new RegistrationStore(dataDir.configFile(PERSISTENCE_FILE).toPath(), cipher);
     this.registryManager = registryManager;
   }
 
@@ -159,90 +146,6 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
     }
   }
 
-  /**
-   * Populate ipt instance from LegacyIpt, for all fields.
-   *
-   * @param ipt LegacyOrganisation
-   *
-   * @return Ipt populated from LegacyIpt
-   */
-  private Ipt createIptFromLegacyIpt(LegacyIpt ipt) {
-    Ipt i = null;
-    if (ipt != null) {
-      i = new Ipt();
-      String key = (ipt.getKey() == null) ? null : ipt.getKey().toString();
-      if (key != null) {
-        i.setKey(key);
-      }
-      i.setDescription(StringUtils.trimToNull(ipt.getDescription()));
-      i.setWsPassword(StringUtils.trimToNull(ipt.getWsPassword()));
-      i.setName(StringUtils.trimToNull(ipt.getName()));
-      i.setCreated(ipt.getCreated());
-      i.setLanguage(StringUtils.trimToNull(ipt.getLanguage()));
-      i.setLogoUrl(StringUtils.trimToNull(ipt.getLogoUrl()));
-      i.setHomepageURL(StringUtils.trimToNull(ipt.getHomepageURL()));
-      i.setOrganisationKey(StringUtils.trimToNull(ipt.getOrganisationKey().toString()));
-      i.setPrimaryContactType(StringUtils.trimToNull(ipt.getPrimaryContactType()));
-      i.setPrimaryContactPhone(StringUtils.trimToNull(ipt.getPrimaryContactPhone()));
-      i.setPrimaryContactLastName(StringUtils.trimToNull(ipt.getPrimaryContactLastName()));
-      i.setPrimaryContactFirstName(StringUtils.trimToNull(ipt.getPrimaryContactFirstName()));
-      i.setPrimaryContactAddress(StringUtils.trimToNull(ipt.getPrimaryContactAddress()));
-      i.setPrimaryContactEmail(StringUtils.trimToNull(ipt.getPrimaryContactEmail()));
-      i.setPrimaryContactDescription(StringUtils.trimToNull(ipt.getPrimaryContactDescription()));
-      i.setPrimaryContactName(StringUtils.trimToNull(ipt.getPrimaryContactName()));
-    }
-    return i;
-  }
-
-  /**
-   * Populate Organisation instance from LegacyOrganisation for only the key, plus fields not coming from registry.
-   *
-   * @param organisation LegacyOrganisation
-   *
-   * @return Organisation populated from LegacyOrganisation
-   */
-  private Organisation createOrganisationFromLegacyOrganisation(LegacyOrganisation organisation) {
-    Organisation o = null;
-    if (organisation != null) {
-      o = new Organisation();
-      String key = (organisation.getKey() == null) ? null : organisation.getKey().toString();
-      if (key != null) {
-        o.setKey(key);
-      }
-      o.setName(organisation.getName());
-      o.setAlias(organisation.getAlias());
-      o.setCanHost(organisation.isCanHost());
-      o.setPassword(organisation.getPassword());
-    }
-    return o;
-  }
-
-  /**
-   * Define XStream used to parse former registration (registration.xml).
-   */
-  private void defineXstreamMappingV1() {
-    xstreamV1.addPermission(AnyTypePermission.ANY);
-    xstreamV1.ignoreUnknownElements();
-    xstreamV1.omitField(LegacyRegistration.class, "associatedOrganisations");
-    xstreamV1.alias("organisation", LegacyOrganisation.class);
-    xstreamV1.alias("registry", LegacyRegistration.class);
-  }
-
-  /**
-   * Define XStream used to parse encrypted registration (registration2.xml) with passwords encrypted.
-   *
-   * @param passwordEncrypter PasswordConverter
-   */
-  private void defineXstreamMappingV2(PasswordEncrypter passwordEncrypter) {
-    xstreamV2.addPermission(AnyTypePermission.ANY);
-    xstreamV2.ignoreUnknownElements();
-    xstreamV2.omitField(Registration.class, "associatedOrganisations");
-    xstreamV2.alias("organisation", Organisation.class);
-    xstreamV2.alias("registry", Registration.class);
-    // encrypt passwords
-    xstreamV2.registerConverter(passwordEncrypter);
-  }
-
   @Override
   public Organisation delete(String key, List<Resource> resources) throws DeletionNotAllowedException {
     Organisation org = get(key);
@@ -318,39 +221,24 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
 
   @Override
   public void load() throws InvalidConfigException {
-    try (Reader registrationReader = IptFileUtils.getUtf8Reader(dataDir.configFile(PERSISTENCE_FILE_V2));
-         ObjectInputStream in = xstreamV2.createObjectInputStream(registrationReader)) {
-      registration.getAssociatedOrganisations().clear();
-
-      try {
-        Registration reg = (Registration) in.readObject();
+    registration.getAssociatedOrganisations().clear();
+    try {
+      Registration reg = store.load();
+      if (reg == null) {
+        LOG.warn("Registration information not existing, {} file missing  (This is normal when IPT is not registered yet)", PERSISTENCE_FILE);
+      } else {
         // load the organisation this IPT is registered against
         addHostingOrganisation(reg.getHostingOrganisation());
         addIptInstance(reg.getIpt());
-
+        registration.setNetwork(reg.getNetwork());
         // load the associated organisations
-        while (true) {
-          try {
-            Organisation org = (Organisation) in.readObject();
-            addAssociatedOrganisation(org);
-          } catch (EOFException e) {
-            // end of file, expected exception!
-            break;
-          } catch (ClassNotFoundException e) {
-            LOG.error(e.getMessage(), e);
-          }
+        for (Organisation org : reg.getAssociatedOrganisations().values()) {
+          addAssociatedOrganisation(org);
         }
-      } catch (EOFException e) {
-        // end of file, expected exception!
-      } catch (AlreadyExistingException e) {
-        LOG.error(e);
       }
-
-    } catch (FileNotFoundException e) {
-      LOG.warn("Registration information not existing, {} file missing  (This is normal when IPT is not registered yet)", PERSISTENCE_FILE_V2);
-    } catch (ClassNotFoundException e) {
-      LOG.error(e.getMessage(), e);
-    } catch (IOException e) {
+    } catch (AlreadyExistingException e) {
+      LOG.error(e);
+    } catch (IOException | RuntimeException e) {
       LOG.error(e.getMessage(), e);
       throw new InvalidConfigException(TYPE.REGISTRATION_CONFIG,
         "Couldnt read the registration information: " + e.getMessage());
@@ -366,91 +254,12 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
 
   @Override
   public Organisation getFromDisk(String key) {
-    SortedMap<String, Organisation> associatedOrganisations = new TreeMap<>();
-    try (Reader registrationReader = IptFileUtils.getUtf8Reader(dataDir.configFile(PERSISTENCE_FILE_V2));
-         ObjectInputStream in = xstreamV2.createObjectInputStream(registrationReader)) {
-
-      in.readObject(); // skip over Registration block
-      // now parse the associated organisations
-      while (true) {
-        try {
-          Organisation org = (Organisation) in.readObject();
-          associatedOrganisations.put(org.getKey().toString(), org);
-        } catch (EOFException e) {
-          // end of file, expected exception!
-          break;
-        }
-      }
-    } catch (ClassNotFoundException e) {
-      LOG.error(e.getMessage(), e);
-    } catch (IOException e) {
+    try {
+      Registration reg = store.load();
+      return reg == null ? null : reg.getAssociatedOrganisations().get(key);
+    } catch (IOException | RuntimeException e) {
       LOG.error(e.getMessage(), e);
       throw new InvalidConfigException(TYPE.REGISTRATION_CONFIG, "Couldnt read registration info: " + e.getMessage());
-    }
-    // return the organisation requested
-    return associatedOrganisations.get(key);
-  }
-
-  @Override
-  public void encryptRegistration() throws InvalidConfigException {
-    File registrationV1 = dataDir.configFile(PERSISTENCE_FILE_V1);
-    if (registrationV1.exists()) {
-      try (Reader registrationReader = IptFileUtils.getUtf8Reader(registrationV1);
-           ObjectInputStream in = xstreamV1.createObjectInputStream(registrationReader)) {
-        registration.getAssociatedOrganisations().clear();
-
-        try {
-          LegacyRegistration reg = (LegacyRegistration) in.readObject();
-          // load the organisation this IPT is registered against
-          LegacyOrganisation legacyHostingOrganisation = reg.getHostingOrganisation();
-          if (legacyHostingOrganisation != null) {
-            Organisation hostingOrganisation = createOrganisationFromLegacyOrganisation(legacyHostingOrganisation);
-            addHostingOrganisation(hostingOrganisation);
-          }
-
-          // load the IPT installation
-          LegacyIpt legacyIpt = reg.getIpt();
-          if (legacyIpt != null) {
-            Ipt ipt = createIptFromLegacyIpt(legacyIpt);
-            addIptInstance(ipt);
-          }
-
-          // load the associated organisations
-          while (true) {
-            try {
-              LegacyOrganisation legacyOrganisation = (LegacyOrganisation) in.readObject();
-              if (legacyOrganisation != null) {
-                Organisation organisation = createOrganisationFromLegacyOrganisation(legacyOrganisation);
-                addAssociatedOrganisation(organisation);
-              }
-            } catch (EOFException e) {
-              // end of file, expected exception!
-              break;
-            } catch (ClassNotFoundException e) {
-              LOG.error(e.getMessage(), e);
-            }
-          }
-        } catch (EOFException e) {
-          // end of file, expected exception!
-        } catch (AlreadyExistingException e) {
-          LOG.error(e);
-        }
-
-        // ensure changes are persisted to registration2.xml
-        save();
-
-      } catch (ClassNotFoundException e) {
-        LOG.error(e.getMessage(), e);
-        throw new InvalidConfigException(TYPE.REGISTRATION_CONFIG,
-          "Problem reading the registration information: " + e.getMessage());
-      } catch (IOException e) {
-        LOG.error(e.getMessage(), e);
-        throw new InvalidConfigException(TYPE.REGISTRATION_CONFIG,
-          "Couldnt read the registration information: " + e.getMessage());
-      } finally {
-        // delete former registration configuration (registration.xml)
-        org.apache.commons.io.FileUtils.deleteQuietly(registrationV1);
-      }
     }
   }
 
@@ -474,7 +283,7 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
       updateOrganisationMetadata(hostingOrganisation);
     }
 
-    // ensure changes are persisted to registration2.xml
+    // ensure changes are persisted to registration.json
     save();
   }
 
@@ -561,12 +370,7 @@ public class RegistrationManagerImpl extends BaseManager implements Registration
   @Override
   public synchronized void save() throws IOException {
     LOG.debug("Saving all user organisations associated to this IPT...");
-    Writer organisationWriter = IptFileUtils.startNewUtf8File(dataDir.configFile(PERSISTENCE_FILE_V2));
-    ObjectOutputStream out = xstreamV2.createObjectOutputStream(organisationWriter, "registration");
-    out.writeObject(registration);
-    for (Organisation organisation : registration.getAssociatedOrganisations().values()) {
-      out.writeObject(organisation);
-    }
-    out.close();
+    store.save(registration);
   }
+
 }

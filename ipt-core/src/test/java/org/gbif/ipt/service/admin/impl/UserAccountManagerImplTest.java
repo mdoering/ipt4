@@ -23,7 +23,6 @@ import org.gbif.ipt.model.User.Role;
 import org.gbif.ipt.service.AlreadyExistingException;
 import org.gbif.ipt.service.DeletionNotAllowedException;
 import org.gbif.ipt.service.admin.UserAccountManager;
-import org.gbif.ipt.utils.PBEEncrypt;
 
 import java.io.File;
 
@@ -41,18 +40,6 @@ public class UserAccountManagerImplTest extends IptBaseTest {
 
   private static File userFile;
   private User admin, manager, publisher, user;
-  private PBEEncrypt encrypt;
-
-  {
-    try {
-      encrypt = new PBEEncrypt(
-          "Carla Maria Luise",
-          new byte[]{0x00, 0x05, 0x02, 0x05, 0x04, 0x25, 0x06, 0x17},
-          9);
-    } catch (PBEEncrypt.EncryptionException e) {
-      encrypt = null;
-    }
-  }
 
   @BeforeAll
   public static void initialiseOnce() {
@@ -73,7 +60,7 @@ public class UserAccountManagerImplTest extends IptBaseTest {
   private UserAccountManager getUserAccountManager() {
     AppConfig mockedCfg = MockAppConfig.buildMock();
     DataDir mockedDataDir = MockDataDir.buildMock();
-    return new UserAccountManagerImpl(mockedCfg, mockedDataDir, encrypt);
+    return new UserAccountManagerImpl(mockedCfg, mockedDataDir);
   }
 
   @BeforeEach

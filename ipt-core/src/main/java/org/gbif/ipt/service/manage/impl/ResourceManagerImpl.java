@@ -45,6 +45,7 @@ import org.gbif.ipt.service.manage.ResourceImportService;
 import org.gbif.ipt.service.manage.ResourceLoadCallbacks;
 import org.gbif.ipt.service.manage.ResourceLoader;
 import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.persistence.AtomicFiles;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.utils.ActionLogger;
@@ -61,7 +62,9 @@ import org.gbif.utils.file.CompressionUtil.UnsupportedCompressionType;
 import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -372,7 +375,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
 
   /**
    * Determine whether the directory represents an IPT Resource directory or not. To qualify, a directory must contain
-   * a resource.xml file and one of the metadata files: eml.xml/datapackage.json/metadata.yml
+   * a resource.json file and one of the metadata files: eml.xml/datapackage.json/metadata.yml
    *
    * @param dir directory where a compressed file was decompressed
    * @return true if it is an IPT Resource folder or false otherwise
@@ -613,14 +616,14 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   public synchronized void save(Resource resource) throws InvalidConfigException {
     File cfgFile = dataDir.resourceFile(resource);
     try {
-      // make sure resource dir exists
-      FileUtils.forceMkdir(cfgFile.getParentFile());
-      // persist data
-      try (Writer writer = IptFileUtils.startNewUtf8File(cfgFile)) {
+      // persist data, replacing the file only once it is completely written
+      AtomicFiles.write(cfgFile.toPath(), out -> {
+        Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
         resourcePersister.save(resource, writer);
-        // add to internal map
-        addResource(resource);
-      }
+        writer.flush();
+      });
+      // add to internal map
+      addResource(resource);
     } catch (IllegalArgumentException e) {
       LOG.error(e);
       throw new InvalidConfigException(TYPE.CONFIG_WRITE, e.getMessage());
@@ -633,20 +636,15 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   @Override
   public synchronized void saveInferredMetadata(Resource resource) throws InvalidConfigException {
     File cfgFile = dataDir.resourceInferredMetadataFile(resource.getShortname());
-    Writer writer = null;
     try {
-      // make sure resource dir exists
-      FileUtils.forceMkdir(cfgFile.getParentFile());
-      // persist data
-      writer = IptFileUtils.startNewUtf8File(cfgFile);
-      resourcePersister.saveInferredMetadata(resource.getInferredMetadata(), writer);
+      AtomicFiles.write(cfgFile.toPath(), out -> {
+        Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+        resourcePersister.saveInferredMetadata(resource.getInferredMetadata(), writer);
+        writer.flush();
+      });
     } catch (IOException e) {
       LOG.error(e);
       throw new InvalidConfigException(TYPE.CONFIG_WRITE, "Can't write inferred metadata file");
-    } finally {
-      if (writer != null) {
-        closeWriter(writer);
-      }
     }
   }
 

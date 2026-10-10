@@ -31,16 +31,6 @@ import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.ResourceSummaryView;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.VersionHistory;
-import org.gbif.ipt.model.converter.ConceptTermConverter;
-import org.gbif.ipt.model.converter.DataPackageFieldConverter;
-import org.gbif.ipt.model.converter.DataPackageIdentifierConverter;
-import org.gbif.ipt.model.converter.ExtensionMappingConverter;
-import org.gbif.ipt.model.converter.ExtensionRowTypeConverter;
-import org.gbif.ipt.model.converter.JdbcInfoConverter;
-import org.gbif.ipt.model.converter.OrganisationKeyConverter;
-import org.gbif.ipt.model.converter.PasswordEncrypter;
-import org.gbif.ipt.model.converter.TableSchemaNameConverter;
-import org.gbif.ipt.model.converter.UserEmailConverter;
 import org.gbif.ipt.model.factory.ExtensionFactory;
 import org.gbif.ipt.model.factory.ThesaurusHandlingRule;
 import org.gbif.ipt.model.voc.DOIRegistrationAgency;
@@ -49,7 +39,9 @@ import org.gbif.ipt.model.voc.PublicationMode;
 import org.gbif.ipt.model.voc.PublicationStatus;
 import org.gbif.ipt.service.InvalidConfigException;
 import org.gbif.ipt.service.PublicationException;
+import org.gbif.ipt.persistence.TestPersisters;
 import org.gbif.ipt.service.admin.DataPackageSchemaManager;
+import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.admin.ExtensionManager;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
@@ -800,8 +792,6 @@ public class ResourcePublicationManagerImplTest {
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     ExtensionFactory extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);
     support = TestBeanProvider.provideJdbcSupport();
-    PasswordEncrypter passwordEncrypter = new PasswordEncrypter(TestBeanProvider.providePasswordEncryption());
-    JdbcInfoConverter jdbcConverter = new JdbcInfoConverter(support);
 
     // construct occurrence core Extension
     InputStream occurrenceCoreIs = ResourceManagerImplTest.class.getResourceAsStream("/extensions/dwc_occurrence.xml");
@@ -838,19 +828,7 @@ public class ResourcePublicationManagerImplTest {
             Map.entry("http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord", occurrenceCore),
             Map.entry("http://rs.gbif.org/terms/1.0/Image", simpleImage)));
 
-    ExtensionRowTypeConverter extensionRowTypeConverter = new ExtensionRowTypeConverter(extensionsHolder);
-    ConceptTermConverter conceptTermConverter = new ConceptTermConverter(extensionRowTypeConverter);
 
-    ResourceConvertersManager mockResourceConvertersManager = new ResourceConvertersManager(
-        mock(UserEmailConverter.class),
-        mock(OrganisationKeyConverter.class),
-        mock(ExtensionMappingConverter.class),
-        extensionRowTypeConverter,
-        conceptTermConverter,
-        mock(DataPackageIdentifierConverter.class),
-        mock(TableSchemaNameConverter.class),
-        mock(DataPackageFieldConverter.class),
-        jdbcConverter);
 
     ResourceVersioningService resourceVersioningService = new ResourceVersioningServiceImpl(mockedDataDir);
     ResourceTypeService resourceTypeService = new ResourceTypeServiceImpl(mock(VocabulariesManager.class));
@@ -874,7 +852,7 @@ public class ResourcePublicationManagerImplTest {
     // mock finding dwca.zip file that does not exist
     when(mockedDataDir.resourceDwcaFile(anyString())).thenReturn(new File("dwca.zip"));
 
-    ResourcePersister resourcePersister = new XStreamResourcePersister(mockResourceConvertersManager, passwordEncrypter);
+    ResourcePersister resourcePersister = TestPersisters.json(mock(UserAccountManager.class), mockRegistrationManager, extensionsHolder, mockSchemaManager, support);
 
     ResourceLoader resourceLoader = new ResourceLoaderImpl(
         mockAppConfig,
@@ -909,7 +887,7 @@ public class ResourcePublicationManagerImplTest {
    */
   public Resource getNonRegisteredMetadataOnlyResource() throws Exception {
     // retrieve resource configuration file
-    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.xml");
+    File resourceXML = FileUtils.getClasspathFile("resources/res1/resource.json");
     // copy to resource folder
     File copiedResourceXML = new File(resourceDir, DataDir.PERSISTENCE_FILENAME);
     org.apache.commons.io.FileUtils.copyFile(resourceXML, copiedResourceXML);

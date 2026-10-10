@@ -16,7 +16,6 @@ package org.gbif.ipt.config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gbif.ipt.utils.InputStreamUtils;
-import org.gbif.ipt.utils.PBEEncrypt;
 import org.gbif.ipt.http.IptHttp;
 
 
@@ -86,17 +85,6 @@ public class TestBeanProvider {
       LOG.error("Cant create namespace aware SAX Parser Factory: " + e.getMessage(), e);
     }
     return saxf;
-  }
-
-  public static PBEEncrypt providePasswordEncryption() {
-    final byte[] salt = {0x00, 0x05, 0x02, 0x05, 0x04, 0x25, 0x06, 0x17};
-    PBEEncrypt enc = null;
-    try {
-      enc = new PBEEncrypt("Carla Maria Luise", salt, 9);
-    } catch (PBEEncrypt.EncryptionException e) {
-      LOG.error("Cannot create password encryption", e);
-    }
-    return enc;
   }
 
   /** A data dir in the temp folder, like IPT 3's test {@code datadir.location}. */
