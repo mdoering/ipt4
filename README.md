@@ -7,6 +7,6 @@ The design is in [docs/design.md](docs/design.md). It is ported from IPT 3 at th
 
 ```bash
 mvn -B verify
-IPT_DATA_DIR=~/ipt4-data mvn -pl ipt-app -am spring-boot:run -Dspring-boot.run.profiles=dev   # http://localhost:7001
+mvn -B -DskipTests install && IPT_DATA_DIR=~/ipt4-data mvn -pl ipt-app spring-boot:run -Dspring-boot.run.profiles=dev   # http://localhost:7001
 docker build -f docker/Dockerfile -t gbif/ipt:4.0.0-SNAPSHOT . && docker run -p 8080:8080 -v ipt4data:/srv/ipt gbif/ipt:4.0.0-SNAPSHOT
 ```

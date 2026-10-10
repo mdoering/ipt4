@@ -5,3 +5,7 @@ target/
 .DS_Store
 /ipt-data/
 logs/
+.classpath
+.project
+.settings/
+.factorypath
