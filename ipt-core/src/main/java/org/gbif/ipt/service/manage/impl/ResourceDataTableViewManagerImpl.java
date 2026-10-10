@@ -30,8 +30,8 @@ import org.gbif.ipt.service.admin.DataPackageSchemaManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.manage.ResourceDataTableViewManager;
 import org.gbif.ipt.service.manage.ResourceManager;
-import org.gbif.ipt.struts2.RequireManagerInterceptor;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.service.manage.ResourceAccessPolicy;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.MapUtils;
 
 import jakarta.inject.Inject;
@@ -119,7 +119,7 @@ public class ResourceDataTableViewManagerImpl extends BaseManager implements Res
     List<Resource> allResources = resourceManager.list();
 
     List<ResourceSummaryView> filteredResources = allResources.stream()
-        .filter(res -> RequireManagerInterceptor.isAuthorized(user, res))
+        .filter(res -> ResourceAccessPolicy.canManage(user, res))
         .map(this::toSimplifiedResource)
         .filter(res -> matchesSearchString(res, request.getSearch()))
         .toList();

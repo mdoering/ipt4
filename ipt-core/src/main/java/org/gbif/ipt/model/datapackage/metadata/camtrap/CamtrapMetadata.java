@@ -35,7 +35,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import org.apache.struts2.util.Element;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -251,7 +250,7 @@ public class CamtrapMetadata extends FrictionlessMetadata<CamtrapContributor, Ca
   @JsonDeserialize(contentAs = CamtrapContributor.class,
       contentUsing = CamtrapContributor.CamtrapContributorDeserializer.class)
   @JsonSetter(contentNulls = Nulls.SKIP)
-  @Element(CamtrapContributor.class)
+  // list element type for form binding: CamtrapContributor (was the Struts @Element annotation)
   @NotNull(message = "validation.input.required", groups = BasicMetadata.class)
   @Valid
   @Size(min = 1, message = "validation.datapackage.metadata.contributors.size", groups = BasicMetadata.class)
@@ -376,7 +375,7 @@ public class CamtrapMetadata extends FrictionlessMetadata<CamtrapContributor, Ca
   @JsonProperty("sources")
   @JsonDeserialize(contentUsing = CamtrapSource.CamtrapSourceDeserializer.class)
   @JsonSetter(contentNulls = Nulls.SKIP)
-  @Element(CamtrapSource.class)
+  // list element type for form binding: CamtrapSource (was the Struts @Element annotation)
   @Valid
   public List<CamtrapSource> getSources() {
     return super.getSources();
@@ -400,7 +399,7 @@ public class CamtrapMetadata extends FrictionlessMetadata<CamtrapContributor, Ca
   @JsonProperty("licenses")
   @JsonDeserialize(contentUsing = CamtrapLicense.CamtrapLicenseDeserializer.class)
   @JsonSetter(contentNulls = Nulls.SKIP)
-  @Element(CamtrapLicense.class)
+  // list element type for form binding: CamtrapLicense (was the Struts @Element annotation)
   @Size(min = 2, message = "validation.camtrap.metadata.licenses.size", groups = BasicMetadata.class)
   @HasGbifCompatibleLicense(
       message = "validation.camtrap.metadata.licenses.gbifCompatible.required",

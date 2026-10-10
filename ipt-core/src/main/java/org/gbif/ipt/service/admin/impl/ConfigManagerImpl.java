@@ -17,8 +17,7 @@ import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.ConfigWarnings;
 import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.config.ExtensionMonitor;
-import org.gbif.ipt.config.LoggingConfigFactory;
-import org.gbif.ipt.config.LoggingConfiguration;
+import org.gbif.ipt.config.LoggingControl;
 import org.gbif.ipt.config.PublishingMonitor;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.User.Role;
@@ -43,7 +42,6 @@ import java.net.URL;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,10 +49,10 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 
 public class ConfigManagerImpl extends BaseManager implements ConfigManager {
+
+  private LoggingControl loggingControl = LoggingControl.NONE;
 
   private final UserAccountManager userManager;
   private final ResourceManager resourceManager;
@@ -136,7 +134,7 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
         ExtendedResponse response = client.get(testUrl, rs);
 
         LOG.info("Proxy response is {}", response.getStatusLine());
-        proxyWorks = (HttpServletResponse.SC_OK == response.getStatusLine().getStatusCode());
+        proxyWorks = (200 == response.getStatusLine().getStatusCode());
       } catch (Exception e) {
         proxyWorks = false;
         LOG.warn("Proxy failed because", e);
@@ -307,19 +305,15 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
   }
 
   private void reloadLogger() {
-    LoggingConfiguration.logDirectory = dataDir.loggingDir().getAbsolutePath() + "/";
-    LOG.info("Changing logging directory to {}", LoggingConfiguration.logDirectory);
-
-    LoggingConfigFactory.useDebug = cfg.debug();
-
-    LoggerContext context = (LoggerContext) LogManager.getContext(false);
-    Configuration newConfig = LoggingConfigFactory.newConfigurationBuilder().build(true);
-    context.setConfiguration(newConfig);
-    context.reconfigure();
-
-    LOG.info("Reloaded Log4J2 for {}", (cfg.debug() ? "debugging" : "production"));
-    LOG.info("Logging to {}", LoggingConfiguration.logDirectory);
+    loggingControl.apply(dataDir.loggingDir(), cfg.debug());
+    LOG.info("Reloaded logging for {}", (cfg.debug() ? "debugging" : "production"));
+    LOG.info("Logging to {}", dataDir.loggingDir().getAbsolutePath());
     LOG.info("IPT Data Directory: {}", dataDir.dataFile(".").getAbsolutePath());
+  }
+
+  @Inject
+  public void setLoggingControl(Optional<LoggingControl> loggingControl) {
+    this.loggingControl = loggingControl.orElse(LoggingControl.NONE);
   }
 
   @Override
@@ -514,7 +508,7 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
 
       ExtendedResponse response = client.get(testURL, requestConfigBuilder.build());
 
-      return HttpServletResponse.SC_OK == response.getStatusLine().getStatusCode();
+      return 200 == response.getStatusLine().getStatusCode();
     } catch (ClientProtocolException e) {
       LOG.info("Protocol error connecting to new base URL [{}]", baseURL, e);
     } catch (IOException e) {

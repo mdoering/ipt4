@@ -35,7 +35,7 @@ import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.service.registry.impl.RegistryManagerImpl;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
 import org.gbif.utils.ExtendedResponse;
 import org.gbif.utils.HttpClient;

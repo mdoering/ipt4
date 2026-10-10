@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.service.manage;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.datapackage.metadata.DataPackageMetadata;
@@ -170,7 +170,7 @@ public interface ResourceImportService {
    * @throws IOException               if the file could not be read
    * @throws InvalidMetadataException  if the metadata is invalid
    */
-  void validateDatapackageMetadataFile(BaseAction action, File metadataFile,
+  void validateDatapackageMetadataFile(Feedback action, File metadataFile,
                                        Class<? extends DataPackageMetadata> metadataClass)
       throws IOException, InvalidMetadataException;
 

@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.service.manage.impl;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -209,7 +209,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Override
-  public Resource create(String shortname, String type, File archiveOrSingleFile, User creator, BaseAction action)
+  public Resource create(String shortname, String type, File archiveOrSingleFile, User creator, Feedback action)
       throws AlreadyExistingException, ImportException, InvalidFilenameException {
     Objects.requireNonNull(shortname);
     // check if existing already
@@ -413,7 +413,7 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Override
-  public void replaceDatapackageMetadata(BaseAction action, Resource resource, File metadataFile, boolean validate)
+  public void replaceDatapackageMetadata(Feedback action, Resource resource, File metadataFile, boolean validate)
       throws IOException, ImportException, org.gbif.ipt.service.InvalidMetadataException {
     if (validate) {
       resourceImportService.validateDatapackageMetadataFile(action, metadataFile, metadataClassForType(resource.getCoreType()));

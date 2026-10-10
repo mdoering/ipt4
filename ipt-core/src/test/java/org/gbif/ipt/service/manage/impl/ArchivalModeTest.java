@@ -25,7 +25,7 @@ import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourceMetadataInferringService;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.task.Eml2Rtf;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
 import org.gbif.ipt.task.GenerateDataPackageFactory;

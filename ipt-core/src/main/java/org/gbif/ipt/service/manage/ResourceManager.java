@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.service.manage;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.ResourceSummaryView;
@@ -58,7 +58,7 @@ public interface ResourceManager {
    * @throws ImportException          if a problem occurred importing the DwC-A file
    * @throws org.gbif.ipt.service.InvalidFilenameException if source filename contained an illegal character
    */
-  Resource create(String shortname, String type, File dwca, User creator, BaseAction action)
+  Resource create(String shortname, String type, File dwca, User creator, Feedback action)
     throws AlreadyExistingException, ImportException, InvalidFilenameException;
 
   /**
@@ -214,7 +214,7 @@ public interface ResourceManager {
   /**
    * Replace the datapackage metadata file in a resource by the provided file
    */
-  void replaceDatapackageMetadata(BaseAction action, Resource resource, File metadataFile, boolean validate) throws IOException, ImportException, InvalidMetadataException;
+  void replaceDatapackageMetadata(Feedback action, Resource resource, File metadataFile, boolean validate) throws IOException, ImportException, InvalidMetadataException;
 
   /**
    * Update organisation name and alias for published resources.

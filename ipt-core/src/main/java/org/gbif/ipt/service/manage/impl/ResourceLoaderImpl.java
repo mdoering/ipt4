@@ -13,7 +13,8 @@
  */
 package org.gbif.ipt.service.manage.impl;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.model.DataPackageFieldMapping;
@@ -39,7 +40,7 @@ import org.gbif.ipt.service.manage.ResourceMetadataLoader;
 import org.gbif.ipt.service.manage.ResourcePersister;
 import org.gbif.ipt.service.manage.ResourceTypeService;
 import org.gbif.ipt.service.manage.ResourceVersioningService;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.ActionLogger;
 
 import jakarta.inject.Inject;
@@ -117,7 +118,7 @@ public class ResourceLoaderImpl implements ResourceLoader {
   @Override
   public Resource load(File resourceDir, @Nullable User creator, ResourceLoadCallbacks callbacks) {
     return load(resourceDir, creator,
-        new ActionLogger(LOG, new BaseAction(textProvider, cfg, registrationManager)), callbacks);
+        new ActionLogger(LOG, new CollectingFeedback(null)), callbacks);
   }
 
   /**

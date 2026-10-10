@@ -14,7 +14,7 @@
 package org.gbif.ipt.service.manage;
 
 import org.gbif.api.model.common.DOI;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Ipt;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.PublicationOptions;
@@ -66,12 +66,12 @@ public interface ResourcePublicationManager {
    *
    * @return true if resource is currently locked for any management.
    */
-  boolean isLocked(String shortname, BaseAction action);
+  boolean isLocked(String shortname, Feedback action);
 
   /**
-   * Defaults BaseAction to null.
+   * Defaults Feedback to null.
    *
-   * @see ResourcePublicationManager#isLocked(String, org.gbif.ipt.action.BaseAction)
+   * @see ResourcePublicationManager#isLocked(String, org.gbif.ipt.feedback.Feedback)
    */
   boolean isLocked(String shortname);
 
@@ -98,7 +98,7 @@ public interface ResourcePublicationManager {
    * @throws PublicationException if resource was already registered
    * @throws InvalidConfigException if resource or metadata could not be saved
    */
-  boolean publish(Resource resource, BigDecimal version, @Nullable BaseAction action) throws PublicationException;
+  boolean publish(Resource resource, BigDecimal version, @Nullable Feedback action) throws PublicationException;
 
   /**
    * Publishes a new version of a resource including generating a darwin core archive and issuing a new EML version for
@@ -114,7 +114,7 @@ public interface ResourcePublicationManager {
    * @throws PublicationException if resource was already registered
    * @throws InvalidConfigException if resource or metadata could not be saved
    */
-  boolean publish(Resource resource, BigDecimal version, @Nullable BaseAction action, boolean skipIfNotChanged) throws PublicationException;
+  boolean publish(Resource resource, BigDecimal version, @Nullable Feedback action, boolean skipIfNotChanged) throws PublicationException;
 
   /**
    * Publishes a new version of a resource including generating a darwin core archive and issuing a new EML version for
@@ -130,7 +130,7 @@ public interface ResourcePublicationManager {
    * @throws PublicationException if resource was already registered
    * @throws InvalidConfigException if resource or metadata could not be saved
    */
-  boolean publish(Resource resource, BigDecimal version, BaseAction action, PublicationOptions options) throws PublicationException;
+  boolean publish(Resource resource, BigDecimal version, Feedback action, PublicationOptions options) throws PublicationException;
 
   void publishDataPackageMetadata(Resource resource, BigDecimal version);
 
@@ -163,7 +163,7 @@ public interface ResourcePublicationManager {
    * @param rollingBack version to rollback
    * @param action   action
    */
-  void restoreVersion(Resource resource, BigDecimal rollingBack, @Nullable BaseAction action);
+  void restoreVersion(Resource resource, BigDecimal rollingBack, @Nullable Feedback action);
 
   /**
    * Remove a specific archived version of a resource
@@ -185,7 +185,7 @@ public interface ResourcePublicationManager {
    * @param ipt          the ipt that the resource will be published through
    * @param action       Action used to show log messages on UI
    */
-  void register(Resource resource, Organisation organisation, Ipt ipt, BaseAction action) throws InvalidConfigException;
+  void register(Resource resource, Organisation organisation, Ipt ipt, Feedback action) throws InvalidConfigException;
 
   /**
    * Update the registration of the resource with the GBIF Registry. This is always done as part of a resource
@@ -196,7 +196,7 @@ public interface ResourcePublicationManager {
    *
    * @throws PublicationException (TYPE.REGISTRY) if update was unsuccessful
    */
-  void updateRegistration(Resource resource, BaseAction action) throws PublicationException;
+  void updateRegistration(Resource resource, Feedback action) throws PublicationException;
 
   /**
    * Makes a resource private.
@@ -206,7 +206,7 @@ public interface ResourcePublicationManager {
    *
    * @throws InvalidConfigException if resource was already registered
    */
-  void visibilityToPrivate(Resource resource, BaseAction action) throws InvalidConfigException;
+  void visibilityToPrivate(Resource resource, Feedback action) throws InvalidConfigException;
 
   /**
    * Makes a resource public.
@@ -216,7 +216,7 @@ public interface ResourcePublicationManager {
    *
    * @throws InvalidConfigException if resource was already registered
    */
-  void visibilityToPublic(Resource resource, BaseAction action) throws InvalidConfigException;
+  void visibilityToPublic(Resource resource, Feedback action) throws InvalidConfigException;
 
   /**
    * Update the resource publicationMode.

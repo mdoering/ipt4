@@ -14,7 +14,8 @@
 package org.gbif.ipt.service.manage.impl;
 
 import org.gbif.api.model.common.DOI;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -66,7 +67,7 @@ import org.gbif.ipt.service.manage.ResourceTypeService;
 import org.gbif.ipt.service.manage.ResourceVersioningService;
 import org.gbif.ipt.service.manage.SourceManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.task.Eml2Rtf;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
 import org.gbif.ipt.task.GenerateDataPackageFactory;
@@ -124,7 +125,7 @@ public class ResourcePublicationManagerImplTest {
   private final GenerateDwcaFactory mockDwcaFactory = mock(GenerateDwcaFactory.class);
   private final SimpleTextProvider mockSimpleTextProvider = mock(SimpleTextProvider.class);
   private final Eml2Rtf mockEml2Rtf = mock(Eml2Rtf.class);
-  private final BaseAction baseAction = new BaseAction(mockSimpleTextProvider, mockAppConfig, mockRegistrationManager);
+  private final Feedback baseAction = new CollectingFeedback(null);
 
   private User creator;
   private Resource resource;

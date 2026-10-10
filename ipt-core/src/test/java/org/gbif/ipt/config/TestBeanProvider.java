@@ -21,7 +21,6 @@ import org.gbif.utils.HttpClient;
 import org.gbif.utils.HttpUtil;
 import org.gbif.utils.PreemptiveAuthenticationInterceptor;
 
-import jakarta.servlet.ServletContext;
 
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
@@ -33,7 +32,6 @@ public class TestBeanProvider {
 
   private static final Logger LOG = LogManager.getLogger(TestBeanProvider.class);
 
-  private static final String DATA_DIR_ENV_VAR = "IPT_DATA_DIR";
   protected static final int CONNECTION_TIMEOUT_MSEC = 30_000;
   protected static final int MAX_CONNECTIONS = 100;
   protected static final int MAX_PER_ROUTE = 10;
@@ -110,37 +108,9 @@ public class TestBeanProvider {
     return enc;
   }
 
-  public static DataDir provideDataDir(ServletContext servletContext) {
-    DataDir dd;
-
-    /*
-     * Parameter from the servlet context, e.g.
-     * <Context>
-     *   <Parameter name="IPT_DATA_DIR" value="/var/lib/ipt2"/>
-     * </Context>
-     * typically in $CATALINA_BASE/conf/Catalina/localhost/ipt2.xml
-     */
-    String dataDirectoryLocationParam = servletContext.getInitParameter(DATA_DIR_ENV_VAR);
-
-    /*
-     * System environment variable
-     */
-    String dataDirectoryLocationEnv = System.getenv(DATA_DIR_ENV_VAR);
-
-    if (dataDirectoryLocationParam != null) {
-      LOG.info("Using context parameter " + DATA_DIR_ENV_VAR +
-          " for data directory location: " + dataDirectoryLocationParam);
-      dd = DataDir.buildFromString(dataDirectoryLocationParam);
-    } else if (dataDirectoryLocationEnv != null) {
-      LOG.info("Using environment variable " + DATA_DIR_ENV_VAR +
-          " for data directory location: " + dataDirectoryLocationEnv);
-      dd = DataDir.buildFromString(dataDirectoryLocationEnv);
-    } else {
-      File dataDirSettingFile = new File(servletContext.getRealPath("/") + "/WEB-INF/datadir.location");
-      LOG.info("Using file " + dataDirSettingFile.getAbsolutePath() +
-          " for data directory location.");
-      dd = DataDir.buildFromLocationFile(dataDirSettingFile);
-    }
+  /** A data dir in the temp folder, like IPT 3's test {@code datadir.location}. */
+  public static DataDir provideDataDir() {
+    DataDir dd = DataDir.buildFromString(System.getProperty("java.io.tmpdir") + "/ipt4-test-datadir");
     try {
       if (dd.isConfigured()) {
         dd.clearTmp();

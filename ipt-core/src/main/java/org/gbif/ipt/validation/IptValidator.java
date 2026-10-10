@@ -13,14 +13,14 @@
  */
 package org.gbif.ipt.validation;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Ipt;
 
 import static org.gbif.ipt.validation.EmailValidationMessageTranslator.EMAIL_ERROR_TRANSLATIONS;
 
 public class IptValidator extends BaseValidator {
 
-  public void validate(BaseAction action, Ipt ipt) {
+  public void validate(Feedback action, Ipt ipt) {
     validateBasic(action, ipt, "ipt");
     if (ipt.getWsPassword() == null || ipt.getWsPassword().isEmpty()) {
       action.addFieldError("ipt.wsPassword", action.getText("validation.ipt.password.required"));
@@ -30,18 +30,18 @@ public class IptValidator extends BaseValidator {
     }
   }
 
-  public void validateIptPassword(BaseAction action, String password) {
+  public void validateIptPassword(Feedback action, String password) {
     if (password != null && password.length() < 6) {
       action.addFieldError("registeredIptPassword", action.getText("validation.ipt.password.short"));
     }
   }
 
-  public void validateUpdate(BaseAction action, Ipt ipt) {
+  public void validateUpdate(Feedback action, Ipt ipt) {
     validateBasic(action, ipt, "registeredIpt");
   }
 
 
-  private void validateBasic(BaseAction action, Ipt ipt, String fieldPrefix) {
+  private void validateBasic(Feedback action, Ipt ipt, String fieldPrefix) {
     if (ipt.getName() == null || ipt.getName().isEmpty()) {
       action.addFieldError(fieldPrefix + ".name", action.getText("validation.ipt.name.required"));
     }

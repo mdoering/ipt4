@@ -20,7 +20,8 @@ import org.gbif.dwc.DwcFiles;
 import org.gbif.dwc.record.Record;
 import org.gbif.dwc.terms.DwcTerm;
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -74,7 +75,7 @@ import org.gbif.ipt.service.manage.impl.ResourceVersioningServiceImpl;
 import org.gbif.ipt.service.manage.impl.SourceManagerImpl;
 import org.gbif.ipt.service.manage.impl.XStreamResourcePersister;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.utils.HttpClient;
 import org.gbif.utils.file.ClosableIterator;
 import org.gbif.utils.file.CompressionUtil;
@@ -462,7 +463,7 @@ public class GenerateDwcaTest extends IptBaseTest {
     RegistryManager mockRegistryManager = MockRegistryManager.buildMock();
     VocabulariesManager mockVocabulariesManager = mock(VocabulariesManager.class);
     SimpleTextProvider mockSimpleTextProvider = mock(SimpleTextProvider.class);
-    BaseAction baseAction = new BaseAction(mockSimpleTextProvider, mockAppConfig, mockRegistrationManager);
+    Feedback baseAction = new CollectingFeedback(null);
 
 
     // construct ExtensionFactory using injected parameters

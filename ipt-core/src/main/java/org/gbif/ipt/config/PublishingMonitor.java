@@ -13,7 +13,8 @@
  */
 package org.gbif.ipt.config;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.PublicationOptions;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.service.InvalidConfigException;
@@ -21,7 +22,7 @@ import org.gbif.ipt.service.PublicationException;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.PublicationFailureEmailUtils;
 
 import jakarta.inject.Inject;
@@ -59,7 +60,7 @@ public class PublishingMonitor {
   private final ResourceManager resourceManager;
   private final ResourcePublicationManager resourcePublicationManager;
   private final AppConfig cfg;
-  private final BaseAction baseAction;
+  private final Feedback baseAction;
   private final Map<String, LocalDate> lastLoggedSkips = new ConcurrentHashMap<>();
 
   @Inject
@@ -72,7 +73,7 @@ public class PublishingMonitor {
     this.resourceManager = resourceManager;
     this.resourcePublicationManager = resourcePublicationManager;
     this.cfg = cfg;
-    baseAction = new BaseAction(textProvider, cfg, registrationManager);
+    baseAction = new CollectingFeedback(null);
   }
 
   /**

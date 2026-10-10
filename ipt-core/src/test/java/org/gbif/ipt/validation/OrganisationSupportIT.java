@@ -15,7 +15,7 @@ package org.gbif.ipt.validation;
 
 import org.gbif.datacite.rest.client.configuration.ClientConfiguration;
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.action.admin.OrganisationsAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.model.Organisation;
@@ -23,7 +23,7 @@ import org.gbif.ipt.model.voc.DOIRegistrationAgency;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.utils.file.properties.PropertiesUtil;
 
 import java.io.IOException;
@@ -50,13 +50,7 @@ public class OrganisationSupportIT extends IptBaseTest {
 
   private static final String ORGANISATION_KEY = UUID.fromString("dce7a3c9-ea78-4be7-9abc-e3838de70dc5").toString();
   private static final String VALID_ORGANISATION_PASSWORD = "password";
-  private static final OrganisationsAction action = new OrganisationsAction(
-      mock(SimpleTextProvider.class),
-      mock(AppConfig.class),
-      mock(RegistrationManager.class),
-      mock(OrganisationSupport.class),
-      mock(ResourceManager.class),
-      mock(RegistryManager.class));
+  private static final CollectingFeedback action = new CollectingFeedback(null);
 
   private static AppConfig mockCfg;
   private static RegistryManager mockRegistryManager;

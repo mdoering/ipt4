@@ -14,14 +14,15 @@
 package org.gbif.ipt.validation;
 
 import org.gbif.api.vocabulary.Language;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.i18n.I18n;
-import org.gbif.ipt.i18n.StrutsI18n;
+import org.gbif.ipt.i18n.FeedbackI18n;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.voc.MetadataSection;
 import org.gbif.ipt.service.admin.RegistrationManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.metadata.eml.EMLProfileVersion;
 import org.gbif.metadata.eml.InvalidEmlException;
 import org.gbif.metadata.eml.ipt.IptEmlWriter;
@@ -167,9 +168,9 @@ public class EmlValidator extends BaseValidator {
   }
 
   public boolean isValid(Resource resource, @Nullable MetadataSection section) {
-    BaseAction action = new BaseAction(simpleTextProvider, cfg, regManager);
+    Feedback action = new CollectingFeedback(null);
     ErrorCollector ec = new ActionErrorCollector(action);
-    I18n i18n = new StrutsI18n(action);
+    I18n i18n = new FeedbackI18n(action);
     validate(resource, section, ec, i18n);
     return !(action.hasActionErrors() || action.hasFieldErrors());
   }

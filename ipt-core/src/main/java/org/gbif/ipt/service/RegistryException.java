@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.service;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -128,11 +128,11 @@ public class RegistryException extends RuntimeException {
    * the IPT admin, from having to interpret complex stacktrace exceptions.
    *
    * @param e      RegistryException
-   * @param action BaseAction
+   * @param action Feedback
    *
    * @return log message
    */
-  public static String logRegistryException(RegistryException e, BaseAction action) {
+  public static String logRegistryException(RegistryException e, Feedback action) {
     // retrieve specific log message, depending on Type
     String msg = action.getText("admin.registration.error.registry");
     if (e.type != null) {

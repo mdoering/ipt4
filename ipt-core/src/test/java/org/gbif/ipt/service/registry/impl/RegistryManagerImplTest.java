@@ -26,7 +26,7 @@ import org.gbif.ipt.model.Vocabulary;
 import org.gbif.ipt.model.voc.PublicationStatus;
 import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptMockBaseTest;
 import org.gbif.utils.ExtendedResponse;
 import org.gbif.utils.HttpClient;

@@ -15,14 +15,15 @@ package org.gbif.ipt.validation;
 
 import org.gbif.api.vocabulary.Language;
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.voc.MetadataSection;
-import org.gbif.ipt.i18n.StrutsI18n;
+import org.gbif.ipt.i18n.FeedbackI18n;
 import org.gbif.ipt.service.admin.RegistrationManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.metadata.eml.ipt.EmlFactory;
 import org.gbif.metadata.eml.ipt.model.Agent;
 import org.gbif.metadata.eml.ipt.model.BBox;
@@ -60,7 +61,7 @@ public class EmlValidatorTest extends IptBaseTest {
   private Resource resource;
   private Eml eml;
   private Agent badAgent;
-  private BaseAction action;
+  private Feedback action;
   private Organisation organisation;
 
   @BeforeEach
@@ -70,8 +71,8 @@ public class EmlValidatorTest extends IptBaseTest {
     RegistrationManager mockRegistrationManager = mock(RegistrationManager.class);
     // instance of EmlValidator using mock AppConfig, RegistrationManager, and SimpleTextProvider
     validator = new EmlValidator(mockCfg, mockRegistrationManager, mockTextProvider);
-    // instance of BaseAction
-    action = new BaseAction(mockTextProvider, mockCfg, mockRegistrationManager);
+    // instance of Feedback
+    action = new CollectingFeedback(null);
 
     // load sample eml, and set on resource
     resource = new Resource();
@@ -728,6 +729,6 @@ public class EmlValidatorTest extends IptBaseTest {
     empty.addCreator(agent);
     empty.addMetadataProvider(agent);
 
-    assertTrue(validator.areAllSectionsValid(resource, new SectionErrorCollector(), new StrutsI18n(action)));
+    assertTrue(validator.areAllSectionsValid(resource, new SectionErrorCollector(), new FeedbackI18n(action)));
   }
 }

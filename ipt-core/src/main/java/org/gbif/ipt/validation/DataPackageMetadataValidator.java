@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.validation;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Resource;
 import org.gbif.ipt.model.datapackage.metadata.DataPackageMetadata;
 import org.gbif.ipt.model.datapackage.metadata.FrictionlessMetadata;
@@ -73,7 +73,7 @@ public class DataPackageMetadataValidator {
    * @param action   Action
    * @param metadata metadata
    */
-  public void validate(BaseAction action, DataPackageMetadata metadata) throws InvalidMetadataException {
+  public void validate(Feedback action, DataPackageMetadata metadata) throws InvalidMetadataException {
     boolean problemsEncountered = false;
 
     if (metadata instanceof CamtrapMetadata) {
@@ -97,7 +97,7 @@ public class DataPackageMetadataValidator {
     }
   }
 
-  public boolean isSectionValid(BaseAction action, Resource resource, DataPackageMetadataSection section) {
+  public boolean isSectionValid(Feedback action, Resource resource, DataPackageMetadataSection section) {
     boolean problemsEncountered = false;
     validate(action, resource, section);
     if ((action.hasActionErrors() || action.hasFieldErrors())) {
@@ -112,11 +112,11 @@ public class DataPackageMetadataValidator {
    * </br>
    * For each section, validation only proceeds if at least one field in the section's form has been entered.
    *
-   * @param action   BaseAction
+   * @param action   Feedback
    * @param resource resource
    * @param section  EML document section name
    */
-  public void validate(BaseAction action, Resource resource, @Nullable DataPackageMetadataSection section) {
+  public void validate(Feedback action, Resource resource, @Nullable DataPackageMetadataSection section) {
     if (resource != null) {
       DataPackageMetadata metadata = (resource.getDataPackageMetadata() == null) ? new FrictionlessMetadata() : resource.getDataPackageMetadata();
 
@@ -135,11 +135,11 @@ public class DataPackageMetadataValidator {
    * </br>
    * For each section, validation only proceeds if at least one field in the section's form has been entered.
    *
-   * @param action   BaseAction
+   * @param action   Feedback
    * @param metadata data package metadata
    * @param section  EML document section name
    */
-  public void validateCamtrap(BaseAction action, CamtrapMetadata metadata, @Nullable CamtrapMetadataSection section) {
+  public void validateCamtrap(Feedback action, CamtrapMetadata metadata, @Nullable CamtrapMetadataSection section) {
     // set default
     if (section == null) {
       section = CamtrapMetadataSection.BASIC_SECTION;
@@ -234,7 +234,7 @@ public class DataPackageMetadataValidator {
   }
 
   // TODO: consider making title, description and license optional in FrictionlessMetadata
-  public void validateDwcDp(BaseAction action, DataPackageMetadata metadata, FrictionlessMetadataSection section) {
+  public void validateDwcDp(Feedback action, DataPackageMetadata metadata, FrictionlessMetadataSection section) {
     // set default
     if (section == null) {
       section = FrictionlessMetadataSection.BASIC_SECTION;
@@ -262,11 +262,11 @@ public class DataPackageMetadataValidator {
    * </br>
    * For each section, validation only proceeds if at least one field in the section's form has been entered.
    *
-   * @param action   BaseAction
+   * @param action   Feedback
    * @param metadata data package metadata
    * @param section  EML document section name
    */
-  public void validateFrictionless(BaseAction action, DataPackageMetadata metadata, @Nullable FrictionlessMetadataSection section) {
+  public void validateFrictionless(Feedback action, DataPackageMetadata metadata, @Nullable FrictionlessMetadataSection section) {
     // set default
     if (section == null) {
       section = FrictionlessMetadataSection.BASIC_SECTION;
@@ -298,10 +298,10 @@ public class DataPackageMetadataValidator {
   /**
    * Validate ColMetadata.
    *
-   * @param action   BaseAction
+   * @param action   Feedback
    * @param metadata col metadata
    */
-  public void validateColMetadata(BaseAction action, ColMetadata metadata) {
+  public void validateColMetadata(Feedback action, ColMetadata metadata) {
     Set<ConstraintViolation<ColMetadata>> violations = validator.validate(metadata);
     String violationsSquashed = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining("\n", "-", ""));
     action.addActionError("Validation failed:\n" + violationsSquashed);
@@ -311,7 +311,7 @@ public class DataPackageMetadataValidator {
     return message.startsWith("validation.");
   }
 
-  private void addDefaultFieldError(BaseAction action, ConstraintViolation<DataPackageMetadata> violation) {
+  private void addDefaultFieldError(Feedback action, ConstraintViolation<DataPackageMetadata> violation) {
     if (isValidationProperty(violation.getMessage())) {
       action.addFieldError(
           "metadata." + violation.getPropertyPath(),
@@ -323,7 +323,7 @@ public class DataPackageMetadataValidator {
     }
   }
 
-  private void validateVernacularNames(BaseAction action, DataPackageMetadata metadata) {
+  private void validateVernacularNames(Feedback action, DataPackageMetadata metadata) {
     if (metadata instanceof CamtrapMetadata camtrapMetadata) {
       List<Taxonomic> taxonomics = camtrapMetadata.getTaxonomic();
 

@@ -18,7 +18,8 @@ import org.gbif.doi.metadata.datacite.DataCiteMetadata;
 import org.gbif.doi.service.DoiException;
 import org.gbif.doi.service.DoiExistsException;
 import org.gbif.doi.service.InvalidMetadataException;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -51,7 +52,7 @@ import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourceMetadataInferringService;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.task.Eml2Rtf;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackage;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
@@ -208,11 +209,11 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
 
   @Override
   public boolean isLocked(String shortname) {
-    return isLocked(shortname, new BaseAction(textProvider, cfg, registrationManager));
+    return isLocked(shortname, new CollectingFeedback(null));
   }
 
   @Override
-  public boolean isLocked(String shortname, BaseAction action) {
+  public boolean isLocked(String shortname, Feedback action) {
     if (processFutures.containsKey(shortname)) {
       Resource resource = resourceManager.get(shortname);
       BigDecimal version = resource.getMetadataVersion();
@@ -430,26 +431,26 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public boolean publish(Resource resource, BigDecimal version, BaseAction action)
+  public boolean publish(Resource resource, BigDecimal version, Feedback action)
       throws PublicationException, InvalidConfigException {
     return publish(resource, version, action, false);
   }
 
   @Override
-  public boolean publish(Resource resource, BigDecimal version, BaseAction action, boolean skipIfNotChanged)
+  public boolean publish(Resource resource, BigDecimal version, Feedback action, boolean skipIfNotChanged)
       throws PublicationException, InvalidConfigException {
     PublicationOptions options = PublicationOptions.builder().skipPublicationIfNotChanged(skipIfNotChanged).build();
     return publish(resource, version, action, options);
   }
 
   @Override
-  public boolean publish(Resource resource, BigDecimal version, BaseAction action, PublicationOptions options)
+  public boolean publish(Resource resource, BigDecimal version, Feedback action, PublicationOptions options)
       throws PublicationException, InvalidConfigException {
     String shortname = resource.getShortname();
 
     // prevent null action from being handled
     if (action == null) {
-      action = new BaseAction(textProvider, cfg, registrationManager);
+      action = new CollectingFeedback(null);
     }
     // add new version history
     addOrUpdateVersionHistory(resource, version, false, action);
@@ -528,7 +529,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   /**
-   * @see #isLocked(String, BaseAction) for removing jobs from internal maps
+   * @see #isLocked(String, Feedback) for removing jobs from internal maps
    */
   private void generateDwca(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
@@ -540,7 +541,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   /**
-   * @see #isLocked(String, BaseAction) for removing jobs from internal maps
+   * @see #isLocked(String, Feedback) for removing jobs from internal maps
    */
   private void generateDataPackage(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
@@ -552,7 +553,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   /**
-   * @see #isLocked(String, BaseAction) for removing jobs from internal maps
+   * @see #isLocked(String, Feedback) for removing jobs from internal maps
    */
   private void generateDwcDP(Resource resource) {
     // use threads to run in the background as sql sources might take a long time
@@ -713,10 +714,10 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public void restoreVersion(Resource resource, BigDecimal rollingBack, BaseAction action) {
+  public void restoreVersion(Resource resource, BigDecimal rollingBack, Feedback action) {
     // prevent null action from being handled
     if (action == null) {
-      action = new BaseAction(textProvider, cfg, registrationManager);
+      action = new CollectingFeedback(null);
     }
 
     if (resource.isDataPackage()) {
@@ -807,7 +808,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public void register(Resource resource, Organisation organisation, Ipt ipt, BaseAction action)
+  public void register(Resource resource, Organisation organisation, Ipt ipt, Feedback action)
       throws RegistryException {
     ActionLogger alog = new ActionLogger(this.LOG, action);
 
@@ -897,11 +898,11 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public void updateRegistration(Resource resource, BaseAction action) throws PublicationException {
+  public void updateRegistration(Resource resource, Feedback action) throws PublicationException {
     if (resource.isRegistered()) {
       // prevent null action from being handled
       if (action == null) {
-        action = new BaseAction(textProvider, cfg, registrationManager);
+        action = new CollectingFeedback(null);
       }
       try {
         LOG.debug("Updating registration of resource with key: {}", resource.getKey().toString());
@@ -935,7 +936,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public void visibilityToPrivate(Resource resource, BaseAction action) throws InvalidConfigException {
+  public void visibilityToPrivate(Resource resource, Feedback action) throws InvalidConfigException {
     if (PublicationStatus.REGISTERED == resource.getStatus()) {
       throw new InvalidConfigException(InvalidConfigException.TYPE.RESOURCE_ALREADY_REGISTERED,
           "The resource is already registered with GBIF");
@@ -955,7 +956,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
   }
 
   @Override
-  public void visibilityToPublic(Resource resource, BaseAction action) throws InvalidConfigException {
+  public void visibilityToPublic(Resource resource, Feedback action) throws InvalidConfigException {
     if (PublicationStatus.REGISTERED == resource.getStatus()) {
       throw new InvalidConfigException(InvalidConfigException.TYPE.RESOURCE_ALREADY_REGISTERED,
           "The resource is already registered with GBIF");
@@ -1140,11 +1141,11 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
    * @throws PublicationException   if publication was unsuccessful
    * @throws InvalidConfigException if resource configuration could not be saved
    */
-  private void publishEnd(Resource resource, BaseAction action, BigDecimal version)
+  private void publishEnd(Resource resource, Feedback action, BigDecimal version)
       throws PublicationException, InvalidConfigException {
     // prevent null action from being handled
     if (action == null) {
-      action = new BaseAction(textProvider, cfg, registrationManager);
+      action = new CollectingFeedback(null);
     }
     BigDecimal replacedMetadataVersion = resource.getReplacedMetadataVersion();
 
@@ -1496,7 +1497,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
    * @param action          action
    * @throws PublicationException thrown if any part of DOI workflow failed
    */
-  private void executeDoiWorkflow(Resource resource, BigDecimal version, BigDecimal versionReplaced, BaseAction action)
+  private void executeDoiWorkflow(Resource resource, BigDecimal version, BigDecimal versionReplaced, Feedback action)
       throws PublicationException {
     // All DOI operations require resource be publicly available, and resource DOI be PUBLIC/PUBLIC_PENDING_PUBLICATION
     if (resource.getDoi() != null && resource.isPubliclyAvailable() && (
@@ -1670,7 +1671,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     }
   }
 
-  private void restoreDarwinCoreResourceVersion(Resource resource, BigDecimal rollingBack, BaseAction action) {
+  private void restoreDarwinCoreResourceVersion(Resource resource, BigDecimal rollingBack, Feedback action) {
     // determine version to restore (looking at version history)
     BigDecimal toRestore = getVersionToRestore(resource, rollingBack);
 
@@ -1750,7 +1751,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     }
   }
 
-  private void restoreDataPackageResourceVersion(Resource resource, BigDecimal rollingBack, BaseAction action) {
+  private void restoreDataPackageResourceVersion(Resource resource, BigDecimal rollingBack, Feedback action) {
     // determine version to restore (looking at version history)
     BigDecimal toRestore = getVersionToRestore(resource, rollingBack);
 
@@ -1827,7 +1828,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     }
   }
 
-  private void publishMetadata(Resource resource, BigDecimal version, BaseAction action) throws PublicationException {
+  private void publishMetadata(Resource resource, BigDecimal version, Feedback action) throws PublicationException {
     if (resource.isDataPackage()) {
       publishDataPackageMetadata(resource, version);
       if (resource.isDwcDp()) {
@@ -1845,7 +1846,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
    * @param version  version number to publish
    * @throws PublicationException if resource was already being published, or if publishing failed for any reason
    */
-  private void publishEml(Resource resource, BigDecimal version, BaseAction action) throws PublicationException {
+  private void publishEml(Resource resource, BigDecimal version, Feedback action) throws PublicationException {
     String shortname = resource.getShortname();
 
     // check if publishing task is already running
@@ -2087,7 +2088,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
    * @param action    action
    */
   protected synchronized void addOrUpdateVersionHistory(Resource resource, BigDecimal version, boolean published,
-                                                        BaseAction action) {
+                                                        Feedback action) {
     LOG.info("Adding or updating version: {}", version.toPlainString());
 
     VersionHistory versionHistory;

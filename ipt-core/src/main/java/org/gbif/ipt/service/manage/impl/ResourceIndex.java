@@ -18,7 +18,7 @@ import org.gbif.ipt.model.ResourceSummaryView;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.VersionHistory;
 import org.gbif.ipt.model.voc.PublicationStatus;
-import org.gbif.ipt.struts2.RequireManagerInterceptor;
+import org.gbif.ipt.service.manage.ResourceAccessPolicy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,7 +132,7 @@ class ResourceIndex {
     List<Resource> result = new ArrayList<>();
     // select based on user rights - for testing return all resources for now
     for (Resource res : resources.values()) {
-      if (RequireManagerInterceptor.isAuthorized(user, res)) {
+      if (ResourceAccessPolicy.canManage(user, res)) {
         result.add(res);
       }
     }

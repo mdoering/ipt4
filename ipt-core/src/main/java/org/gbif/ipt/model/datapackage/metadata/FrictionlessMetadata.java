@@ -36,7 +36,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import org.apache.struts2.util.Element;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -365,7 +364,7 @@ public class FrictionlessMetadata<C extends FrictionlessContributor, L extends F
    */
   @JsonProperty("contributors")
   @JsonDeserialize(contentAs = FrictionlessContributor.class)
-  @Element(FrictionlessContributor.class)
+  // list element type for form binding: FrictionlessContributor (was the Struts @Element annotation)
   public List<C> getContributors() {
     return contributors;
   }
@@ -430,7 +429,7 @@ public class FrictionlessMetadata<C extends FrictionlessContributor, L extends F
    */
   @JsonProperty("licenses")
   @JsonDeserialize(contentUsing = FrictionlessLicense.DataPackageLicenseDeserializer.class)
-  @Element(FrictionlessLicense.class)
+  // list element type for form binding: FrictionlessLicense (was the Struts @Element annotation)
   public List<L> getLicenses() {
     return licenses;
   }
@@ -453,7 +452,7 @@ public class FrictionlessMetadata<C extends FrictionlessContributor, L extends F
   @JsonProperty("sources")
   @JsonDeserialize(contentUsing = FrictionlessSource.DataPackageSourceDeserializer.class)
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  @Element(FrictionlessSource.class)
+  // list element type for form binding: FrictionlessSource (was the Struts @Element annotation)
   public List<S> getSources() {
     return sources;
   }

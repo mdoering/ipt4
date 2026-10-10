@@ -22,7 +22,7 @@ import org.gbif.dwc.UnsupportedArchiveException;
 import org.gbif.dwc.terms.DwcTerm;
 import org.gbif.dwc.terms.Term;
 import org.gbif.dwc.terms.TermFactory;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -568,7 +568,7 @@ public class ResourceImportServiceImpl implements ResourceImportService {
   }
 
   @Override
-  public void validateDatapackageMetadataFile(BaseAction action, File metadataFile, Class<? extends DataPackageMetadata> metadataClass)
+  public void validateDatapackageMetadataFile(Feedback action, File metadataFile, Class<? extends DataPackageMetadata> metadataClass)
       throws IOException, InvalidMetadataException {
     DataPackageMetadataValidator validator = new DataPackageMetadataValidator();
     DataPackageMetadata metadata = metadataReader.readValue(metadataFile, metadataClass);

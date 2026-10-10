@@ -46,12 +46,14 @@ import org.apache.commons.lang3.Strings;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Reads user accounts from a simple XStream managed xml file.
  */
 public class UserAccountManagerImpl extends BaseManager implements UserAccountManager {
+
+  private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(12);
 
   public static final String PERSISTENCE_FILE = "users.xml";
   private final Map<String, User> users = new LinkedHashMap<>();
@@ -103,7 +105,7 @@ public class UserAccountManagerImpl extends BaseManager implements UserAccountMa
     }
     User agent = get(email);
     if (agent != null && agent.getPassword() != null
-        && BCrypt.verifyer().verify(password.toCharArray(), agent.getPassword()).verified) {
+        && BCRYPT.matches(password, agent.getPassword())) {
       return agent;
     }
     return null;
@@ -116,7 +118,7 @@ public class UserAccountManagerImpl extends BaseManager implements UserAccountMa
         throw new AlreadyExistingException();
       }
       // hash password before creation
-      String hash = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
+      String hash = BCRYPT.encode(user.getPassword());
       user.setPassword(hash);
       addUser(user);
       save();
@@ -255,7 +257,7 @@ public class UserAccountManagerImpl extends BaseManager implements UserAccountMa
             String decrypted;
             try {
               decrypted = encrypter.decrypt(pass);
-              String hash = BCrypt.withDefaults().hashToString(12, decrypted.toCharArray());
+              String hash = BCRYPT.encode(decrypted);
               user.setPassword(hash);
             } catch (PBEEncrypt.EncryptionException e) {
               LOG.error("Cannot decrypt password for the user [{}]", user.getEmail(), e);

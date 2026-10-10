@@ -17,7 +17,8 @@ import org.gbif.api.model.common.DOI;
 import org.gbif.api.model.registry.Network;
 import org.gbif.dwc.terms.DwcTerm;
 import org.gbif.dwc.terms.Term;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.ConfigWarnings;
 import org.gbif.ipt.config.DataDir;
@@ -35,7 +36,7 @@ import org.gbif.ipt.service.BaseManager;
 import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.RegistryException.Type;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.RegistryEntryHandler;
 import org.gbif.ipt.validation.AgentValidator;
 import org.gbif.metadata.eml.ipt.EmlFactory;
@@ -119,8 +120,8 @@ public class RegistryManagerImpl extends BaseManager implements RegistryManager 
   private SAXParser saxParser;
   private Gson gson;
   private ConfigWarnings warnings;
-  // create instance of BaseAction - allows class to retrieve i18n terms via getText()
-  private BaseAction baseAction;
+  // create instance of Feedback - allows class to retrieve i18n terms via getText()
+  private Feedback baseAction;
 
   @Inject
   public RegistryManagerImpl(
@@ -136,7 +137,7 @@ public class RegistryManagerImpl extends BaseManager implements RegistryManager 
     this.http = client;
     this.gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
     this.warnings = warnings;
-    baseAction = new BaseAction(textProvider, cfg, null);
+    baseAction = new CollectingFeedback(null);
   }
 
   private List<NameValuePair> buildRegistryParameters(Resource resource) {
@@ -459,7 +460,7 @@ public class RegistryManagerImpl extends BaseManager implements RegistryManager 
   @Override
   public List<DataPackageSchema> getSupportedDataSchemas() throws RegistryException {
     List<DataPackageSchema> result = new ArrayList<>();
-    Map<String, String> schemasWithVersions = baseAction.getCfg().getSupportedDataSchemaNamesWithVersions();
+    Map<String, String> schemasWithVersions = cfg.getSupportedDataSchemaNamesWithVersions();
 
     for (Map.Entry<String, String> entrySchemaVersion : schemasWithVersions.entrySet()) {
       DataPackageSchema jsonDataSchema = gson

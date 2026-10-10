@@ -13,18 +13,18 @@
  */
 package org.gbif.ipt.validation;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.User;
 
 import static org.gbif.ipt.validation.EmailValidationMessageTranslator.EMAIL_ERROR_TRANSLATIONS;
 
 public class UserValidator extends BaseValidator {
 
-  public boolean validate(BaseAction action, User user) {
+  public boolean validate(Feedback action, User user) {
     return validate(action, user, true);
   }
 
-  public boolean validate(BaseAction action, User user, boolean validatePassword) {
+  public boolean validate(Feedback action, User user, boolean validatePassword) {
     boolean valid = true;
     if (user != null) {
       if (exists(user.getEmail())) {
@@ -58,7 +58,7 @@ public class UserValidator extends BaseValidator {
     return valid;
   }
 
-  public boolean validatePassword(BaseAction action, String password) {
+  public boolean validatePassword(Feedback action, String password) {
     boolean valid = true;
     if (!exists(password, 4)) {
       valid = false;

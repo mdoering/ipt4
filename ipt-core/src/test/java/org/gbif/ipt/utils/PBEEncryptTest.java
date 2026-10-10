@@ -14,7 +14,7 @@
 package org.gbif.ipt.utils;
 
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.config.IPTModule;
+import org.gbif.ipt.config.TestBeanProvider;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ public class PBEEncryptTest extends IptBaseTest {
    */
   @Test
   public void encryptPassword() throws Exception {
-    final PBEEncrypt encrypter = new IPTModule().providePasswordEncryption();
+    final PBEEncrypt encrypter = TestBeanProvider.providePasswordEncryption();
 
     String password = "Ga_1bxiedrvNHSyK";
 

@@ -14,7 +14,7 @@
 package org.gbif.ipt.model.factory;
 
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.config.IPTModule;
+import org.gbif.ipt.config.TestBeanProvider;
 import org.gbif.ipt.model.Vocabulary;
 import org.gbif.ipt.model.VocabularyConcept;
 import org.gbif.ipt.model.VocabularyTerm;
@@ -40,8 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class VocabularyFactoryTest extends IptBaseTest {
 
   private VocabularyFactory getFactory() throws ParserConfigurationException, SAXException {
-    IPTModule mod = new IPTModule();
-    SAXParserFactory sax = mod.provideNsAwareSaxParserFactory();
+    SAXParserFactory sax = TestBeanProvider.provideNsAwareSaxParserFactory();
     return new VocabularyFactory(sax);
   }
 

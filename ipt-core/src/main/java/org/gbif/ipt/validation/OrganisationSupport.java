@@ -19,7 +19,7 @@ import org.gbif.doi.service.DoiException;
 import org.gbif.doi.service.DoiService;
 import org.gbif.doi.service.InvalidMetadataException;
 import org.gbif.doi.service.datacite.RestJsonApiDataCiteService;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.model.Organisation;
@@ -60,7 +60,7 @@ public class OrganisationSupport {
    * @param action       action
    * @param organisation organisation
    */
-  public boolean validate(BaseAction action, Organisation organisation) {
+  public boolean validate(Feedback action, Organisation organisation) {
     boolean valid = true;
     if (organisation.getKey() == null || organisation.getKey().toString().length() < 1) {
       valid = false;
@@ -168,7 +168,7 @@ public class OrganisationSupport {
     return valid;
   }
 
-  public void validateOrganisationToken(BaseAction action, UUID organisationKey, String organisationToken) {
+  public void validateOrganisationToken(Feedback action, UUID organisationKey, String organisationToken) {
     // validate if the key+password combination validates to true
     if (organisationKey != null && organisationToken != null) {
       if (organisationKey.toString().length() > 0 && organisationToken.length() > 0) {

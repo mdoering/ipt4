@@ -13,7 +13,6 @@
  */
 package org.gbif.ipt;
 
-import org.gbif.ipt.config.LoggingConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -25,14 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IptBaseTest {
-
-  @SuppressWarnings("ResultOfMethodCallIgnored")
-  @BeforeAll
-  static void setupLogging() {
-    LoggingConfiguration.logDirectory = System.getProperty("java.io.tmpdir") + "/testlogs/";
-    // Make sure the directory exists
-    new File(LoggingConfiguration.logDirectory).mkdirs();
-  }
 
   // TODO: Some tests still produce junk files - make sure all are cleaned up
 //  @AfterEach

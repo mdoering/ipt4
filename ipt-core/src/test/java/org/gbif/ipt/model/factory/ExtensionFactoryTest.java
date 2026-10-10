@@ -17,7 +17,7 @@ import org.gbif.dwc.ArchiveField.DataType;
 import org.gbif.dwc.terms.DcTerm;
 import org.gbif.dwc.terms.DwcTerm;
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.config.IPTModule;
+import org.gbif.ipt.config.TestBeanProvider;
 import org.gbif.ipt.model.Extension;
 import org.gbif.ipt.model.ExtensionProperty;
 import org.gbif.ipt.model.Vocabulary;
@@ -43,8 +43,7 @@ import static org.mockito.Mockito.when;
 public class ExtensionFactoryTest extends IptBaseTest {
 
   public static ExtensionFactory getFactory() throws Exception {
-    IPTModule mod = new IPTModule();
-    SAXParserFactory sax = mod.provideNsAwareSaxParserFactory();
+    SAXParserFactory sax = TestBeanProvider.provideNsAwareSaxParserFactory();
     HttpClient client = HttpUtil.newDefaultMultithreadedClient();
 
     VocabulariesManager vocabulariesManager = mock(VocabulariesManager.class);

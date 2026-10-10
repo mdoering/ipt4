@@ -13,7 +13,8 @@
  */
 package org.gbif.ipt.service.admin.impl;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.ConfigWarnings;
 import org.gbif.ipt.config.Constants;
@@ -28,7 +29,7 @@ import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
 import org.gbif.utils.HttpClient;
 
@@ -85,8 +86,8 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
 
   private ConfigWarnings warnings;
 
-  // create instance of BaseAction - allows class to retrieve i18n terms via getText()
-  private BaseAction baseAction;
+  // create instance of Feedback - allows class to retrieve i18n terms via getText()
+  private Feedback baseAction;
 
   @Inject
   public VocabulariesManagerImpl(
@@ -103,7 +104,7 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
     this.downloader = client;
     this.registryManager = registryManager;
     this.warnings = warnings;
-    baseAction = new BaseAction(textProvider, cfg, registrationManager);
+    baseAction = new CollectingFeedback(null);
   }
 
   /**

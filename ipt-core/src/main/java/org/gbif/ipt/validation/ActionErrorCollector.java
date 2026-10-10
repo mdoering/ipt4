@@ -13,13 +13,13 @@
  */
 package org.gbif.ipt.validation;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 
 public class ActionErrorCollector implements ErrorCollector {
 
-  private final BaseAction action;
+  private final Feedback action;
 
-  public ActionErrorCollector(BaseAction action) {
+  public ActionErrorCollector(Feedback action) {
     this.action = action;
   }
 

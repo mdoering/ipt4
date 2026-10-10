@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.service;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class RegistryExceptionTest {
   @Test
   public void testLogRegistryException() {
     String answer = "An unknown error occurred!";
-    BaseAction mockAction = mock(BaseAction.class);
+    Feedback mockAction = mock(Feedback.class);
     when(mockAction.getText("admin.registration.error.unknown")).thenReturn(answer);
     String msg = RegistryException.logRegistryException(new RegistryException(RegistryException.Type.UNKNOWN, "url", null, null), mockAction);
     assertEquals(answer+" [url]", msg);

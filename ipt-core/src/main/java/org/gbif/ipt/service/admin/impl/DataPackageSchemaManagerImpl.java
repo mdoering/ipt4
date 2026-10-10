@@ -13,7 +13,8 @@
  */
 package org.gbif.ipt.service.admin.impl;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.ConfigWarnings;
 import org.gbif.ipt.config.Constants;
@@ -28,7 +29,7 @@ import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.admin.DataPackageSchemaManager;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
 import org.gbif.utils.HttpClient;
 
@@ -74,8 +75,8 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
   private final HttpClient downloader;
   private final Gson gson;
 
-  // create instance of BaseAction - allows class to retrieve i18n terms via getText()
-  private final BaseAction baseAction;
+  // create instance of Feedback - allows class to retrieve i18n terms via getText()
+  private final Feedback baseAction;
 
   private List<DataPackageSchema> dataPackageSchemas = new ArrayList<>();
   private Map<String, DataPackageSchema> dataPackageSchemasByIdentifiers = new HashMap<>();
@@ -97,7 +98,7 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
     this.factory = factory;
     this.registryManager = registryManager;
     this.downloader = downloader;
-    this.baseAction = new BaseAction(textProvider, cfg, registrationManager);
+    this.baseAction = new CollectingFeedback(null);
     this.gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd").create();
     // TODO: store in properties somewhere
     this.alternativeIdentifiers.put(Constants.DATA_PACKAGE_DWC_DP_IDENTIFIER, Set.of(Constants.DATA_PACKAGE_DWC_DP_IDENTIFIER_2));

@@ -13,7 +13,7 @@
  */
 package org.gbif.ipt.validation;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.model.Resource;
 
 import java.util.regex.Pattern;
@@ -24,7 +24,7 @@ public class ResourceValidator {
 
   private static Pattern shortnamePattern = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
-  public void validate(BaseAction action, Resource resource) {
+  public void validate(Feedback action, Resource resource) {
     if (resource != null) {
       validateShortname(action, resource.getShortname());
 
@@ -38,7 +38,7 @@ public class ResourceValidator {
     }
   }
 
-  public void validateShortname(BaseAction action, String shortname) {
+  public void validateShortname(Feedback action, String shortname) {
     if (shortname == null) {
       action.addFieldError("resource.shortname", action.getText("validation.resource.shortname.required"));
     } else {
@@ -48,7 +48,7 @@ public class ResourceValidator {
     }
   }
 
-  public void validateCreateNew(BaseAction action, String shortname, String resourceType) {
+  public void validateCreateNew(Feedback action, String shortname, String resourceType) {
     if (shortname == null) {
       action.addFieldError("resource.shortname", action.getText("validation.resource.shortname.required"));
     } else if (shortname.length() < 3 || !shortnamePattern.matcher(shortname).matches()) {

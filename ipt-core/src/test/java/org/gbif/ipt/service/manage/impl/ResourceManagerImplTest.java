@@ -18,7 +18,8 @@ import org.gbif.dwc.Archive;
 import org.gbif.dwc.DwcFiles;
 import org.gbif.dwc.UnsupportedArchiveException;
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.config.DataDir;
@@ -73,7 +74,7 @@ import org.gbif.ipt.service.manage.ResourceTypeService;
 import org.gbif.ipt.service.manage.ResourceVersioningService;
 import org.gbif.ipt.service.manage.SourceManager;
 import org.gbif.ipt.service.registry.RegistryManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.ResourceUtils;
 import org.gbif.metadata.eml.ipt.model.KeywordSet;
 import org.gbif.utils.HttpClient;
@@ -131,7 +132,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
   private final SimpleTextProvider mockSimpleTextProvider = mock(SimpleTextProvider.class);
 
   private final DataDir mockedDataDir = MockDataDir.buildMock();
-  private final BaseAction baseAction = new BaseAction(mockSimpleTextProvider, mockAppConfig, mockRegistrationManager);
+  private final Feedback baseAction = new CollectingFeedback(null);
 
   private User creator;
   private JdbcSupport support;

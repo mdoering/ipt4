@@ -14,11 +14,12 @@
 package org.gbif.ipt.validation;
 
 import org.gbif.ipt.IptBaseTest;
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.CollectingFeedback;
+import org.gbif.ipt.feedback.Feedback;
 import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.service.admin.RegistrationManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Named;
@@ -37,8 +38,7 @@ import static org.mockito.Mockito.mock;
 public class UserValidatorTest extends IptBaseTest {
 
   private static UserValidator USER_VALIDATOR = new UserValidator();
-  private static BaseAction BASE_ACTION = new BaseAction(mock(SimpleTextProvider.class), mock(AppConfig.class), mock(
-    RegistrationManager.class));
+  private static Feedback BASE_ACTION = new CollectingFeedback(null);
 
   @DisplayName("Test email validator")
   @ParameterizedTest(name = "[{index}] {0}")

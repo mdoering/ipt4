@@ -13,16 +13,16 @@
  */
 package org.gbif.ipt.utils;
 
-import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.feedback.Feedback;
 
 import org.apache.logging.log4j.Logger;
 
 public class ActionLogger {
 
   private final Logger log;
-  private final BaseAction action;
+  private final Feedback action;
 
-  public ActionLogger(Logger log, BaseAction action) {
+  public ActionLogger(Logger log, Feedback action) {
     this.log = log;
     this.action = action;
   }

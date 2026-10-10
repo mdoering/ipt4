@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import org.apache.struts2.json.annotations.JSON;
 
 /**
  * This class represents source data for data tables (resource home table, resource manage table etc.)
@@ -27,8 +26,6 @@ public class DatatableResult {
   private int totalRecords = 0;
   private int totalDisplayRecords = 0;
   private List<List<String>> data = new ArrayList<>();
-
-  @JSON(name = "iTotalRecords")
   public int getTotalRecords() {
     return totalRecords;
   }
@@ -36,8 +33,6 @@ public class DatatableResult {
   public void setTotalRecords(int totalRecords) {
     this.totalRecords = totalRecords;
   }
-
-  @JSON(name = "iTotalDisplayRecords")
   public int getTotalDisplayRecords() {
     return totalDisplayRecords;
   }
@@ -45,8 +40,6 @@ public class DatatableResult {
   public void setTotalDisplayRecords(int totalDisplayRecords) {
     this.totalDisplayRecords = totalDisplayRecords;
   }
-
-  @JSON(name = "aaData")
   public List<List<String>> getData() {
     return data;
   }

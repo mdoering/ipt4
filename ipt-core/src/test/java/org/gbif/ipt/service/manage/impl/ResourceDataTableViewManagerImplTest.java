@@ -24,7 +24,7 @@ import org.gbif.ipt.service.admin.DataPackageSchemaManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.manage.ResourceDataTableViewManager;
 import org.gbif.ipt.service.manage.ResourceManager;
-import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
