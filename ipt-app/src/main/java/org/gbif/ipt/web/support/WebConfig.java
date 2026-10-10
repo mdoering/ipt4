@@ -14,37 +14,33 @@
 package org.gbif.ipt.web.support;
 
 import org.gbif.ipt.app.IptProperties;
-import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
-import org.gbif.ipt.web.support.page.GlobalModel;
-import org.gbif.ipt.web.support.page.PageContext;
-import org.springframework.context.annotation.ScopedProxyMode;
-
-import java.util.Locale;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-
 import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.web.support.feedback.DoSuffixFlashMapManager;
 import org.gbif.ipt.web.support.feedback.FeedbackFlashInterceptor;
 import org.gbif.ipt.web.support.feedback.RequestFeedback;
 import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
 import org.gbif.ipt.web.support.page.GlobalModel;
 import org.gbif.ipt.web.support.page.PageContext;
-import org.springframework.context.annotation.ScopedProxyMode;
+
+import java.util.Locale;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.Ordered;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.FlashMapManager;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import jakarta.servlet.DispatcherType;
@@ -85,6 +81,11 @@ public class WebConfig implements WebMvcConfigurer {
   }
 
   /** The default language is the one chosen in the admin UI ({@code ipt.properties}), else {@code ipt.default-locale}. */
+  @Bean(name = DispatcherServlet.FLASH_MAP_MANAGER_BEAN_NAME)
+  public FlashMapManager flashMapManager() {
+    return new DoSuffixFlashMapManager();
+  }
+
   @Bean(name = DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
   public LocaleResolver localeResolver(IptProperties props, AppConfig cfg) {
     return new IptLocaleResolver(() -> StringUtils.hasText(cfg.getDefaultLocale()) ? cfg.getDefaultLocale()

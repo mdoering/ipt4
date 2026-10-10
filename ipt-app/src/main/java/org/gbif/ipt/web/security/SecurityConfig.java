@@ -13,6 +13,9 @@
  */
 package org.gbif.ipt.web.security;
 
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.service.admin.UserAccountManager;
+
 import java.util.stream.Stream;
 
 import org.springframework.context.annotation.Bean;
@@ -23,9 +26,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.ForwardAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
@@ -63,15 +65,23 @@ public class SecurityConfig {
 
   @Bean
   @Order(2)
-  SecurityFilterChain web(HttpSecurity http) throws Exception {
+  SecurityFilterChain web(HttpSecurity http, UserAccountManager users, AppConfig cfg,
+                          IptAuthenticationProvider authenticationProvider) throws Exception {
     http.authorizeHttpRequests(
             auth ->
                 auth.requestMatchers("/admin/**", "/admin-api/**")
-                    .hasRole("ADMIN")
+                    .access(IptAuthorization.admin(users))
                     .requestMatchers("/manage/**", "/manager-api/**", "/resource/preview")
-                    .hasAnyRole("MANAGER", "PUBLISHER", "ADMIN")
+                    .access(IptAuthorization.manager(users))
                     .anyRequest()
                     .permitAll())
+        .formLogin(login -> login.loginPage("/login")
+            .usernameParameter("email")
+            .passwordParameter("password")
+            .successHandler(new LoginSuccessHandler(users, cfg))
+            // re-renders login.ftl with the error and the entered email, as IPT 3 did
+            .failureHandler(new ForwardAuthenticationFailureHandler("/login?error")))
+        .authenticationProvider(authenticationProvider)
         .exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
             .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
@@ -79,13 +89,5 @@ public class SecurityConfig {
                 new CacheControlHeadersWriter())))
         .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"));
     return http.build();
-  }
-
-  /** No accounts until M2 ports the IPT users; this also stops Spring Boot generating a default user. */
-  @Bean
-  UserDetailsService userDetailsService() {
-    return username -> {
-      throw new UsernameNotFoundException(username);
-    };
   }
 }

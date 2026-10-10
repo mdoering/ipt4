@@ -31,3 +31,7 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | `inventory/v2/dataset?status=` | `private` and `deleted` listed those resources (titles, record counts, links) | Only `public` and `registered` are honoured; other values give the default list of published public resources | The inventory is anonymous; private resources must stay hidden | M2 |
 | `api/resources` paging parameters | Non-numeric `start`, `length` or `order[0][column]` gave a 500 error page | 400 Bad Request | Bad input is the client's error | M2 |
 | `Cache-Control` | Not sent | `no-cache, no-store` on HTML pages (Spring Security default); JSON keeps IPT 3's `no-cache`, downloads and static assets send none | Pages show user-specific content | M2 |
+| Login | Struts action with its own CSRF cookie; session id kept | Spring Security form login on the same URL and fields; CSRF token on every form; session id changes at login | Session fixation protection | M2 |
+| Failed login | Form shown again with the email and the rejected password filled in | Email kept, password field empty | Passwords do not belong in HTML | M2 |
+| Password change | New password kept in memory until users were next saved (lost on restart) | Saved at once | Bug fix | M2 |
+| Rights of a logged-in user | Session held the user object: role changes applied at once, a deleted user stayed logged in | Read from the user record on every request: role changes apply at once, deleted users lose access | Removing an account must take effect | M2 |

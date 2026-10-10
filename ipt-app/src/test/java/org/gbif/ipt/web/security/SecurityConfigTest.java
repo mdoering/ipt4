@@ -13,6 +13,10 @@
  */
 package org.gbif.ipt.web.security;
 
+import org.gbif.ipt.model.User;
+import org.gbif.ipt.service.admin.UserAccountManager;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +38,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SecurityConfigTest {
 
   @Autowired MockMvc mvc;
+  @Autowired UserAccountManager users;
+
+  /** Rights come from the IPT user records, as in IPT 3. */
+  @BeforeEach
+  void users() throws Exception {
+    for (User.Role role : User.Role.values()) {
+      String email = role.name().toLowerCase() + "@example.org";
+      if (users.get(email) == null) {
+        User user = new User();
+        user.setEmail(email);
+        user.setFirstname(role.name());
+        user.setLastname("Test");
+        user.setRole(role);
+        user.setPassword("Secret-pass-1");
+        users.create(user);
+      }
+    }
+  }
 
   @Test
   void anonymousAdminRequestRedirectsToLogin() throws Exception {
@@ -51,13 +73,13 @@ class SecurityConfigTest {
   }
 
   @Test
-  @WithMockUser(roles = "MANAGER")
+  @WithMockUser(username = "manager@example.org")
   void managerCannotOpenAdmin() throws Exception {
     mvc.perform(get("/admin/")).andExpect(status().isForbidden());
   }
 
   @Test
-  @WithMockUser(roles = "ADMIN")
+  @WithMockUser(username = "admin@example.org")
   void adminPassesSecurity() throws Exception {
     mvc.perform(get("/admin/nothing-here")).andExpect(status().isNotFound());
   }
@@ -68,13 +90,13 @@ class SecurityConfigTest {
   }
 
   @Test
-  @WithMockUser(roles = "USER")
+  @WithMockUser(username = "user@example.org")
   void plainUserCannotManage() throws Exception {
     mvc.perform(get("/manage/")).andExpect(status().isForbidden());
   }
 
   @Test
-  @WithMockUser(roles = "PUBLISHER")
+  @WithMockUser(username = "publisher@example.org")
   void publisherCanManage() throws Exception {
     mvc.perform(get("/manage/nothing-here")).andExpect(status().isNotFound());
   }

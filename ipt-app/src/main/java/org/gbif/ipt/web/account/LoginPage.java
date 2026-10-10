@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.gbif.ipt.web.security.LocalPaths;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 
 import lombok.Getter;
@@ -79,12 +80,8 @@ public class LoginPage extends PostActionPage {
 
       if (StringUtils.isNotBlank(refererHeader) && StringUtils.isNotBlank(base) && refererHeader.startsWith(base)) {
         String relative = refererHeader.substring(base.length());
-        // normalize to something like "/resource?r=..."
-        if (StringUtils.isBlank(relative)) {
-          relative = "/";
-        } else if (!relative.startsWith("/")) {
-          relative = "/" + relative;
-        }
+        // normalize to something like "/resource?r=...", never "//host"
+        relative = LocalPaths.of(relative);
 
         // avoid redirecting back to the login page itself
         if (!(relative.endsWith("login.do") || relative.endsWith("login"))) {
@@ -119,6 +116,8 @@ public class LoginPage extends PostActionPage {
     if (req.getParameter("error") != null) {
       addActionError(getText("admin.user.wrong.email.password.combination"));
     }
+    // IPT 3 wrote the rejected password back into the form
+    password = null;
     return INPUT;
   }
 
@@ -135,7 +134,7 @@ public class LoginPage extends PostActionPage {
     LOG.debug("Session's referer: {}", referer);
 
     if (StringUtils.isNotEmpty(referer) && !(referer.endsWith("login.do") || referer.endsWith("login"))) {
-      redirectUrl = getBase() + referer;
+      redirectUrl = getBase() + LocalPaths.of(referer);
     }
 
     // remove referer from session

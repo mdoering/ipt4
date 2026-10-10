@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.servlet.FlashMap;
@@ -45,6 +46,16 @@ class RequestFeedbackTest {
 
     String again = mvc.perform(get("/_feedback/show")).andReturn().getResponse().getContentAsString();
     assertThat(again).doesNotContain("Saved").doesNotContain("Careful");
+  }
+
+  @Test
+  void messagesSurviveARedirectToADoUrl() throws Exception {
+    MockHttpSession session = new MockHttpSession();
+    MvcResult posted = mvc.perform(post("/_feedback/redirect-do").session(session).with(csrf())).andReturn();
+    assertThat(posted.getResponse().getRedirectedUrl()).isEqualTo("/_feedback/show.do");
+    String shown = mvc.perform(get("/_feedback/show.do").session(session)).andReturn().getResponse()
+        .getContentAsString();
+    assertThat(shown).contains("Saved <b>it</b>");
   }
 
   @Test

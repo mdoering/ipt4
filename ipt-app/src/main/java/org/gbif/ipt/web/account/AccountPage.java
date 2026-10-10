@@ -152,6 +152,14 @@ public class AccountPage extends PostActionPage {
         // otherwise, set password if it's valid
       } else if (validator.validatePassword(this, newPassword)) {
         currentUser.setPassword(BCRYPT.encode(newPassword));
+        // IPT 3 kept the new password in memory only, until users were next saved
+        try {
+          userManager.save();
+        } catch (IOException e) {
+          addActionError(getText("admin.user.account.saveError"));
+          LOG.error("The password of user {} could not be saved: {}", currentUser.getEmail(), e.getMessage(), e);
+          return INPUT;
+        }
         // erase data
         newPassword = null;
         currentPassword = null;

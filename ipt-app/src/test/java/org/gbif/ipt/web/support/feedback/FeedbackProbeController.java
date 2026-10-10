@@ -38,6 +38,13 @@ public class FeedbackProbeController {
     return "redirect:/_feedback/show";
   }
 
+  /** Pages redirect to IPT 3's .do URLs, which DoSuffixFilter strips on the way back in. */
+  @PostMapping("/_feedback/redirect-do")
+  public String redirectDo() {
+    feedback.addActionMessage("Saved <b>it</b>");
+    return "redirect:/_feedback/show.do";
+  }
+
   @GetMapping("/_feedback/show")
   public String show() {
     return "probe/feedback";

@@ -41,7 +41,6 @@
 
         <form class="needs-validation" action="${baseURL}/login.do" method="post" novalidate>
 <@csrfField/>
-            <input type="hidden" name="csrfToken" value="${newCsrfToken!}">
             <#assign userEmail>
                 <@s.text name="user.email"/>
             </#assign>
