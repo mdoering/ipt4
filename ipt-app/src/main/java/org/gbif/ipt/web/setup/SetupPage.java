@@ -15,6 +15,7 @@ package org.gbif.ipt.web.setup;
 
 import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.security.IptLogin;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.config.AppConfig.REGISTRY_TYPE;
 import org.gbif.ipt.config.Constants;
@@ -73,6 +74,7 @@ public class SetupPage extends ActionPage {
   private final ExtensionManager extensionManager;
   private final DataPackageSchemaManager schemaManager;
   private final IptHttp client;
+  private final IptLogin iptLogin;
 
   private final UserValidator userValidation = new UserValidator();
 
@@ -104,8 +106,10 @@ public class SetupPage extends ActionPage {
       DataDir dataDir,
       ExtensionManager extensionManager,
       DataPackageSchemaManager schemaManager,
-      IptHttp client) {
+      IptHttp client,
+      IptLogin iptLogin) {
     super(ctx);
+    this.iptLogin = iptLogin;
     this.configManager = configManager;
     this.userManager = userManager;
     this.dataDir = dataDir;
@@ -233,7 +237,7 @@ public class SetupPage extends ActionPage {
           userManager.setSetupUser(user);
 
           // login as new admin
-          session.put(Constants.SESSION_USER, user);
+          iptLogin.login(user, req, response);
 
           return SUCCESS;
         }
@@ -369,15 +373,13 @@ public class SetupPage extends ActionPage {
       return ERROR;
     }
 
-    // this step logs the newly created setup admin into the session. That must only ever
-    // happen once, immediately after setup - getSetupUser() acts as a one-time token here.
-    // Once consumed (or if this action is hit without ever having gone through setup in this
-    // session), never authenticate the caller as a side effect of calling this action.
+    // IPT 3 logged the setup admin in here, using getSetupUser() as a one-time token shared by all visitors.
+    // IPT4 logs the admin in when the account is created (step 2), in that visitor's session only; the token
+    // just marks the data dir config as still to be reloaded.
     User setupUser = userManager.getSetupUser();
     if (setupUser != null) {
       try {
         configManager.loadDataDirConfig();
-        session.put(Constants.SESSION_USER, setupUser);
       } catch (InvalidConfigException e) {
         String msg = getText("admin.vocabulary.couldnt.install.defaults", new String[]{e.getMessage()});
         LOG.error(msg, e);

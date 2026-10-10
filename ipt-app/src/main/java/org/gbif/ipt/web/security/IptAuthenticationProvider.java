@@ -48,6 +48,10 @@ public class IptAuthenticationProvider implements AuthenticationProvider {
     if (user == null) {
       throw new BadCredentialsException("Bad credentials");
     }
+    return authenticated(user);
+  }
+
+  static Authentication authenticated(User user) {
     return UsernamePasswordAuthenticationToken.authenticated(user.getEmail(), null,
         List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name().toUpperCase())));
   }

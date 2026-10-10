@@ -9,3 +9,7 @@ ipt:
   defaults:
     "[dev.registry.url]": http://127.0.0.1:9
     "[dev.registrydev.url]": http://127.0.0.1:9
+# test data dirs count as set up; the setup wizard tests turn this off
+test:
+  ipt:
+    complete-setup: true

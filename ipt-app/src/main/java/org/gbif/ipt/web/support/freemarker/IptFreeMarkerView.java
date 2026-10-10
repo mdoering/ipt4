@@ -16,6 +16,7 @@ package org.gbif.ipt.web.support.freemarker;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerView;
 
 import freemarker.template.SimpleHash;
@@ -30,6 +31,19 @@ public class IptFreeMarkerView extends FreeMarkerView {
 
   public static final String PAGE = "page";
   public static final String ACTION = "action";
+
+  /**
+   * Spring Security creates the CSRF token, and with it the session, when a form first asks for it. On a long page
+   * the servlet container has sent the start of the response by then, and a session can no longer be created.
+   */
+  @Override
+  protected void renderMergedTemplateModel(Map<String, Object> model, HttpServletRequest request,
+                                           HttpServletResponse response) throws Exception {
+    if (request.getAttribute(CsrfToken.class.getName()) instanceof CsrfToken csrf) {
+      csrf.getToken();
+    }
+    super.renderMergedTemplateModel(model, request, response);
+  }
 
   @Override
   protected SimpleHash buildTemplateModel(

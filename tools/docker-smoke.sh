@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Builds the IPT4 image, starts it and checks health, the about page, file logging and the non-root user.
+# Builds the IPT4 image, starts it on a fresh data dir and checks health, the setup wizard, file logging and the
+# non-root user.
 set -euo pipefail
 image=${1:-gbif/ipt:4.0.0-SNAPSHOT}
 port=${PORT:-18080}
@@ -14,8 +15,12 @@ for _ in $(seq 1 90); do
   sleep 2
 done
 curl -fs "http://localhost:$port/actuator/health" | grep '"UP"' > /dev/null
-curl -fs "http://localhost:$port/about.do" | grep 'About this IPT installation' > /dev/null
-curl -fs "http://localhost:$port/about?request_locale=fr" | grep 'propos de cette installation IPT' > /dev/null
+# a fresh data dir sends every page to the setup wizard
+test "$(curl -s -o /dev/null -w '%{redirect_url}' "http://localhost:$port/about.do")" = \
+  "http://localhost:$port/setupDefaultAdministrator.do"
+curl -fs "http://localhost:$port/setupDefaultAdministrator.do" | grep 'IPT Default administrator' > /dev/null
+curl -fs "http://localhost:$port/setupDefaultAdministrator.do?request_locale=fr" \
+  | grep "Administrateur par défaut de l&#39;IPT\|Administrateur par défaut de l'IPT" > /dev/null
 docker exec "$name" test -s /srv/ipt/logs/debug.log
 test "$(docker exec "$name" id -un)" = "ipt"
 echo "docker smoke test: OK"

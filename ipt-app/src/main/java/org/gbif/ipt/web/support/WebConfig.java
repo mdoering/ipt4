@@ -15,9 +15,13 @@ package org.gbif.ipt.web.support;
 
 import org.gbif.ipt.app.IptProperties;
 import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.ConfigWarnings;
+import org.gbif.ipt.service.admin.ConfigManager;
+import org.gbif.ipt.web.setup.SetupGuard;
 import org.gbif.ipt.web.support.feedback.DoSuffixFlashMapManager;
 import org.gbif.ipt.web.support.feedback.FeedbackFlashInterceptor;
 import org.gbif.ipt.web.support.feedback.RequestFeedback;
+import org.gbif.ipt.web.support.feedback.StartupWarningsInterceptor;
 import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
 import org.gbif.ipt.web.support.page.GlobalModel;
 import org.gbif.ipt.web.support.page.PageContext;
@@ -53,9 +57,11 @@ public class WebConfig implements WebMvcConfigurer {
   public static final String LOCALE_PARAMETER = "request_locale";
 
   private final ObjectProvider<RequestFeedback> feedback;
+  private final ConfigWarnings warnings;
 
-  public WebConfig(ObjectProvider<RequestFeedback> feedback) {
+  public WebConfig(ObjectProvider<RequestFeedback> feedback, ConfigWarnings warnings) {
     this.feedback = feedback;
+    this.warnings = warnings;
   }
 
   /** Replaces Spring Boot's {@code server.forward-headers-strategy=framework}, trusting only proxy addresses. */
@@ -80,12 +86,21 @@ public class WebConfig implements WebMvcConfigurer {
     return registration;
   }
 
-  /** The default language is the one chosen in the admin UI ({@code ipt.properties}), else {@code ipt.default-locale}. */
+  /** Until setup is complete, pages lead to the setup wizard (IPT 3: SetupAndCancelInterceptor). */
+  @Bean
+  public FilterRegistrationBean<SetupGuard> setupGuard(ConfigManager configManager) {
+    FilterRegistrationBean<SetupGuard> registration = new FilterRegistrationBean<>(new SetupGuard(configManager));
+    registration.addUrlPatterns("/*");
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 20);
+    return registration;
+  }
+
   @Bean(name = DispatcherServlet.FLASH_MAP_MANAGER_BEAN_NAME)
   public FlashMapManager flashMapManager() {
     return new DoSuffixFlashMapManager();
   }
 
+  /** The default language is the one chosen in the admin UI ({@code ipt.properties}), else {@code ipt.default-locale}. */
   @Bean(name = DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
   public LocaleResolver localeResolver(IptProperties props, AppConfig cfg) {
     return new IptLocaleResolver(() -> StringUtils.hasText(cfg.getDefaultLocale()) ? cfg.getDefaultLocale()
@@ -125,5 +140,7 @@ public class WebConfig implements WebMvcConfigurer {
     localeChange.setParamName(LOCALE_PARAMETER);
     localeChange.setIgnoreInvalidLocale(true);
     registry.addInterceptor(localeChange);
+    // after the locale change: it creates the request's feedback, which keeps the locale it was made with
+    registry.addInterceptor(new StartupWarningsInterceptor(warnings, feedback));
   }
 }
