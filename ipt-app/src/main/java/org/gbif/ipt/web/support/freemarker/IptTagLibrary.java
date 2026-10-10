@@ -30,7 +30,14 @@ public final class IptTagLibrary implements TemplateHashModel {
   private final Map<String, TemplateModel> tags;
 
   public IptTagLibrary(Messages messages) {
-    this.tags = Map.of("text", new TextDirective(messages), "param", new ParamDirective());
+    this.tags = Map.of(
+        "text", new TextDirective(messages),
+        "param", new ParamDirective(),
+        "submit", new SubmitDirective(messages),
+        "property", new PropertyDirective(),
+        "fielderror", new FieldErrorDirective(),
+        "select", new SelectDirective(),
+        "checkbox", new CheckboxDirective());
   }
 
   @Override

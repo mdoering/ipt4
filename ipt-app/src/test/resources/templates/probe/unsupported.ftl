@@ -1,1 +1,1 @@
-<@s.submit name="save"/>
+<@s.datetextfield name="save"/>

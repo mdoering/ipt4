@@ -13,6 +13,7 @@
  */
 package org.gbif.ipt.web.support.freemarker;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,8 +34,22 @@ public class FreeMarkerProbeController {
     model.addAttribute("stringKeyed", new TreeMap<>(Map.of("a", "x", "b", "y")));
     model.addAttribute("emptyMap", Map.of());
     model.addAttribute("modelValue", "from model");
+    model.addAttribute("fieldErrors", Map.of("email", List.of("Email is <required>")));
+    model.addAttribute("options", new TreeMap<>(Map.of("a", "Alpha", "b", "Beta & Co")));
+    model.addAttribute("beans", List.of(new Lang("en", "English"), new Lang("fr", "French")));
+    model.addAttribute("page", new ProbePage());
     model.addAttribute(IptFreeMarkerView.PAGE, new ProbePage());
     return "probe/" + view;
+  }
+
+  public record Lang(String code, String label) {
+    public String getCode() {
+      return code;
+    }
+
+    public String getLabel() {
+      return label;
+    }
   }
 
   public static class ProbePage {
