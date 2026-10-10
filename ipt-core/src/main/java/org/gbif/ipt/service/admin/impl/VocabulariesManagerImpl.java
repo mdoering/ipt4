@@ -328,6 +328,10 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
   public int load() {
     Map<String, Vocabulary> fileNameToVocabulary = getFileNameToVocabularyMap();
     int counter = 0;
+    if (fileNameToVocabulary.isEmpty()) {
+      // IPT 3 loaded nothing without the registry, so publishing failed; IPT4 uses what is installed
+      return loadWithoutRegistry();
+    }
     if (!fileNameToVocabulary.isEmpty()) {
       // now iterate over all vocab files and load them
       File dir = dataDir.configFile(CONFIG_FOLDER);
@@ -389,6 +393,30 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
         }
       }
     }
+    return counter;
+  }
+
+  /**
+   * Loads every installed vocabulary file as it is, without asking the registry which ones are current. Their resolvable
+   * URIs stay unknown until the registry can be reached again.
+   */
+  private int loadWithoutRegistry() {
+    int counter = 0;
+    File dir = dataDir.configFile(CONFIG_FOLDER);
+    if (dir.isDirectory()) {
+      FilenameFilter ff = new SuffixFileFilter(VOCAB_FILE_SUFFIX, IOCase.INSENSITIVE);
+      for (File vf : Arrays.asList(dir.listFiles(ff))) {
+        try {
+          Vocabulary v = loadFromFile(vf);
+          if (v.getUriString() != null && vocabulariesById.putIfAbsent(v.getUriString(), v) == null) {
+            counter++;
+          }
+        } catch (InvalidConfigException e) {
+          warnings.addStartupError("Failed to load vocabulary definition file: " + vf.getAbsolutePath(), e);
+        }
+      }
+    }
+    LOG.warn("Loaded {} installed vocabularies without the registry", counter);
     return counter;
   }
 

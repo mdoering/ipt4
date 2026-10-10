@@ -22,3 +22,5 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Stored secrets | PBE with a key compiled into the IPT | AES-256-GCM with a per-installation key (`config/.secret.key` or `IPT_SECRET_KEY`) | The IPT 3 key is public | M1 |
 | Data dir location | Chosen in setup step 1, stored in `WEB-INF/datadir.location` | `IPT_DATA_DIR` / `ipt.data-dir` only; IPT 3 data dirs must be converted with `ipt migrate` | No WAR; one-time migration | M1 |
 | Registry unreachable at start-up | IPT fails to start | IPT starts and shows a start-up warning | An outage of the GBIF registry should not take IPTs down | M1 |
+| Vocabularies without registry | Installed vocabularies are only loaded when the GBIF registry answers; publishing then fails | Installed vocabularies are loaded anyway | An outage of the GBIF registry should not stop publishing | M1 |
+| Uploaded IPT 3 resource folders | Read with XStream allowing any Java type | Read with XStream limited to the IPT's own classes and JDK value types | Uploaded files must not be able to instantiate arbitrary classes | M1 |

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thesaurus dc:URI="http://iso.org/iso3166-1/alpha2" dc:title="ISO 3166 countries" xmlns="http://rs.gbif.org/thesaurus/" xmlns:dc="http://purl.org/dc/terms/">
+  <concept dc:identifier="FI" dc:URI="http://iso.org/iso3166-1/alpha2/FI"><preferred><term dc:title="Finland" xml:lang="en"/></preferred><alternative><term dc:title="fi" xml:lang="en"/></alternative></concept>
+  <concept dc:identifier="DK" dc:URI="http://iso.org/iso3166-1/alpha2/DK"><preferred><term dc:title="Denmark" xml:lang="en"/></preferred><alternative><term dc:title="dk" xml:lang="en"/></alternative></concept>
+  <concept dc:identifier="US" dc:URI="http://iso.org/iso3166-1/alpha2/US"><preferred><term dc:title="United States" xml:lang="en"/></preferred><alternative><term dc:title="us" xml:lang="en"/></alternative></concept>
+</thesaurus>

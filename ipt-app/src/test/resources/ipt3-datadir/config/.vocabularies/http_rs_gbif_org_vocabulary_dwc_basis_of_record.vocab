@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thesaurus dc:URI="http://rs.tdwg.org/dwc/dwctype/" dc:title="Darwin Core Type Vocabulary" xmlns="http://rs.gbif.org/thesaurus/" xmlns:dc="http://purl.org/dc/terms/">
+  <concept dc:identifier="PreservedSpecimen" dc:URI="http://rs.tdwg.org/dwc/dwctype/PreservedSpecimen"><preferred><term dc:title="Preserved Specimen" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="FossilSpecimen" dc:URI="http://rs.tdwg.org/dwc/dwctype/FossilSpecimen"><preferred><term dc:title="Fossil Specimen" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="LivingSpecimen" dc:URI="http://rs.tdwg.org/dwc/dwctype/LivingSpecimen"><preferred><term dc:title="Living Specimen" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="HumanObservation" dc:URI="http://rs.tdwg.org/dwc/dwctype/HumanObservation"><preferred><term dc:title="Human Observation" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="MachineObservation" dc:URI="http://rs.tdwg.org/dwc/dwctype/MachineObservation"><preferred><term dc:title="Machine Observation" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="MaterialSample" dc:URI="http://rs.tdwg.org/dwc/dwctype/MaterialSample"><preferred><term dc:title="Material Sample" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="MaterialCitation" dc:URI="http://rs.tdwg.org/dwc/dwctype/MaterialCitation"><preferred><term dc:title="Material Citation" xml:lang="en"/></preferred></concept>
+  <concept dc:identifier="Occurrence" dc:URI="http://rs.tdwg.org/dwc/dwctype/Occurrence"><preferred><term dc:title="Occurrence" xml:lang="en"/></preferred></concept>
+</thesaurus>

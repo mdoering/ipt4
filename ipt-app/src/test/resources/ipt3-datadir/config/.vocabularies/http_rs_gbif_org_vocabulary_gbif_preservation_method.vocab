@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thesaurus dc:URI="http://rs.gbif.org/vocabulary/gbif/preservation_method" dc:title="Preservation methods" xmlns="http://rs.gbif.org/thesaurus/" xmlns:dc="http://purl.org/dc/terms/">
+  <concept dc:identifier="noTreatment" dc:URI="http://rs.gbif.org/vocabulary/gbif/preservation_method/noTreatment"><preferred><term dc:title="No treatment" xml:lang="en"/></preferred><alternative><term dc:title="none" xml:lang="en"/></alternative></concept>
+</thesaurus>

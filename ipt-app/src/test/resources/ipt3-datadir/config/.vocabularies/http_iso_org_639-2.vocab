@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thesaurus dc:URI="http://iso.org/639-2" dc:title="ISO 639-2 languages" xmlns="http://rs.gbif.org/thesaurus/" xmlns:dc="http://purl.org/dc/terms/">
+  <concept dc:identifier="eng" dc:URI="http://iso.org/639-2/eng"><preferred><term dc:title="English" xml:lang="en"/></preferred><alternative><term dc:title="en" xml:lang="en"/></alternative></concept>
+  <concept dc:identifier="spa" dc:URI="http://iso.org/639-2/spa"><preferred><term dc:title="Spanish" xml:lang="en"/></preferred><alternative><term dc:title="es" xml:lang="en"/></alternative></concept>
+</thesaurus>
