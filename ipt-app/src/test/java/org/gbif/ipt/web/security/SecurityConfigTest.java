@@ -75,7 +75,8 @@ class SecurityConfigTest {
   @Test
   @WithMockUser(username = "manager@example.org")
   void managerCannotOpenAdmin() throws Exception {
-    mvc.perform(get("/admin/")).andExpect(status().isForbidden());
+    // IPT 3's NOT_ALLOWED result: 401
+    mvc.perform(get("/admin/")).andExpect(status().isUnauthorized());
   }
 
   @Test
@@ -92,7 +93,7 @@ class SecurityConfigTest {
   @Test
   @WithMockUser(username = "user@example.org")
   void plainUserCannotManage() throws Exception {
-    mvc.perform(get("/manage/")).andExpect(status().isForbidden());
+    mvc.perform(get("/manage/")).andExpect(status().isUnauthorized());
   }
 
   @Test

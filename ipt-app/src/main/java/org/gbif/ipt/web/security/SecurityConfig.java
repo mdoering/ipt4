@@ -18,6 +18,8 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 
 import java.util.stream.Stream;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,6 +30,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.ForwardAuthenticationFailureHandler;
+import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
@@ -82,7 +85,10 @@ public class SecurityConfig {
             // re-renders login.ftl with the error and the entered email, as IPT 3 did
             .failureHandler(new ForwardAuthenticationFailureHandler("/login?error")))
         .authenticationProvider(authenticationProvider)
-        .exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
+        // logged-in users without rights get IPT 3's 401 pages; a missing or stale CSRF token stays a 403
+        .exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+            .accessDeniedHandler((request, response, denied) -> response.sendError(
+                denied instanceof CsrfException ? HttpServletResponse.SC_FORBIDDEN : HttpServletResponse.SC_UNAUTHORIZED)))
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
             .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
             .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(new NegatedRequestMatcher(CACHEABLE),
