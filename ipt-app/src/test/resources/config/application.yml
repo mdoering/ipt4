@@ -1,0 +1,8 @@
+# Test-only settings, loaded on top of the main application.yml.
+ipt:
+  # a throwaway data dir, kept between runs like a developer's own
+  data-dir: ${user.dir}/target/test-data-dir
+  # keep tests offline: registry calls fail fast instead of reaching the real GBIF registry
+  defaults:
+    "[dev.registry.url]": http://127.0.0.1:9
+    "[dev.registrydev.url]": http://127.0.0.1:9

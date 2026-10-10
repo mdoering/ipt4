@@ -23,6 +23,7 @@ import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.User.Role;
 import org.gbif.ipt.service.BaseManager;
 import org.gbif.ipt.service.InvalidConfigException;
+import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.InvalidConfigException.TYPE;
 import org.gbif.ipt.service.admin.ConfigManager;
 import org.gbif.ipt.service.admin.DataPackageSchemaManager;
@@ -208,7 +209,13 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
     vocabManager.load();
 
     LOG.info("Ensure latest versions of default vocabularies are installed...");
-    vocabManager.installOrUpdateDefaults();
+    try {
+      vocabManager.installOrUpdateDefaults();
+    } catch (RegistryException e) {
+      // IPT 3 failed to start without the registry; IPT4 starts and reports it
+      LOG.error("Cannot check the default vocabularies against the GBIF registry", e);
+      warnings.addStartupError("Cannot check the default vocabularies against the GBIF registry: " + e.getMessage(), e);
+    }
 
     File vocabDir = dataDir.configFile(VocabulariesManagerImpl.CONFIG_FOLDER);
     File deprecatedVocabFile = new File(vocabDir, DEPRECATED_VOCAB_PERSISTENCE_FILE);
@@ -224,7 +231,13 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
     schemaManager.load();
 
     LOG.info("Ensure supported versions of default schemas are installed...");
-    schemaManager.installOrUpdateDefaults();
+    try {
+      schemaManager.installOrUpdateDefaults();
+    } catch (RegistryException e) {
+      LOG.error("Cannot check the default data package schemas against the GBIF registry", e);
+      warnings.addStartupError("Cannot check the default data package schemas against the GBIF registry: "
+          + e.getMessage(), e);
+    }
 
     LOG.info("Loading registration configuration...");
     registrationManager.load();

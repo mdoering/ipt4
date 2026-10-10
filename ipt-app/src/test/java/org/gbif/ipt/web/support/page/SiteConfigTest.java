@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SiteConfigTest {
 
   private static IptProperties props(String baseUrl) {
-    return new IptProperties(null, baseUrl, "en", null, false);
+    return new IptProperties(null, baseUrl, "en", null, false, null);
   }
 
   @Test

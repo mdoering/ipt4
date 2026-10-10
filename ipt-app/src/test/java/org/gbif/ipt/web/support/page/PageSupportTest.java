@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PageSupportTest {
 
   private static PageSupport page(Locale locale) {
-    SiteConfig cfg = new SiteConfig(new IptProperties(null, null, "en", null, false), Optional.empty(), Optional.empty());
+    SiteConfig cfg = new SiteConfig(new IptProperties(null, null, "en", null, false, null), Optional.empty(), Optional.empty());
     return new PageSupport(
         new PageContext(
             new BundleMessages(), locale, cfg, "http://localhost", "http://localhost/about", false, false, false));

@@ -1,0 +1,10 @@
+{
+  "schemaVersion" : 1,
+  "users" : [ {
+    "email" : "admin@example.org",
+    "firstname" : "Ada",
+    "lastname" : "Admin",
+    "password" : "$2a$12$abcdefghijklmnopqrstuuWb0V4o6M5wF3bC7m7FvKX9i3uXlG3l2",
+    "role" : "Admin"
+  } ]
+}

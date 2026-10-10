@@ -58,6 +58,8 @@ import lombok.Getter;
 
 public class AppConfig {
 
+  private final Map<String, String> defaults = new java.util.LinkedHashMap<>();
+
   public enum REGISTRY_TYPE {
     PRODUCTION, DEVELOPMENT
   }
@@ -65,7 +67,7 @@ public class AppConfig {
   private static final String UI_SETTINGS_FOLDER = ".uiSettings";
   private static final String COLOR_SCHEME_PROPFILE = "ipt-color-scheme.properties";
   protected static final String DATADIR_PROPFILE = "ipt.properties";
-  static final String CLASSPATH_PROPFILE = "application.properties";
+  static final String CLASSPATH_PROPFILE = "ipt-defaults.properties";
   public static final String BASEURL = "ipt.baseURL";
   // Since 2.1
   public static final String CORE_ROW_TYPES = "ipt.core_rowTypes";
@@ -534,7 +536,18 @@ public class AppConfig {
   }
 
   /**
-   * Load application configuration from application properties file (application.properties), from
+   * Overrides for the built-in settings of {@code ipt-defaults.properties} (keys starting with {@code dev.}), set by
+   * the application from its own configuration before {@link #loadConfig()}.
+   */
+  public void setDefaults(Map<String, String> defaults) {
+    this.defaults.clear();
+    if (defaults != null) {
+      this.defaults.putAll(defaults);
+    }
+  }
+
+  /**
+   * Load application configuration from application properties file (ipt-defaults.properties), from
    * user configuration file (ipt.properties) and color configuration file (ipt-color-scheme.properties),
    * which includes populating core configuration.
    */
@@ -545,11 +558,12 @@ public class AppConfig {
     try {
       Properties props = new Properties();
       if (configStream == null) {
-        LOG.error("Could not load default configuration from application.properties in classpath");
+        LOG.error("Could not load default configuration from ipt-defaults.properties in classpath");
       } else {
         props.load(configStream);
-        LOG.debug("Loaded default configuration from application.properties in classpath");
+        LOG.debug("Loaded default configuration from ipt-defaults.properties in classpath");
       }
+      props.putAll(defaults);
       if (dataDir.isConfigured()) {
         // load user configuration properties from data dir ipt.properties (if it exists)
         File userCfgFile = new File(dataDir.dataDir, "config/" + DATADIR_PROPFILE);

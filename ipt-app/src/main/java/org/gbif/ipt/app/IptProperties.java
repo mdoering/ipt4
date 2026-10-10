@@ -13,18 +13,22 @@
  */
 package org.gbif.ipt.app;
 
+import java.util.Map;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * Deployment settings (environment, {@code application.yml}). Installation settings edited in the admin UI live in the
- * data directory and arrive with M1.
+ * data directory ({@code config/ipt.properties}).
  *
  * @param dataDir the IPT data directory, from {@code IPT_DATA_DIR}
  * @param baseUrl public base URL; when blank it is derived from each request (incl. X-Forwarded-* headers)
  * @param defaultLocale language used until a visitor picks another one
  * @param analyticsKey optional Google Analytics key
  * @param devMode development conveniences: template reloading and error details in pages
+ * @param defaults overrides of the built-in settings in {@code ipt-defaults.properties}, e.g. registry endpoints;
+ *                 keys contain dots, so write them as {@code "[dev.registry.url]"} in YAML
  */
 @ConfigurationProperties("ipt")
 public record IptProperties(
@@ -32,4 +36,10 @@ public record IptProperties(
     String baseUrl,
     @DefaultValue("en") String defaultLocale,
     String analyticsKey,
-    boolean devMode) {}
+    boolean devMode,
+    Map<String, String> defaults) {
+
+  public IptProperties {
+    defaults = defaults == null ? Map.of() : Map.copyOf(defaults);
+  }
+}

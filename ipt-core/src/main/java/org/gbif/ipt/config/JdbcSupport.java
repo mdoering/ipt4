@@ -155,6 +155,20 @@ public class JdbcSupport {
 
   private final Map<String, JdbcInfo> driver = new TreeMap<>();
 
+  /** The JDBC drivers listed in {@value #CLASSPATH_PROPFILE} on the classpath (IPT 3: IPTModule). */
+  public static JdbcSupport fromClasspath() throws java.io.IOException {
+    JdbcSupport jdbcs = new JdbcSupport();
+    try (java.io.InputStream in = JdbcSupport.class.getClassLoader().getResourceAsStream(CLASSPATH_PROPFILE)) {
+      if (in == null) {
+        throw new java.io.FileNotFoundException(CLASSPATH_PROPFILE + " is missing from the classpath");
+      }
+      Properties props = new Properties();
+      props.load(in);
+      jdbcs.setProperties(props);
+    }
+    return jdbcs;
+  }
+
   public JdbcInfo get(String name) {
     return driver.get(name.toLowerCase());
   }

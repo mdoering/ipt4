@@ -37,7 +37,7 @@ class GlobalModelTest {
 
   private static GlobalModel globalModel(String baseUrl) {
     SiteConfig cfg =
-        new SiteConfig(new IptProperties(null, baseUrl, "en", null, false), Optional.empty(), Optional.empty());
+        new SiteConfig(new IptProperties(null, baseUrl, "en", null, false, null), Optional.empty(), Optional.empty());
     return new GlobalModel(cfg, new BundleMessages());
   }
 
