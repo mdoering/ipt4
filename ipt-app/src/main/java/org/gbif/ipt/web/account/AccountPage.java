@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +42,8 @@ import lombok.Setter;
  */
 @PageBean
 public class AccountPage extends PostActionPage {
+
+  private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder(12);
 
   @Serial
   private static final long serialVersionUID = 5092204508303815778L;
@@ -138,7 +140,7 @@ public class AccountPage extends PostActionPage {
         LOG.error("The new password confirmation entered is empty");
       }
       // confirm current password is correct
-      else if (!BCrypt.verifyer().verify(trimmedCurrentPassword.toCharArray(), currentUser.getPassword().toCharArray()).verified) {
+      else if (!BCRYPT.matches(trimmedCurrentPassword, currentUser.getPassword())) {
         addFieldError("currentPassword", getText("validation.password.wrong"));
         LOG.error("The password does not match");
       }
@@ -149,7 +151,7 @@ public class AccountPage extends PostActionPage {
         password2 = null;
         // otherwise, set password if it's valid
       } else if (validator.validatePassword(this, newPassword)) {
-        currentUser.setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
+        currentUser.setPassword(BCRYPT.encode(newPassword));
         // erase data
         newPassword = null;
         currentPassword = null;

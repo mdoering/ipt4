@@ -16,12 +16,8 @@ package org.gbif.ipt.web.portal;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
-import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.config.DataDir;
-import org.gbif.ipt.service.admin.RegistrationManager;
-import org.gbif.ipt.i18n.SimpleTextProvider;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import jakarta.inject.Inject;
 
@@ -29,9 +25,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.Serial;
 
@@ -44,7 +39,7 @@ public class HealthPage extends ActionPage {
   private static final Logger LOG = LogManager.getLogger(HealthPage.class);
 
   private DataDir dataDir;
-  private final HttpClient http;
+  private final IptHttp http;
 
   public Status status;
 
@@ -85,10 +80,8 @@ public class HealthPage extends ActionPage {
 
   @Inject
   public HealthPage(
-      SimpleTextProvider textProvider,
-      AppConfig cfg,
-      HttpClient client,
-      RegistrationManager registrationManager,
+      PageContext ctx,
+      IptHttp client,
       DataDir dataDir) {
     super(ctx);
     this.dataDir = dataDir;
@@ -102,7 +95,7 @@ public class HealthPage extends ActionPage {
     // Network
     try {
       networkRegistryURL = cfg.getRegistryUrl();
-      ExtendedResponse resp = http.get(networkRegistryURL);
+      IptHttp.Response resp = http.get(networkRegistryURL);
       if ((resp != null) && (resp.getStatusCode() == 200)) {
         networkRegistry = true;
       }
@@ -111,7 +104,7 @@ public class HealthPage extends ActionPage {
     }
 
     try {
-      ExtendedResponse resp = http.get(networkRepositoryURL);
+      IptHttp.Response resp = http.get(networkRepositoryURL);
       if ((resp != null) && (resp.getStatusCode() == 200)) {
         networkRepository = true;
       }
@@ -121,11 +114,10 @@ public class HealthPage extends ActionPage {
 
     try {
       networkPublicAccessURL = cfg.getBaseUrl();
-      ExtendedResponse resp = http.get(networkCheckPublicAccessURL + networkPublicAccessURL);
+      IptHttp.Response resp = http.get(networkCheckPublicAccessURL + networkPublicAccessURL);
       if ((resp != null) && (resp.getStatusCode() == 200)) {
-        JsonObject jsonObject = new JsonParser().parse(resp.getContent()).getAsJsonObject();
-        JsonElement success = jsonObject.get("success");
-        if ((success != null) && success.getAsBoolean()) {
+        JsonNode success = JsonMapper.shared().readTree(resp.getContent()).get("success");
+        if ((success != null) && success.asBoolean()) {
           networkPublicAccess = true;
         }
       }
@@ -173,7 +165,7 @@ public class HealthPage extends ActionPage {
     if (javaVersion == null) {
       javaVersion = System.getProperty("java.version");
     }
-    appServerVersion = ServletActionContext.getServletContext().getServerInfo();
+    appServerVersion = req.getServletContext().getServerInfo();
     iptMode = ((cfg != null) && (cfg.getRegistryType() != null)) ? cfg.getRegistryType().name() : "";
   }
 

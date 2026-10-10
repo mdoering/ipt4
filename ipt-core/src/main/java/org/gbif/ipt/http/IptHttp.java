@@ -121,6 +121,17 @@ public class IptHttp {
     return proxy;
   }
 
+  /** Whether a TCP connection to {@code host} can be opened (gbif-httputils' verifyHost, used to check proxies). */
+  public boolean verifyHost(HttpHost host) {
+    try (java.net.Socket socket = new java.net.Socket()) {
+      socket.connect(new InetSocketAddress(host.hostName(), host.port() < 0 ? 80 : host.port()),
+          (int) timeout.toMillis());
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
   public String getUserAgent() {
     return userAgent;
   }

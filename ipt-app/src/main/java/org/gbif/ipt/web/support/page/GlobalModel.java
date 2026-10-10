@@ -48,9 +48,11 @@ public class GlobalModel {
   private final Messages messages;
   private final RegistrationManager registrations;
   private final ObjectProvider<RequestFeedback> feedback;
+  private final ObjectProvider<PageContext> contexts;
 
   public GlobalModel(AppConfig cfg, IptProperties props, Messages messages, RegistrationManager registrations,
-                     ObjectProvider<RequestFeedback> feedback) {
+                     ObjectProvider<RequestFeedback> feedback, ObjectProvider<PageContext> contexts) {
+    this.contexts = contexts;
     this.cfg = cfg;
     this.props = props;
     this.messages = messages;
@@ -59,8 +61,8 @@ public class GlobalModel {
   }
 
   @ModelAttribute
-  public void addPage(Model model, HttpServletRequest request, Locale locale) {
-    PageContext ctx = pageContext(request, locale);
+  public void addPage(Model model) {
+    PageContext ctx = contexts.getObject();
     model.addAttribute(PAGE_CONTEXT, ctx);
     model.addAttribute(PAGE, new PageSupport(ctx));
     // live views: what the handler adds later still shows
@@ -70,7 +72,8 @@ public class GlobalModel {
     model.addAttribute("fieldErrors", ctx.feedback().getFieldErrors());
   }
 
-  PageContext pageContext(HttpServletRequest request, Locale locale) {
+  /** The facts of the current request; also the request-scoped {@link PageContext} bean (see WebConfig). */
+  public PageContext pageContext(HttpServletRequest request, Locale locale) {
     String baseUrl = baseUrl(request);
     Locale pageLocale = IptLocaleResolver.supported(locale).orElse(Locale.UK);
     RequestFeedback f = feedback.getObject();

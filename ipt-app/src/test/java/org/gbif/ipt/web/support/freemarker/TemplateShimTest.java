@@ -80,6 +80,11 @@ class TemplateShimTest {
   }
 
   @Test
+  void topLevelNamesReadPublicFieldsOfThePage() throws Exception {
+    assertThat(render("/_probe/field")).contains("FIELD:from a field");
+  }
+
+  @Test
   void squareBracketSyntaxWorks() throws Exception {
     assertThat(render("/_probe/shim_square")).contains("S:created by <b>Bo</b> on 1999");
   }

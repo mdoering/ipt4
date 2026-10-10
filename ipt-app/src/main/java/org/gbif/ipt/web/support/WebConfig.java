@@ -15,6 +15,9 @@ package org.gbif.ipt.web.support;
 
 import org.gbif.ipt.app.IptProperties;
 import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
+import org.gbif.ipt.web.support.page.GlobalModel;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 import java.util.Locale;
 
@@ -34,8 +37,12 @@ import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.web.support.feedback.FeedbackFlashInterceptor;
 import org.gbif.ipt.web.support.feedback.RequestFeedback;
 import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
+import org.gbif.ipt.web.support.page.GlobalModel;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.springframework.context.annotation.ScopedProxyMode;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -86,10 +93,18 @@ public class WebConfig implements WebMvcConfigurer {
 
   /** The messages and errors of the current request; also injectable as core's {@code Feedback}. */
   @Bean
+  @Primary
   @RequestScope
   public RequestFeedback requestFeedback(CurrentUser currentUser, HttpServletRequest request) {
     Locale locale = IptLocaleResolver.supported(LocaleContextHolder.getLocale()).orElse(Locale.UK);
     return new RequestFeedback(locale, currentUser.get(), RequestContextUtils.getInputFlashMap(request));
+  }
+
+  /** The page facts of the current request, injected into page beans (no proxy: page beans live per request). */
+  @Bean
+  @RequestScope(proxyMode = ScopedProxyMode.NO)
+  public PageContext pageContext(GlobalModel globalModel, HttpServletRequest request) {
+    return globalModel.pageContext(request, LocaleContextHolder.getLocale());
   }
 
   @Override

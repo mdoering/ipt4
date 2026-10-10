@@ -17,6 +17,8 @@ import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.config.AppConfig.REGISTRY_TYPE;
+import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.model.DataPackageSchema;
 import org.gbif.ipt.model.Extension;
 import org.gbif.ipt.model.Organisation;
@@ -34,7 +36,8 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.URLUtils;
 import org.gbif.ipt.validation.UserValidator;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.HttpHost;
+import org.gbif.ipt.http.IptHttp;
 
 import jakarta.inject.Inject;
 import java.io.File;
@@ -47,7 +50,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gbif.ipt.web.support.action.StrutsParameter;
@@ -70,7 +72,7 @@ public class SetupPage extends ActionPage {
   private final DataDir dataDir;
   private final ExtensionManager extensionManager;
   private final DataPackageSchemaManager schemaManager;
-  private final HttpClient client;
+  private final IptHttp client;
 
   private final UserValidator userValidation = new UserValidator();
 
@@ -102,7 +104,7 @@ public class SetupPage extends ActionPage {
       DataDir dataDir,
       ExtensionManager extensionManager,
       DataPackageSchemaManager schemaManager,
-      HttpClient client) {
+      IptHttp client) {
     super(ctx);
     this.configManager = configManager;
     this.userManager = userManager;
@@ -197,57 +199,7 @@ public class SetupPage extends ActionPage {
     this.setupPublicUrl = setupPublicUrl;
   }
 
-  public String setupDataDirectory() {
-    // this step only owns the data directory itself: once it's configured, never allow it to be
-    // changed again via this action, regardless of whether the rest of the wizard (registry
-    // type, admin user) has completed yet
-    if (dataDir.isConfigured()) {
-      LOG.info("Skipping setup data directory step");
-      return SUCCESS;
-    }
-
-    if ((dataDir.dataDir != null && (!dataDir.dataDir.exists() || dataDir.isConfiguredButEmpty()))
-        || (isHttpPost() && dataDirPath != null)) {
-
-      LOG.info("Set up data directory {}", dataDir.dataDir);
-
-      File dd = dataDirPath != null ? new File(dataDirPath.trim()) : dataDir.dataDir;
-      try {
-        if (StringUtils.isEmpty(dataDirPath) && dataDir.dataDir == null) {
-          addFieldError("dataDirPath",
-              getText("validation.required", new String[] {getText("admin.config.setup.datadir")}));
-        } else if (dd.isAbsolute()) {
-          boolean created = configManager.setDataDir(dd);
-          if (created) {
-            addActionMessage(getText("admin.config.setup.datadir.created"));
-          } else {
-            addActionMessage(getText("admin.config.setup.datadir.reused"));
-          }
-        } else {
-          addFieldError("dataDirPath", getText("admin.config.setup.datadir.absolute"));
-        }
-      } catch (InvalidConfigException e) {
-        LOG.warn("Failed to setup datadir: {}", e.getMessage(), e);
-        if (e.getType() == InvalidConfigException.TYPE.NON_WRITABLE_DATA_DIR) {
-          addActionError(getText("admin.config.setup.datadir.writable", new String[] {dataDirPath}));
-        } else {
-          addActionError(getText("admin.config.setup.datadir.error"));
-        }
-      } catch (RegistryException e) {
-        String msg = RegistryException.logRegistryException(e, this);
-        LOG.warn("Failed to contact the GBIF Registry ({}): {}", msg, e.getMessage(), e);
-        addActionError(msg);
-      }
-    }
-
-    if (dataDir.isConfigured()) {
-      // the data dir is already/now configured, skip the first setup step
-      LOG.info("Skipping setup data directory step");
-      return SUCCESS;
-    }
-
-    return INPUT;
-  }
+  // IPT 3's setupDataDirectory step is gone: IPT4 gets its data directory from IPT_DATA_DIR
 
   public String setupDefaultAdministrator() {
     // check if a data directory exists

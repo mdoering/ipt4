@@ -151,10 +151,6 @@ class AboutPageTest {
     mvc.perform(get("/js/jquery/jquery-3.7.1.min.js")).andExpect(status().isOk());
   }
 
-  @Test
-  void rootRedirectsToAboutUntilThePortalHomeIsPorted() throws Exception {
-    mvc.perform(get("/")).andExpect(status().isFound()).andExpect(redirectedUrl("/about"));
-  }
 
   @Test
   void staticAssetsAreCacheable() throws Exception {

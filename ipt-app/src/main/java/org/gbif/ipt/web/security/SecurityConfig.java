@@ -52,7 +52,7 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers("/admin/**", "/admin-api/**")
                     .hasRole("ADMIN")
-                    .requestMatchers("/manage/**", "/manager-api/**")
+                    .requestMatchers("/manage/**", "/manager-api/**", "/resource/preview")
                     .hasAnyRole("MANAGER", "PUBLISHER", "ADMIN")
                     .anyRequest()
                     .permitAll())

@@ -53,6 +53,9 @@ public class FreeMarkerProbeController {
   }
 
   public static class ProbePage {
+    // IPT 3's HealthAction exposed its values as public fields, which OGNL read
+    public String publicField = "from a field";
+
     public String getTitle() {
       return "From page";
     }

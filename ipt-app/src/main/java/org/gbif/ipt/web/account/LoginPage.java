@@ -21,7 +21,6 @@ import org.gbif.ipt.config.Constants;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.admin.UserAccountManager;
-import org.gbif.ipt.struts2.CsrfLoginInterceptor;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 
 import jakarta.inject.Inject;
@@ -59,7 +58,6 @@ public class LoginPage extends PostActionPage {
   private String password;
   @Getter
   private String adminEmail;
-  private String csrfToken;
 
   @Inject
   public LoginPage(
@@ -108,52 +106,29 @@ public class LoginPage extends PostActionPage {
     }
   }
 
-  public String login() throws IOException {
-    // login
-    Cookie csrfCookie = getCookie(CsrfLoginInterceptor.CSRFtoken);
-
+  /**
+   * Shows the login form. Spring Security checks the posted credentials (see SecurityConfig and
+   * LoginSuccessHandler); a failed attempt comes back here with {@code error}.
+   */
+  public String login() {
     // user already logged in, return
-    if (session.get(Constants.SESSION_USER) != null) {
+    if (getCurrentUser() != null) {
       setRedirectUrl();
       return SUCCESS;
     }
-
-    if (email != null && !StringUtils.isBlank(csrfToken) && csrfCookie != null) {
-      // prevent login CSRF
-      // Make sure the token from the login form is the same as in the cookie
-      if (csrfToken.equals(csrfCookie.getValue())) {
-        User authUser = userManager.authenticate(email.trim(), password.trim());
-        if (authUser == null) {
-          addActionError(getText("admin.user.wrong.email.password.combination"));
-          LOG.info("User {} failed to log in", email);
-        } else {
-          LOG.info("User {} logged in successfully", email);
-          authUser.setLastLoginToNow();
-          userManager.save();
-          session.put(Constants.SESSION_USER, authUser);
-
-          int sessionTimeout = cfg.getSessionTimeout();
-          LOG.debug("Setting session timeout to {} seconds", sessionTimeout);
-          req.getSession().setMaxInactiveInterval(sessionTimeout);
-
-          // remember the previous URL to redirect back to
-          setRedirectUrl();
-          return SUCCESS;
-        }
-      } else {
-        LOG.warn("CSRF login token wrong! A potential malicious attack.");
-      }
+    if (req.getParameter("error") != null) {
+      addActionError(getText("admin.user.wrong.email.password.combination"));
     }
     return INPUT;
   }
 
   public String logout() {
     redirectUrl = getBase() + "/";
-    session.clear();
     return SUCCESS;
   }
 
-  private void setRedirectUrl() {
+  /** Where to go after logging in: the page that sent the visitor here, else home; always within this IPT. */
+  public void setRedirectUrl() {
     redirectUrl = getBase() + "/";
     // if we have a request, refer back to the originally requested page
     String referer = (String) session.get(Constants.SESSION_REFERER);
@@ -188,8 +163,4 @@ public class LoginPage extends PostActionPage {
     this.adminEmail = adminEmail;
   }
 
-  @StrutsParameter
-  public void setCsrfToken(String csrfToken) {
-    this.csrfToken = csrfToken;
-  }
 }

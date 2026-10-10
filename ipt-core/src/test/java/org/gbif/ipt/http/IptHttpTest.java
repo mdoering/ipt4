@@ -175,6 +175,16 @@ class IptHttpTest {
   }
 
   @Test
+  void verifiesReachableHosts() throws Exception {
+    assertThat(http.verifyHost(new HttpHost("127.0.0.1", server.getAddress().getPort()))).isTrue();
+    try (java.net.ServerSocket free = new java.net.ServerSocket(0)) {
+      int closedPort = free.getLocalPort();
+      free.close();
+      assertThat(http.verifyHost(new HttpHost("127.0.0.1", closedPort))).isFalse();
+    }
+  }
+
+  @Test
   void proxyCanBeSetAndRemoved() throws Exception {
     // a proxy that is this very server: the absolute-form request still reaches /hello
     http.setProxy(new HttpHost("127.0.0.1", server.getAddress().getPort()));

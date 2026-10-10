@@ -128,6 +128,12 @@ public class CollectingFeedback implements Feedback {
     return currentUser;
   }
 
+  /** Forgets action and field errors (e.g. before a form is shown again with fresh values). */
+  public void clearErrors() {
+    errors.clear();
+    fieldErrors.clear();
+  }
+
   public List<String> getActionMessages() {
     return Collections.unmodifiableList(messages);
   }

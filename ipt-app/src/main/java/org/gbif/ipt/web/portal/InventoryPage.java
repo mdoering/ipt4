@@ -51,6 +51,8 @@ public class InventoryPage {
   private static final long serialVersionUID = -549820308428762423L;
 
   private static final Logger LOG = LogManager.getLogger(InventoryPage.class);
+
+  private final AppConfig cfg;
   private final ResourceManager resourceManager;
   private List<DatasetItem> inventory = new ArrayList<>();
 
@@ -58,6 +60,7 @@ public class InventoryPage {
   public InventoryPage(
       AppConfig cfg,
       ResourceManager resourceManager) {
+    this.cfg = cfg;
     this.resourceManager = resourceManager;
   }
 

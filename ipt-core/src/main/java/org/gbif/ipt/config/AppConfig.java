@@ -755,7 +755,7 @@ public class AppConfig {
     properties.setProperty(DEFAULT_LOCALE, value);
   }
 
-  protected void setRegistryType(REGISTRY_TYPE newType) throws InvalidConfigException {
+  public void setRegistryType(REGISTRY_TYPE newType) throws InvalidConfigException {
     Objects.requireNonNull(newType, "Registry type cannot be null");
     if (this.type != null) {
       if (this.type == newType) {

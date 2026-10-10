@@ -46,7 +46,7 @@ class GlobalModelTest {
     ObjectProvider<RequestFeedback> feedback = mock(ObjectProvider.class);
     when(feedback.getObject()).thenReturn(new RequestFeedback(Locale.UK, user, null));
     return new GlobalModel(cfg, new IptProperties(null, propsBaseUrl, "en", null, false, null), new BundleMessages(),
-        mock(RegistrationManager.class), feedback);
+        mock(RegistrationManager.class), feedback, mock(ObjectProvider.class));
   }
 
   private static MockHttpServletRequest request() {

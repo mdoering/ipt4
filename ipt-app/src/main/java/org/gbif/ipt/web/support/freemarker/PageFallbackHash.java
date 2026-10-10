@@ -54,11 +54,23 @@ final class PageFallbackHash extends SimpleHash {
     }
     Method getter = findGetter(page.getClass(), key);
     if (getter == null) {
-      return null;
+      return publicField(key);
     }
     try {
       return getObjectWrapper().wrap(getter.invoke(page));
     } catch (ReflectiveOperationException e) {
+      throw new TemplateModelException("Cannot read " + key + " from " + page.getClass().getName(), e);
+    }
+  }
+
+  /** OGNL also read public fields of the action (IPT 3's HealthAction relied on it). */
+  private TemplateModel publicField(String key) throws TemplateModelException {
+    try {
+      java.lang.reflect.Field field = page.getClass().getField(key);
+      return getObjectWrapper().wrap(field.get(page));
+    } catch (NoSuchFieldException e) {
+      return null;
+    } catch (IllegalAccessException e) {
       throw new TemplateModelException("Cannot read " + key + " from " + page.getClass().getName(), e);
     }
   }
