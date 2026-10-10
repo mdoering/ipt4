@@ -36,6 +36,14 @@ class DataDirFormatTest {
   }
 
   @Test
+  void logsWrittenBeforeStartUpDoNotCount() throws IOException {
+    // logging starts before the application and writes into <data dir>/logs
+    Files.createDirectories(dir.resolve("logs"));
+    Files.writeString(dir.resolve("logs/debug.log"), "starting");
+    assertThat(DataDirFormat.detect(dir)).isEqualTo(DataDirFormat.Kind.EMPTY);
+  }
+
+  @Test
   void recognisesIpt3DataDirs() throws IOException {
     Files.createDirectories(dir.resolve("config"));
     Files.writeString(dir.resolve("config/ipt.properties"), "ipt.baseURL=http://x");

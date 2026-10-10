@@ -440,7 +440,7 @@ public class DataDir {
       File configDir = configFile("");
 
       // hidden files (.DS_Store, ...) do not make a directory an existing data dir
-      if (dataDir.exists() && (!dataDir.isDirectory() || dataDir.list((d, name) -> !name.startsWith(".")).length > 0)) {
+      if (dataDir.exists() && (!dataDir.isDirectory() || dataDir.list((d, name) -> !name.startsWith(".") && !name.equals(LOGGING_DIR)).length > 0)) {
         // EXISTING file or directory with content: make sure its an IPT datadir - otherwise break
         if (dataDir.isDirectory()) {
           // check if this directory contains a config folder - if not copy empty default dir from classpath

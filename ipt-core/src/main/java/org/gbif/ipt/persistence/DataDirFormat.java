@@ -34,7 +34,7 @@ public final class DataDirFormat {
   public static final int CURRENT_VERSION = 1;
 
   public enum Kind {
-    /** Missing, or holding nothing but hidden files: a new IPT is set up here. */
+    /** Missing, or holding nothing but hidden files and logs: a new IPT is set up here. */
     EMPTY,
     /** An IPT4 data dir. */
     V4,
@@ -67,7 +67,9 @@ public final class DataDirFormat {
       return Kind.V4;
     }
     try (Stream<Path> entries = Files.list(dir)) {
-      if (entries.allMatch(p -> p.getFileName().toString().startsWith("."))) {
+      // hidden files and the logs folder (written before start-up) do not make a directory a data dir
+      if (entries.allMatch(p -> p.getFileName().toString().startsWith(".")
+          || (p.getFileName().toString().equals("logs") && Files.isDirectory(p)))) {
         return Kind.EMPTY;
       }
     }

@@ -60,6 +60,15 @@ class DataDirStartupTest {
   }
 
   @Test
+  void setsUpADirectoryHoldingOnlyEarlyLogs() throws IOException {
+    // as in a new Docker volume: logging started before the application
+    Files.createDirectories(tmp.resolve("logs"));
+    Files.writeString(tmp.resolve("logs/debug.log"), "starting");
+    DataDirStartup.open(tmp.toString(), "4.0.0", Map.of());
+    assertThat(tmp.resolve("config/ipt.properties")).exists();
+  }
+
+  @Test
   void refusesIpt3DataDirsAndExplainsTheMigration() throws IOException {
     Files.createDirectories(tmp.resolve("config"));
     Files.writeString(tmp.resolve("config/ipt.properties"), "ipt.baseURL=http://x");
