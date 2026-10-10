@@ -42,6 +42,25 @@ class ActionRunnerTest {
   /** Holds a reference to an installed extension, like IPT 3's ExtensionMapping. */
   public static class Mapping {
     private String name;
+    private java.io.File file;
+    private java.nio.file.Path path;
+
+    public java.io.File getFile() {
+      return file;
+    }
+
+    public void setFile(java.io.File file) {
+      this.file = file;
+    }
+
+    public java.nio.file.Path getPath() {
+      return path;
+    }
+
+    public void setPath(java.nio.file.Path path) {
+      this.path = path;
+    }
+
     private Extension extension = new Extension();
 
     public String getName() {
@@ -149,6 +168,18 @@ class ActionRunnerTest {
     assertThat(page.getMapping().getExtension().getTitle()).isNull();
     assertThat(page.getMappings().get(0).getExtension().getTitle()).isNull();
     assertThat(page.getResource().getCreator().getRole()).isNotEqualTo(User.Role.Admin);
+  }
+
+  /** Spring converts strings to files; a source pointed at /etc/passwd could then be downloaded as raw source. */
+  @Test
+  void filesAndPathsAreNeverBound() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/x");
+    request.addParameter("mapping.file", "/etc/passwd");
+    request.addParameter("mapping.path", "/etc/passwd");
+    ProbePage page = page(request);
+    runner().run(page, request, "save", () -> ActionPage.SUCCESS);
+    assertThat(page.getMapping().getFile()).isNull();
+    assertThat(page.getMapping().getPath()).isNull();
   }
 
   @Test

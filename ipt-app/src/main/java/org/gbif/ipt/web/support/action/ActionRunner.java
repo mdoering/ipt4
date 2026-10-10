@@ -28,7 +28,9 @@ import org.gbif.ipt.model.VocabularyConcept;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -135,7 +137,7 @@ public class ActionRunner {
     ServletRequestDataBinder binder = new ServletRequestDataBinder(page) {
       @Override
       protected boolean isAllowed(String field) {
-        return super.isAllowed(field) && !throughSharedObject(pageType, field);
+        return super.isAllowed(field) && !forbidden(pageType, field);
       }
     };
     binder.setAllowedFields(
@@ -150,8 +152,17 @@ public class ActionRunner {
     }
   }
 
-  /** Whether the path leads into (or replaces) a shared object below the page's own properties, by declared types. */
-  static boolean throughSharedObject(Class<?> pageType, String field) {
+  /**
+   * Local files are never set from requests (Spring, unlike Struts, converts strings to files, so a source could be
+   * pointed at any file on the server).
+   */
+  private static final Set<Class<?>> NEVER_BOUND = Set.of(File.class, Path.class);
+
+  /**
+   * Whether the path leads into (or replaces) a shared object below the page's own properties, or sets a file, judged
+   * by declared types.
+   */
+  static boolean forbidden(Class<?> pageType, String field) {
     String[] segments = field.split("\\.");
     ResolvableType type = ResolvableType.forClass(pageType);
     for (int i = 0; i < segments.length; i++) {
@@ -167,6 +178,9 @@ public class ActionRunner {
         type = elementType(type);
       }
       Class<?> resolved = type.resolve();
+      if (resolved != null && NEVER_BOUND.stream().anyMatch(never -> never.isAssignableFrom(resolved))) {
+        return true;
+      }
       if (i > 0 && resolved != null && SHARED.stream().anyMatch(shared -> shared.isAssignableFrom(resolved))) {
         return true;
       }
