@@ -20,6 +20,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- Compatibility probe only; becomes a compile dependency in M1 (data packages) -->
+    <dependency>
+      <groupId>io.frictionlessdata</groupId>
+      <artifactId>tableschema-java</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
