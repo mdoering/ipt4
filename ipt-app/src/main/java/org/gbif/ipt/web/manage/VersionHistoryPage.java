@@ -13,6 +13,7 @@
  */
 package org.gbif.ipt.web.manage;
 
+import org.gbif.ipt.web.portal.PortalGuard;
 import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
 import org.gbif.ipt.web.support.action.StrutsParameter;
@@ -65,10 +66,11 @@ public class VersionHistoryPage extends ManagerBasePage {
     // look for version parameter
     String v = StringUtils.trimToNull(req.getParameter(Constants.REQ_PARAM_VERSION));
     if (StringUtils.isNotBlank(v)) {
-      try {
-        setVersion(new BigDecimal(v));
-      } catch (NumberFormatException e) {
-        LOG.error("Parameter version (v) was not a valid number: {}", String.valueOf(v));
+      BigDecimal parsed = PortalGuard.parseVersion(v);
+      if (parsed == null) {
+        LOG.error("Parameter version (v) was not a valid version: {}", StringUtils.abbreviate(v, 40));
+      } else {
+        setVersion(parsed);
       }
     }
   }
