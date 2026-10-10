@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.web.security;
 
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -25,6 +27,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Replaces the IPT 3 RequireAdmin/RequireManager interceptors with URL rules, and adds CSRF protection to every form
@@ -33,6 +41,14 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
+
+  /**
+   * Downloads (conditional GET on Last-Modified, as in IPT 3) and static assets keep their caching; everything else
+   * gets Spring Security's no-store.
+   */
+  private static final RequestMatcher CACHEABLE = new OrRequestMatcher(Stream.of("/eml", "/metadata", "/logo",
+          "/rtf", "/archive", "/publicationlog", "/sourcelog", "/appLogo", "/js/**", "/styles/**", "/images/**")
+      .<RequestMatcher>map(PathPatternRequestMatcher::pathPattern).toList());
 
   /** Reserved for a token-authenticated REST API (e.g. a later MDT integration); no handlers exist yet. */
   @Bean
@@ -57,7 +73,10 @@ public class SecurityConfig {
                     .anyRequest()
                     .permitAll())
         .exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
-        .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+        .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+            .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
+            .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(new NegatedRequestMatcher(CACHEABLE),
+                new CacheControlHeadersWriter())))
         .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/"));
     return http.build();
   }

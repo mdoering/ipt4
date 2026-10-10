@@ -28,3 +28,6 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Secret key at start-up | n/a (one built-in key) | A data dir without its key, or with another key, refuses to start; the marker holds a key check | Stored passwords must never be silently lost | M1 |
 | Resource folders from another IPT | Imported with SQL passwords (same built-in key everywhere) | Imported; SQL passwords encrypted by the other installation are dropped with a warning | Each installation has its own key | M1 |
 | Data dirs of newer IPT versions | No check | Refused at start-up (and files of a newer format are not read) | Rolling back must not silently lose data | M1 |
+| `inventory/v2/dataset?status=` | `private` and `deleted` listed those resources (titles, record counts, links) | Only `public` and `registered` are honoured; other values give the default list of published public resources | The inventory is anonymous; private resources must stay hidden | M2 |
+| `api/resources` paging parameters | Non-numeric `start`, `length` or `order[0][column]` gave a 500 error page | 400 Bad Request | Bad input is the client's error | M2 |
+| `Cache-Control` | Not sent | `no-cache, no-store` on HTML pages (Spring Security default); JSON keeps IPT 3's `no-cache`, downloads and static assets send none | Pages show user-specific content | M2 |

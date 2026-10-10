@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -82,7 +83,10 @@ public class InventoryV2Page {
         Optional.ofNullable(status)
             .flatMap(s -> {
               try {
-                return Optional.of(PublicationStatus.valueOf(s.toUpperCase()));
+                PublicationStatus requested = PublicationStatus.valueOf(s.toUpperCase());
+                // IPT 3 also listed private and deleted resources for status=private|deleted
+                return requested == PublicationStatus.PUBLIC || requested == PublicationStatus.REGISTERED
+                    ? Optional.of(requested) : Optional.<PublicationStatus>empty();
               } catch (IllegalArgumentException e) {
                 return Optional.empty();
               }
@@ -150,6 +154,7 @@ public class InventoryV2Page {
     /**
      * @return the date the dataset was last published
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getLastPublished() {
       return lastPublished;
     }

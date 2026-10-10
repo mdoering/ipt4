@@ -65,8 +65,16 @@ public final class PortalFixture {
                                  org.gbif.ipt.service.manage.ResourcePublicationManager publications,
                                  org.gbif.ipt.service.admin.UserAccountManager users,
                                  org.gbif.ipt.service.admin.RegistrationManager registrations) throws Exception {
-    org.gbif.ipt.model.Resource res1 = resources.get("res1");
-    if (res1.getOrganisation() == null) {
+    publish("res1", dataDir, resources, publications, users, registrations);
+  }
+
+  /** Publishes a resource of the fixture with IPT4 (keeping its visibility), once per data dir. */
+  public static void publish(String shortname, Path dataDir, org.gbif.ipt.service.manage.ResourceManager resources,
+                                 org.gbif.ipt.service.manage.ResourcePublicationManager publications,
+                                 org.gbif.ipt.service.admin.UserAccountManager users,
+                                 org.gbif.ipt.service.admin.RegistrationManager registrations) throws Exception {
+    org.gbif.ipt.model.Resource resource = resources.get(shortname);
+    if (resource.getOrganisation() == null) {
       // what the setup wizard installs; IPT 3 published public resources with an organisation only
       org.gbif.ipt.model.Organisation none = registrations.get(org.gbif.ipt.config.Constants.DEFAULT_ORG_KEY);
       if (none == null) {
@@ -79,22 +87,22 @@ public final class PortalFixture {
         registrations.addAssociatedOrganisation(none);
         registrations.save();
       }
-      res1.setOrganisation(none);
-      resources.save(res1);
+      resource.setOrganisation(none);
+      resources.save(resource);
     }
-    if (res1.getLastPublished() != null && dataDir.resolve("resources/res1/eml-" + res1.getEmlVersion().toPlainString()
+    if (resource.getLastPublished() != null && dataDir.resolve("resources/" + shortname + "/eml-" + resource.getEmlVersion().toPlainString()
         + ".xml").toFile().exists()) {
       return;
     }
     org.gbif.ipt.feedback.CollectingFeedback feedback =
         new org.gbif.ipt.feedback.CollectingFeedback(null, users.get(ADMIN));
-    publications.publish(res1, res1.getNextVersion(), feedback);
+    publications.publish(resource, resource.getNextVersion(), feedback);
     long deadline = System.currentTimeMillis() + 60_000;
-    while (publications.isLocked("res1", feedback) && System.currentTimeMillis() < deadline) {
+    while (publications.isLocked(shortname, feedback) && System.currentTimeMillis() < deadline) {
       Thread.sleep(100);
     }
     if (!feedback.getActionErrors().isEmpty()) {
-      throw new IllegalStateException("Publishing res1 failed: " + feedback.getActionErrors());
+      throw new IllegalStateException("Publishing " + shortname + " failed: " + feedback.getActionErrors());
     }
   }
 

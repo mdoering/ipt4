@@ -16,6 +16,7 @@ package org.gbif.ipt.web.portal;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import org.gbif.api.model.common.DOI;
 import org.gbif.ipt.config.AppConfig;
@@ -160,6 +161,7 @@ public class InventoryPage {
     /**
      * @return the date the dataset was last published
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     public Date getLastPublished() {
       return lastPublished;
     }

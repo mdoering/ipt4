@@ -84,6 +84,9 @@ class DownloadsTest {
     assertThat(r.getContentType()).isEqualTo("application/zip");
     assertThat(r.getHeader("Content-Disposition")).isEqualTo("filename=\"dwca-res1-v" + version() + ".zip\"");
     assertThat(r.getContentAsByteArray()).startsWith((byte) 'P', (byte) 'K');
+    // IPT 3 left caching of downloads to Last-Modified; no Spring Security no-store
+    assertThat(r.getHeader("Cache-Control")).isNull();
+    assertThat(r.getHeader("Pragma")).isNull();
     assertThat(fetch("/archive?r=res1&v=99.0").getStatus()).isEqualTo(404);
   }
 
