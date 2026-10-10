@@ -14,6 +14,7 @@
 package org.gbif.ipt.web.portal;
 
 import org.gbif.ipt.web.support.CurrentUser;
+import org.gbif.ipt.web.support.FileStreams;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.web.support.action.ActionResults;
 import org.gbif.ipt.web.support.action.ActionRunner;
@@ -23,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.springframework.beans.factory.ObjectProvider;
@@ -149,12 +149,7 @@ public class DownloadController extends PageController {
       if (!ActionPage.SUCCESS.equals(result)) {
         return render(page, result, PORTAL);
       }
-      response.setContentType(charset ? mimeType + ";charset=" + StandardCharsets.UTF_8.name() : mimeType);
-      response.setHeader("Content-Disposition", "filename=\"" + filename + "\"");
-      response.setContentLengthLong(data.length());
-      if (!"HEAD".equals(request.getMethod())) {
-        closing.transferTo(response.getOutputStream());
-      }
+      FileStreams.write(request, response, data, mimeType, filename, closing, charset);
       return null;
     }
   }
