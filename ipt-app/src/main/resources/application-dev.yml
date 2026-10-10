@@ -1,0 +1,5 @@
+server:
+  port: 7001
+
+ipt:
+  dev-mode: true

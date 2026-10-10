@@ -12,11 +12,81 @@
 
   <artifactId>ipt-app</artifactId>
   <name>IPT 4 application</name>
+  <description>Spring Boot web application of the IPT</description>
 
   <dependencies>
     <dependency>
       <groupId>org.gbif.ipt</groupId>
       <artifactId>ipt-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-freemarker</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <finalName>ipt-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>git-info</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <commitIdGenerationMode>flat</commitIdGenerationMode>
+          <includeOnlyProperties>
+            <includeOnlyProperty>^git.commit.id$</includeOnlyProperty>
+            <includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>
+            <includeOnlyProperty>^git.commit.time$</includeOnlyProperty>
+            <includeOnlyProperty>^git.branch$</includeOnlyProperty>
+          </includeOnlyProperties>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-info</goal>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>org.gbif.ipt.app.IptApplication</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

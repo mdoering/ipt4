@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ipt
+  main:
+    banner-mode: off
+
+server:
+  port: 8080
+  shutdown: graceful
+  forward-headers-strategy: framework
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+ipt:
+  data-dir: ${IPT_DATA_DIR:}
+  # Read by logback-spring.xml before the application context exists
+  log-dir: ${IPT_LOG_DIR:${IPT_DATA_DIR:${java.io.tmpdir}/ipt4}/logs}
+  default-locale: en
+  dev-mode: false
