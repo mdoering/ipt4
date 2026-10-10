@@ -1,0 +1,190 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.account;
+
+import org.gbif.ipt.web.support.action.PostActionPage;
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.model.User;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.admin.UserAccountManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+import org.gbif.ipt.validation.UserValidator;
+
+import jakarta.inject.Inject;
+import java.io.IOException;
+import java.io.Serial;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.gbif.ipt.web.support.action.StrutsParameter;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Action handling account updates, such as changing username and password.
+ */
+@PageBean
+public class AccountPage extends PostActionPage {
+
+  @Serial
+  private static final long serialVersionUID = 5092204508303815778L;
+
+  private static final Logger LOG = LogManager.getLogger(AccountPage.class);
+
+  private final UserAccountManager userManager;
+  private final UserValidator validator = new UserValidator();
+
+  // main form
+  @Getter
+  private String email;
+  @Setter
+  private User user;
+
+  // password change form
+  @Getter
+  private String newPassword;
+  @Getter
+  private String password2;
+  @Getter
+  private String currentPassword;
+
+  // current user
+  private User currentUser;
+
+  @Inject
+  public AccountPage(
+      PageContext ctx,
+      UserAccountManager userManager) {
+    super(ctx);
+    this.userManager = userManager;
+  }
+
+  @Override
+  public String execute() throws Exception {
+    // check if any user is logged in right now - otherwise redirect to login page
+    if (user == null) {
+      return LOGIN;
+    }
+    return super.execute();
+  }
+
+  @Override
+  public void prepare() {
+    super.prepare();
+    try {
+      if (getCurrentUser() != null) {
+        currentUser = getCurrentUser();
+        user = (User) currentUser.clone();
+        email = user.getEmail();
+      }
+    } catch (CloneNotSupportedException e) {
+      LOG.error("Failed to clone current user: {}", e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public String save() {
+    try {
+      // password can't be updated here, skip password validation
+      if (validator.validate(this, user, false)) {
+        currentUser.setLastname(user.getLastname());
+        currentUser.setFirstname(user.getFirstname());
+        addActionMessage(getText("admin.user.account.updated"));
+        LOG.info("The user {} account has been updated", user.getEmail());
+        userManager.save();
+        return SUCCESS;
+      }
+    } catch (IOException e) {
+      addActionError(getText("admin.user.account.saveError"));
+      LOG.error("The user {} account change could not be made: {}", user.getEmail(), e.getMessage(), e);
+      addActionError(e.getMessage());
+    }
+
+    return INPUT;
+  }
+
+  public String changePassword() {
+    if (currentUser != null) {
+      String trimmedCurrentPassword = StringUtils.trimToNull(currentPassword);
+      String trimmedNewPassword = StringUtils.trimToNull(newPassword);
+      String trimmedNewPasswordConfirmation = StringUtils.trimToNull(password2);
+
+      // all passwords must not be nulls
+      if (trimmedCurrentPassword == null) {
+        addFieldError("currentPassword", getText("validation.password.reentered"));
+        LOG.error("The current password entered is empty");
+      } else if (trimmedNewPassword == null) {
+        addFieldError("newPassword", getText("validation.password.reentered"));
+        LOG.error("The new password entered is empty");
+      } else if (trimmedNewPasswordConfirmation == null) {
+        addFieldError("password2", getText("validation.password.reentered"));
+        LOG.error("The new password confirmation entered is empty");
+      }
+      // confirm current password is correct
+      else if (!BCrypt.verifyer().verify(trimmedCurrentPassword.toCharArray(), currentUser.getPassword().toCharArray()).verified) {
+        addFieldError("currentPassword", getText("validation.password.wrong"));
+        LOG.error("The password does not match");
+      }
+      // passwords don't match?
+      else if (!trimmedNewPassword.equals(trimmedNewPasswordConfirmation)) {
+        addFieldError("password2", getText("validation.password2.wrong"));
+        LOG.error("The passwords entered do not match");
+        password2 = null;
+        // otherwise, set password if it's valid
+      } else if (validator.validatePassword(this, newPassword)) {
+        currentUser.setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
+        // erase data
+        newPassword = null;
+        currentPassword = null;
+        password2 = null;
+        addActionMessage(getText("admin.user.account.passwordChanged"));
+        LOG.debug("The password has been reset");
+        return SUCCESS;
+      }
+    }
+
+    return INPUT;
+  }
+
+  @StrutsParameter
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  @StrutsParameter(depth = 2)
+  public User getUser() {
+    return user;
+  }
+
+  @StrutsParameter
+  public void setPassword2(String password2) {
+    this.password2 = password2;
+  }
+
+  @StrutsParameter
+  public void setNewPassword(String newPassword) {
+    this.newPassword = newPassword;
+  }
+
+  @StrutsParameter
+  public void setCurrentPassword(String currentPassword) {
+    this.currentPassword = currentPassword;
+  }
+}

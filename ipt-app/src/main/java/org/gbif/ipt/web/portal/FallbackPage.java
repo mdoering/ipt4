@@ -13,20 +13,30 @@
  */
 package org.gbif.ipt.web.portal;
 
-import org.gbif.ipt.web.support.page.GlobalModel;
+import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.support.action.ActionPage;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import jakarta.inject.Inject;
+import java.io.Serial;
 
-@Controller
-public class AboutController {
+@PageBean
+public class FallbackPage extends ActionPage {
 
-  @GetMapping("/about")
-  public String about(@ModelAttribute(name = GlobalModel.PAGE_CONTEXT, binding = false) PageContext ctx, Model model) {
-    model.addAttribute(GlobalModel.PAGE, new AboutPage(ctx));
-    return "about";
+  @Serial
+  private static final long serialVersionUID = 5075091500212058562L;
+
+  @Inject
+  public FallbackPage(
+      PageContext ctx) {
+    super(ctx);
+  }
+
+  @Override
+  public void prepare() {
+    super.prepare();
   }
 }

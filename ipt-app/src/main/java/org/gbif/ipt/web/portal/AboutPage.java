@@ -13,37 +13,69 @@
  */
 package org.gbif.ipt.web.portal;
 
+import org.gbif.ipt.web.support.action.ActionPage;
+import org.gbif.ipt.web.support.action.PageBean;
 import org.gbif.ipt.web.support.page.PageContext;
-import org.gbif.ipt.web.support.page.PageSupport;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.model.Ipt;
+import org.gbif.ipt.model.Organisation;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
 
+import jakarta.inject.Inject;
+import java.io.Serial;
 import java.util.UUID;
 
-/** View getters of the IPT 3 {@code AboutAction}. Registration details arrive with the registration manager (M1). */
-public class AboutPage extends PageSupport {
+import lombok.Getter;
 
-  public AboutPage(PageContext ctx) {
+@PageBean
+public class AboutPage extends ActionPage {
+
+  @Serial
+  private static final long serialVersionUID = -471175839075190159L;
+  @Getter
+  private String title;
+  @Getter
+  private UUID iptKey;
+  @Getter
+  private String iptDescription;
+  @Getter
+  private String hostingOrganisationName;
+
+  @Inject
+  public AboutPage(
+      PageContext ctx) {
     super(ctx);
   }
 
-  /** Registered name, else {@code about.title} from ipt.properties, else the default text. */
-  public String getTitle() {
-    String configured = getCfg().getProperty("about.title");
-    return configured != null ? configured : getText("about.title");
-  }
-
-  public UUID getIptKey() {
-    return null;
-  }
-
-  public String getIptDescription() {
-    return null;
-  }
-
-  public String getHostingOrganisationName() {
-    return null;
-  }
-
   public String getPortalUrl() {
-    return getCfg().getPortalUrl();
+    return cfg.getPortalUrl();
   }
+
+  @Override
+  public void prepare() {
+    Ipt ipt = registrationManager.getIpt();
+    Organisation org = registrationManager.getHostingOrganisation();
+
+    if (ipt != null) {
+      iptKey = ipt.getKey();
+      iptDescription = ipt.getDescription();
+    }
+
+    if (org != null) {
+      hostingOrganisationName = org.getName();
+    }
+
+    // if registered - get title from registration data
+    // if not - try to get title form ipt.properties
+    // otherwise, just use default value
+    if (ipt != null && ipt.getName() != null) {
+      title = ipt.getName();
+    } else if (cfg.getProperty("about.title") != null) {
+      title = cfg.getProperty("about.title");
+    } else {
+      title = getText("about.title");
+    }
+  }
+
 }
