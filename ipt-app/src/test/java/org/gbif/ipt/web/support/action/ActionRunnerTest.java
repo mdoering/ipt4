@@ -44,6 +44,11 @@ class ActionRunnerTest {
     private String name;
     private java.io.File file;
     private java.nio.file.Path path;
+    private org.gbif.ipt.model.Source source = new org.gbif.ipt.model.TextFileSource();
+
+    public org.gbif.ipt.model.Source getSource() {
+      return source;
+    }
 
     public java.io.File getFile() {
       return file;
@@ -161,6 +166,7 @@ class ActionRunnerTest {
     request.addParameter("mapping.extension.title", "EVIL");
     request.addParameter("mappings[0].extension.title", "EVIL");
     request.addParameter("resource.creator.role", "Admin");
+    request.addParameter("mapping.source.name", "renamed");
     ProbePage page = page(request);
     page.getResource().setCreator(new User());
     runner().run(page, request, "save", () -> ActionPage.SUCCESS);
@@ -168,6 +174,8 @@ class ActionRunnerTest {
     assertThat(page.getMapping().getExtension().getTitle()).isNull();
     assertThat(page.getMappings().get(0).getExtension().getTitle()).isNull();
     assertThat(page.getResource().getCreator().getRole()).isNotEqualTo(User.Role.Admin);
+    // a mapping's source is one of the resource's sources
+    assertThat(page.getMapping().getSource().getName()).isNull();
   }
 
   /** Spring converts strings to files; a source pointed at /etc/passwd could then be downloaded as raw source. */

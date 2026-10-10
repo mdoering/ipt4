@@ -22,6 +22,7 @@ import org.gbif.ipt.model.Ipt;
 import org.gbif.ipt.model.Network;
 import org.gbif.ipt.model.Organisation;
 import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.model.Source;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.Vocabulary;
 import org.gbif.ipt.model.VocabularyConcept;
@@ -73,12 +74,13 @@ public class ActionRunner {
 
   /**
    * Objects the IPT shares between pages and users. Requests never bind into them through another object (IPT 3 let
-   * a manager post {@code resource.creator.role} or {@code mapping.extension.title}); a page's own copy at the top
-   * level (the account form's {@code user}) stays bindable.
+   * a manager post {@code resource.creator.role}, {@code mapping.extension.title} or {@code mapping.source.name});
+   * a page's own object at the top level (the account form's {@code user}, the source form's {@code source}) stays
+   * bindable.
    */
   private static final Set<Class<?>> SHARED = Set.of(User.class, Organisation.class, Extension.class,
       ExtensionProperty.class, Vocabulary.class, VocabularyConcept.class, DataPackageSchema.class,
-      DataPackageTableSchema.class, DataPackageField.class, Resource.class, Ipt.class, Network.class);
+      DataPackageTableSchema.class, DataPackageField.class, Resource.class, Ipt.class, Network.class, Source.class);
   private static final Pattern INDEX = Pattern.compile("\\[[^]]*]");
 
   private final Map<Class<?>, String[]> allowedFields = new ConcurrentHashMap<>();
