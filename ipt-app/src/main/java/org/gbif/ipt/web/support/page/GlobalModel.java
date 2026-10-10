@@ -24,6 +24,7 @@ import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.aop.scope.ScopedObject;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -76,7 +77,11 @@ public class GlobalModel {
   public PageContext pageContext(HttpServletRequest request, Locale locale) {
     String baseUrl = baseUrl(request);
     Locale pageLocale = IptLocaleResolver.supported(locale).orElse(Locale.UK);
+    // the request's own feedback, not its scoped proxy: pages hand it to publishing jobs, which run on other threads
     RequestFeedback f = feedback.getObject();
+    if (f instanceof ScopedObject scoped) {
+      f = (RequestFeedback) scoped.getTargetObject();
+    }
     return new PageContext(messages, pageLocale, cfg, registrations, baseUrl,
         RequestUrls.withoutLocaleParameter(baseUrl, request), f.getCurrentUser(), f);
   }

@@ -1,38 +1,35 @@
 {
   "identifier": "http://rs.tdwg.org/dwc/dwc-dp/material-media",
-  "url": "https://rs.gbif.org/sandbox/experimental/data-packages/dwc-dp/0.1/table-schemas/material-media.json",
+  "url": "https://rs.gbif.org/sandbox/experimental/data-packages/dwc-dp/1.0_DEV/table-schemas/material-media.json",
   "name": "material-media",
   "title": "Material Media",
-  "description": "A dwc:MaterialEntity as content in a dwc:Media entity.",
+  "description": "A dwc:MaterialEntity as content in an ac:Media entity.",
   "comments": "",
   "examples": "",
   "namespace": "",
   "dcterms:isVersionOf": "http://example.com/term-pending//material-media",
-  "dcterms:references": "",
-  "rdfs:comment": "",
   "fields": [
     {
-      "name": "mediaID",
-      "title": "Media ID",
-      "description": "An identifier for a dwc:Media resource.",
-      "comments": "Recommended best practice is to use a globally unique identifier.",
+      "name": "media_fk",
+      "title": "Media (Foreign Key)",
+      "description": "An identifier for an ac:Media resource.",
+      "comments": "The value in this field MAY be changed in aggregation to preserve the relationship to the (Primary Key).",
       "examples": "",
       "type": "string",
       "format": "default",
-      "namespace": "dwc",
-      "dcterms:isVersionOf": "http://example.com/term-pending/dwc/mediaID",
-      "dcterms:references": "",
-      "rdfs:comment": "",
+      "namespace": "dcterms",
+      "dcterms:isVersionOf": "http://purl.org/dc/terms/identifier",
+      "rdfs:comment": "An unambiguous reference to the resource within a given context.",
       "constraints": {
         "required": true,
         "unique": false
       }
     },
     {
-      "name": "materialEntityID",
-      "title": "Material Entity ID",
+      "name": "materialEntity_fk",
+      "title": "Material Entity (Foreign Key)",
       "description": "An identifier for a dwc:MaterialEntity.",
-      "comments": "Values of dwc:materialEntityID are intended to uniquely and persistently identify a particular dwc:MaterialEntity within some context. Examples of context include a particular sample collection, an organization, or the worldwide scale. Recommended best practice is to use a persistent, globally unique identifier. The identifier is bound to a physical object (a dwc:MaterialEntity) as opposed to a particular digital record (representation) of that physical object.",
+      "comments": "The value in this field MAY be changed in aggregation to preserve the relationship to the (Primary Key).",
       "examples": "",
       "type": "string",
       "format": "default",
@@ -48,31 +45,31 @@
     {
       "name": "subjectCategory",
       "title": "Subject Category",
-      "description": "A category for the content of a dwc:Media resource.",
+      "description": "A term to describe the content of a image or a region of interest within an image using a controlled value string.",
       "comments": "Recommended best practice is to use a controlled vocabulary.",
       "examples": "",
       "type": "string",
       "format": "default",
-      "namespace": "dwc",
-      "dcterms:isVersionOf": "http://example.com/term-pending/dwc/subjectCategory",
-      "dcterms:references": "",
-      "rdfs:comment": ""
+      "namespace": "ac",
+      "dcterms:isVersionOf": "http://rs.tdwg.org/ac/terms/CVtermLiteral",
+      "dcterms:references": "http://rs.tdwg.org/ac/terms/version/CVtermLiteral-2026-01-23",
+      "rdfs:comment": "A term to describe the content of a image or a region of interest within an image using a controlled value string."
     },
     {
       "name": "subjectCategoryIRI",
       "title": "Subject Category IRI",
-      "description": "An IRI of a controlled vocabulary value for the subject category of a dwc:Media resource.",
+      "description": "An IRI of a controlled vocabulary value for the subject category of an ac:Media resource.",
       "comments": "Recommended best practice is to use a controlled vocabulary.",
       "examples": "",
       "type": "string",
       "format": "default",
-      "namespace": "dwciri",
-      "dcterms:isVersionOf": "http://example.com/term-pending/dwciri/subjectCategoryIRI",
-      "dcterms:references": "",
-      "rdfs:comment": ""
+      "namespace": "ac",
+      "dcterms:isVersionOf": "http://rs.tdwg.org/ac/terms/CVterm",
+      "dcterms:references": "pending",
+      "rdfs:comment": "A term to describe the content of the image by a value from a Controlled Vocabulary."
     },
     {
-      "name": "subjectCategorySource",
+      "name": "subjectCategoryVocabulary",
       "title": "Subject Category Source",
       "description": "A reference to a controlled vocabulary in which the definition of a value in dwc:subjectCategory is given.",
       "comments": "The Audiovisual Core recommended vocabularies do not need to be cited here. There is no required linkage between individual Subject Category terms and the vocabulary; the mechanism is intended to support discovery of the normative URI for a term, but not guarantee it.",
@@ -80,14 +77,14 @@
       "type": "string",
       "format": "default",
       "namespace": "ac",
-      "dcterms:isVersionOf": "http://rs.tdwg.org/ac/terms/subjectCategorySource",
-      "dcterms:references": "http://rs.tdwg.org/ac/terms/version/subjectCategorySource-2020-01-27",
-      "rdfs:comment": "Any vocabulary or formal classification from which terms in the Subject Category have been drawn."
+      "dcterms:isVersionOf": "http://rs.tdwg.org/ac/terms/subjectCategoryVocabulary",
+      "dcterms:references": "http://rs.tdwg.org/ac/terms/version/subjectCategoryVocabulary-2026-01-23",
+      "rdfs:comment": "Any controlled vocabulary from which values for ac:CVtermLiteral have been drawn."
     },
     {
       "name": "subjectPartLiteral",
       "title": "Subject Part Literal",
-      "description": "The portion or product of organism morphology, behaviour, environment, etc. that is either predominantly shown or particularly well exemplified by the dwc:Media resource, denoted by a controlled value string.",
+      "description": "The portion or product of organism morphology, behaviour, environment, etc. that is either predominantly shown or particularly well exemplified by the ac:Media resource, denoted by a controlled value string.",
       "comments": "Values SHOULD be selected from the Controlled Vocabulary for ac:subjectPart. It is best practice to use ac:subjectPart instead of ac:subjectPartLiteral whenever practical.",
       "examples": "",
       "type": "string",
@@ -100,7 +97,7 @@
     {
       "name": "subjectPart",
       "title": "Subject Part",
-      "description": "The portion or product of organism morphology, behaviour, environment, etc. that is either predominantly shown or particularly well exemplified by the dwc:Media resource, denoted by an IRI.",
+      "description": "The portion or product of organism morphology, behaviour, environment, etc. that is either predominantly shown or particularly well exemplified by the ac:Media resource, denoted by an IRI.",
       "comments": "",
       "examples": "",
       "type": "string",
@@ -113,7 +110,7 @@
     {
       "name": "subjectOrientationLiteral",
       "title": "Subject Orientation Literal",
-      "description": "Specific orientation (= direction, view angle) of the subject represented in the dwc:Media resource with respect to the acquisition device, denoted by a controlled value string.",
+      "description": "Specific orientation (= direction, view angle) of the subject represented in the ac:Media resource with respect to the acquisition device, denoted by a controlled value string.",
       "comments": "Values SHOULD be selected from the Controlled Vocabulary for ac:subjectOrientation. It is best practice to use ac:subjectOrientation instead of ac:subjectOrientationLiteral whenever practical.",
       "examples": "",
       "type": "string",
@@ -126,7 +123,7 @@
     {
       "name": "subjectOrientation",
       "title": "Subject Orientation",
-      "description": "Specific orientation (= direction, view angle) of the subject represented in the dwc:Media resource with respect to the acquisition device.",
+      "description": "Specific orientation (= direction, view angle) of the subject represented in the ac:Media resource with respect to the acquisition device.",
       "comments": "",
       "examples": "",
       "type": "string",
@@ -139,32 +136,32 @@
     {
       "name": "physicalSetting",
       "title": "Physical Setting",
-      "description": "The setting of the content represented in a dwc:Media resource, such as images, sounds, and movies if the provider deems them relevant.",
+      "description": "The setting of the content represented in an ac:Media resource, such as images, sounds, and movies if the provider deems them relevant.",
       "comments": "",
       "examples": "",
       "type": "string",
       "format": "default",
       "namespace": "ac",
       "dcterms:isVersionOf": "http://rs.tdwg.org/ac/terms/physicalSetting",
-      "dcterms:references": "http://rs.tdwg.org/ac/terms/version/physicalSetting-2020-01-27",
-      "rdfs:comment": "The setting of the content represented in a dwc:Media resource, such as images, sounds, and movies if the provider deems them relevant."
+      "dcterms:references": "http://rs.tdwg.org/ac/terms/version/physicalSetting-2026-02-24",
+      "rdfs:comment": "The setting of the content represented in media such as images, sounds, and movies if the provider deems them relevant."
     }
   ],
   "foreignKeys": [
     {
-      "fields": "mediaID",
+      "fields": "media_fk",
       "predicate": "this media instance",
       "reference": {
         "resource": "media",
-        "fields": "mediaID"
+        "fields": "media_pk"
       }
     },
     {
-      "fields": "materialEntityID",
+      "fields": "materialEntity_fk",
       "predicate": "about",
       "reference": {
         "resource": "material",
-        "fields": "materialEntityID"
+        "fields": "materialEntity_pk"
       }
     }
   ]
