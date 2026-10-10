@@ -125,3 +125,14 @@ function formatFileSize(longSize, decimalPos = 2, strLocale = 'en-GB', inseparab
 
     return formatter.format(longSize) + delimiter + 'bytes';
 }
+
+// IPT4: send the Spring Security CSRF token (meta tags in inc/header.ftl) with every jQuery AJAX request.
+$(function () {
+  var token = $('meta[name="_csrf"]').attr('content');
+  var header = $('meta[name="_csrf_header"]').attr('content');
+  if (token && header) {
+    var headers = {};
+    headers[header] = token;
+    $.ajaxSetup({ headers: headers });
+  }
+});
