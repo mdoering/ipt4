@@ -1,0 +1,179 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.service.manage.impl;
+
+import org.gbif.ipt.IptBaseTest;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.DataDir;
+import org.gbif.ipt.mock.MockAppConfig;
+import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.model.VersionHistory;
+import org.gbif.ipt.model.voc.PublicationStatus;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.service.manage.ResourceMetadataInferringService;
+import org.gbif.ipt.service.manage.ResourcePublicationManager;
+import org.gbif.ipt.service.registry.RegistryManager;
+import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.task.Eml2Rtf;
+import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
+import org.gbif.ipt.task.GenerateDataPackageFactory;
+import org.gbif.ipt.task.GenerateDwcaFactory;
+import org.gbif.utils.file.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class ArchivalModeTest extends IptBaseTest {
+
+  private DataDir mockDataDir = mock(DataDir.class);
+
+  @BeforeEach
+  public void setup() throws IOException {
+    File tmpDataDir = FileUtils.createTempDir();
+    when(mockDataDir.resourceEmlFile(anyString(), any())).thenReturn(tmpDataDir);
+    when(mockDataDir.resourceRtfFile(anyString(), any())).thenReturn(tmpDataDir);
+    when(mockDataDir.resourceDwcaFile(anyString(), any())).thenReturn(tmpDataDir);
+  }
+
+  public ResourcePublicationManager getResourcePublicationManager(AppConfig mockAppConfig) {
+    return new ResourcePublicationManagerImpl(
+        mockAppConfig,
+        mockDataDir,
+        mock(ResourceManager.class),
+        mock(RegistryManager.class),
+        mock(RegistrationManager.class),
+        mock(Eml2Rtf.class),
+        mock(GenerateDwcaFactory.class),
+        mock(GenerateDataPackageFactory.class),
+        mock(GenerateDarwinCoreDataPackageFactory.class),
+        mock(SimpleTextProvider.class),
+        mock(ResourceMetadataInferringService.class));
+  }
+
+  public Resource getResource(String shortName) {
+    List<VersionHistory> history = new ArrayList<>();
+    history.add(new VersionHistory(BigDecimal.valueOf(2.5), PublicationStatus.PUBLIC));
+    history.add(new VersionHistory(BigDecimal.valueOf(2.4), PublicationStatus.PUBLIC));
+    history.add(new VersionHistory(BigDecimal.valueOf(2.3), PublicationStatus.PUBLIC));
+    history.add(new VersionHistory(BigDecimal.valueOf(2.2), PublicationStatus.PUBLIC));
+    history.add(new VersionHistory(BigDecimal.valueOf(2.1), PublicationStatus.PUBLIC));
+    history.add(new VersionHistory(BigDecimal.valueOf(2.0), PublicationStatus.PUBLIC));
+    Resource resource = new Resource();
+    resource.setShortname(shortName);
+    resource.setVersionHistory(history);
+    return resource;
+  }
+
+  @Test
+  public void testArchiveModeOnWithoutLimit() {
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(true);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource("testArchiveModeOnWithoutLimit");
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(0)).resourceDwcaFile(any(), any());
+  }
+
+  @Test
+  public void testArchiveModeOffWithoutLimit() {
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(false);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource("testArchiveModeOffWithoutLimit");
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(0)).resourceDwcaFile(any(), any());
+  }
+
+  @Test
+  public void testArchiveModeOnWithNullLimit() {
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(true);
+    when(mockAppConfig.getArchivalLimit()).thenReturn(null);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource("testArchiveModeOnWithNullLimit");
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(0)).resourceDwcaFile(any(), any());
+  }
+
+  @Test
+  public void testArchiveModeOnWithZeroLimit() {
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(true);
+    when(mockAppConfig.getArchivalLimit()).thenReturn(0);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource("testArchiveModeOnWithZeroLimit");
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(0)).resourceDwcaFile(any(), any());
+  }
+
+  @Test
+  public void testArchiveLimitHigher() {
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(true);
+    when(mockAppConfig.getArchivalLimit()).thenReturn(10);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource("testArchiveLimitHigher");
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(0)).resourceDwcaFile(any(), any());
+  }
+
+  @Test
+  public void testArchiveLimitLower() {
+    String resourceName = "testArchiveLimitLower";
+    AppConfig mockAppConfig = MockAppConfig.rebuildMock();
+    when(mockAppConfig.isArchivalMode()).thenReturn(true);
+    when(mockAppConfig.getArchivalLimit()).thenReturn(2);
+    ResourcePublicationManager manager = getResourcePublicationManager(mockAppConfig);
+
+    Resource resource = getResource(resourceName);
+    manager.cleanArchiveVersions(resource);
+
+    assertEquals(6, resource.getVersionHistory().size());
+    verify(mockDataDir, times(4)).resourceDwcaFile(any(), any());
+    verify(mockDataDir, times(1)).resourceDwcaFile(resourceName, BigDecimal.valueOf(2.3));
+    verify(mockDataDir, times(1)).resourceDwcaFile(resourceName, BigDecimal.valueOf(2.2));
+    verify(mockDataDir, times(1)).resourceDwcaFile(resourceName, BigDecimal.valueOf(2.1));
+    verify(mockDataDir, times(1)).resourceDwcaFile(resourceName, BigDecimal.valueOf(2.0));
+  }
+}

@@ -1,0 +1,726 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.service.admin.impl;
+
+import org.gbif.dwc.terms.DcTerm;
+import org.gbif.dwc.terms.DwcTerm;
+import org.gbif.dwc.terms.Term;
+import org.gbif.ipt.action.BaseAction;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.ConfigWarnings;
+import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.config.DataDir;
+import org.gbif.ipt.model.Extension;
+import org.gbif.ipt.model.ExtensionMapping;
+import org.gbif.ipt.model.ExtensionProperty;
+import org.gbif.ipt.model.PropertyMapping;
+import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.model.Vocabulary;
+import org.gbif.ipt.model.factory.ExtensionFactory;
+import org.gbif.ipt.service.BaseManager;
+import org.gbif.ipt.service.InvalidConfigException;
+import org.gbif.ipt.service.InvalidConfigException.TYPE;
+import org.gbif.ipt.service.RegistryException;
+import org.gbif.ipt.service.admin.ExtensionManager;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.registry.RegistryManager;
+import org.gbif.ipt.struts2.SimpleTextProvider;
+import org.gbif.ipt.utils.IptFileUtils;
+import org.gbif.utils.HttpClient;
+
+import jakarta.inject.Inject;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.StatusLine;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
+
+import static org.gbif.utils.HttpUtil.success;
+
+public class ExtensionManagerImpl extends BaseManager implements ExtensionManager {
+
+  private static final Logger LOG = LogManager.getLogger(ExtensionManagerImpl.class);
+
+  public static final String EXTENSION_FILE_SUFFIX = ".xml";
+  protected static final String CONFIG_FOLDER = ".extensions";
+  private final static String TAXON_KEYWORD = "dwc:taxon";
+  private final static String OCCURRENCE_KEYWORD = "dwc:occurrence";
+  private final static String EVENT_KEYWORD = "dwc:event";
+  private final static String MATERIAL_ENTITY_KEYWORD = "dwc:materialentity";
+  private final static String RECORD_LEVEL_CLASS = "Record-level";
+  private final ExtensionFactory factory;
+  private final HttpClient downloader;
+  private final ConfigWarnings warnings;
+  private final RegistryManager registryManager;
+  private final ExtensionsHolder extensionsHolder;
+
+  // create instance of BaseAction - allows class to retrieve i18n terms via getText()
+  private final BaseAction baseAction;
+  // map of deprecated terms and their replacedBy terms
+  private static final Map<String, Term> TERMS_REPLACED_BY_ANOTHER_TERM;
+
+  static {
+    Map<String, Term> termsReplacedByAnotherTermInternal = new HashMap<>();
+    termsReplacedByAnotherTermInternal.put("http://purl.org/dc/terms/source", DcTerm.references);
+    termsReplacedByAnotherTermInternal.put("http://purl.org/dc/terms/rights", DcTerm.license);
+    termsReplacedByAnotherTermInternal.put("http://rs.tdwg.org/dwc/terms/individualID", DwcTerm.organismID);
+    termsReplacedByAnotherTermInternal.put("http://rs.tdwg.org/dwc/terms/occurrenceDetails", DcTerm.references);
+    TERMS_REPLACED_BY_ANOTHER_TERM = Collections.unmodifiableMap(termsReplacedByAnotherTermInternal);
+  }
+
+  @Inject
+  public ExtensionManagerImpl(
+      AppConfig cfg,
+      DataDir dataDir,
+      ExtensionFactory factory,
+      HttpClient client,
+      ConfigWarnings warnings,
+      SimpleTextProvider textProvider,
+      RegistrationManager registrationManager,
+      RegistryManager registryManager,
+      ExtensionsHolder extensionsHolder) {
+    super(cfg, dataDir);
+    this.factory = factory;
+    this.downloader = client;
+    this.warnings = warnings;
+    this.baseAction = new BaseAction(textProvider, cfg, registrationManager);
+    this.registryManager = registryManager;
+    this.extensionsHolder = extensionsHolder;
+  }
+
+  public static String normalizeRowType(String rowType) {
+    // occurrence alternatives
+    if ("http://rs.tdwg.org/dwc/terms/DarwinCore".equalsIgnoreCase(rowType)
+        || "http://rs.tdwg.org/dwc/xsd/simpledarwincore/".equalsIgnoreCase(rowType)
+        || "http://rs.tdwg.org/dwc/terms/SimpleDarwinCore".equalsIgnoreCase(rowType)
+        || "http://rs.tdwg.org/dwc/dwctype/Occurrence".equalsIgnoreCase(rowType)
+        || "http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord".equalsIgnoreCase(rowType)) {
+      return Constants.DWC_ROWTYPE_OCCURRENCE;
+    }
+
+    // taxon alternatives
+    if ("http://rs.tdwg.org/dwc/dwctype/Taxon".equalsIgnoreCase(rowType)) {
+      return Constants.DWC_ROWTYPE_TAXON;
+    }
+
+    return rowType;
+  }
+
+  @Override
+  public void uninstallSafely(String rowType) {
+    if (extensionsHolder.getExtensionsByRowtype().containsKey(rowType)) {
+      uninstall(rowType);
+    } else {
+      LOG.warn("Extension not installed locally, cant delete {}", rowType);
+    }
+  }
+
+  /**
+   * Uninstall extension by its unique rowType.
+   *
+   * @param rowType rowType of extension to uninstall
+   */
+  private void uninstall(String rowType) {
+    if (extensionsHolder.getExtensionsByRowtype().containsKey(rowType)) {
+      extensionsHolder.getExtensionsByRowtype().remove(rowType);
+      File f = getExtensionFile(rowType);
+      if (f.exists()) {
+        FileUtils.deleteQuietly(f);
+      } else {
+        LOG.warn("Extension doesnt exist locally, cant delete {}", rowType);
+      }
+    } else {
+      LOG.warn("Extension not installed locally, cant delete {}", rowType);
+    }
+  }
+
+  @Override
+  public synchronized Extension update(String rowType) throws IOException, RegistryException {
+    // identify installed extension by rowType
+    Extension installed = get(rowType);
+    Extension latestVersion = null;
+
+    if (installed != null) {
+      // verify there is a newer (latest) version
+      for (Extension e : registryManager.getExtensions()) {
+        // match by rowType and isLatest, plus the URL cannot be null in order to be installed
+        if (e.getRowType() != null && e.getRowType().equalsIgnoreCase(rowType) && e.isLatest()) {
+          latestVersion = e;
+          break;
+        }
+      }
+
+      boolean isNewVersion = false;
+      if (latestVersion != null) {
+        Date issued = installed.getIssued();
+        Date issuedLatest = latestVersion.getIssued();
+        if (issued == null && issuedLatest != null) {
+          isNewVersion = true;
+        } else if (issued != null && issuedLatest != null) {
+          isNewVersion = (issuedLatest.compareTo(issued) > 0); // latest version must have newer issued date
+        }
+      }
+
+      if (isNewVersion && latestVersion.getUrl() != null) {
+        // first download latestVersion XML file
+        File tmpFile = download(latestVersion.getUrl());
+        Extension extension = loadFromFile(tmpFile);
+
+        // uninstall and install new version
+        uninstall(rowType);
+        finishInstall(tmpFile, extension);
+
+        // set missing fields
+        latestVersion.setProperties(extension.getProperties());
+        latestVersion.setName(extension.getName());
+        latestVersion.setNamespace(extension.getNamespace());
+        latestVersion.setLink(extension.getLink());
+      } else {
+        latestVersion = null;
+      }
+    }
+
+    return latestVersion;
+  }
+
+  @Override
+  public synchronized void updateIfChanged() throws IOException, RegistryException {
+    List<Extension> installedExtensions = list();
+    List<Extension> registryExtensions = registryManager.getExtensions();
+
+    for (Extension installed : installedExtensions) {
+      if (installed == null || installed.getRowType() == null) {
+        LOG.error("Installed extension is null or rowType is null");
+      } else {
+        String rowType = installed.getRowType();
+        LOG.debug("Updating extension {}", rowType);
+        // match extension by rowType and issued date
+        Extension matched = null;
+        boolean isMatched = false;
+
+        for (Extension ex : registryExtensions) {
+          if (ex.getRowType() != null && ex.getRowType().equalsIgnoreCase(rowType)) {
+            isMatched = true;
+            if (installed.getIssued() != null && ex.getIssued() != null
+                && installed.getIssued().compareTo(ex.getIssued()) < 0
+                && ex.isLatest()) {
+              matched = ex;
+              break;
+            }
+          }
+        }
+
+        // verify the version was updated
+        if (!isMatched) {
+          LOG.error("No matching extension found for {}", rowType);
+        } else if (matched == null) {
+          LOG.debug("Extension {} is already up-to-date", rowType);
+        } else if (matched.getUrl() == null) {
+          LOG.error("Matched extension {} doesn't have a URL", rowType);
+        } else {
+          LOG.debug("Found matching extension {}", matched.getUrl());
+          File extensionFile = getExtensionFile(rowType);
+          boolean downloadResult = downloader.downloadIfChanged(matched.getUrl(), extensionFile);
+
+          if (downloadResult) {
+            LOG.debug("Downloaded extension {}", matched.getUrl());
+            Extension result = loadFromFile(extensionFile);
+
+            // update extension in local lookup
+            extensionsHolder.getExtensionsByRowtype().replace(rowType, result);
+          } else {
+            LOG.error("Failed to download extension {} from {}", rowType, matched.getUrl());
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Migrate a resource's extension mappings to an extension to a newer version of that extension.
+   *
+   * @param r       resource whose mappings must be migrated
+   * @param current extension
+   * @param newer   newer version of extension to migrate mappings to
+   */
+  @Override
+  public void migrateResourceToNewExtensionVersion(Resource r, Extension current, Extension newer) {
+    // sanity check that the current and newer extensions share same rowType
+    if (!current.getRowType().equalsIgnoreCase(newer.getRowType()) || r.getMappings(current.getRowType()).isEmpty()) {
+      throw new IllegalStateException();
+    }
+
+    LOG.info("Migrating {} mappings to extension {} to latest extension version", r.getShortname(), current.getRowType());
+
+    // populate various set to keep track of how many terms were deprecated, how terms' vocabulary was updated, etc
+    Set<ExtensionProperty> deprecated = new HashSet<>();
+    Set<ExtensionProperty> vocabulariesRemoved = new HashSet<>();
+    Set<ExtensionProperty> vocabulariesUnchanged = new HashSet<>();
+    Set<ExtensionProperty> vocabulariesUpdated = new HashSet<>();
+    for (ExtensionProperty property : current.getProperties()) {
+      // newer extension still contain this property?
+      if (!newer.hasProperty(property.qualifiedName())) {
+        deprecated.add(property);
+      }
+      // if so, check if this property uses a vocabulary, and whether the newer extension uses a newer version of it
+      else {
+        if (property.getVocabulary() != null) {
+          Vocabulary v1 = property.getVocabulary();
+          Vocabulary v2 = newer.getProperty(property.qualifiedName()).getVocabulary();
+          // case 1: vocabulary removed in newer version
+          if (v2 == null) {
+            vocabulariesRemoved.add(property);
+          }
+          // case 2: vocabulary versions are unchanged between versions
+          else if (Strings.CI.equals(v1.getUriString(), v2.getUriString())) {
+            vocabulariesUnchanged.add(property);
+          }
+          // case 3: vocabulary has been updated in newer version
+          else {
+            vocabulariesUpdated.add(property);
+          }
+        }
+      }
+    }
+    LOG.debug("{} properties have been deprecated in the newer version", deprecated.size());
+    LOG.debug("{} properties in the newer version of extension no longer use a vocabulary", vocabulariesRemoved.size());
+    LOG.debug("{} properties in the newer version of extension use the same vocabulary", vocabulariesUnchanged.size());
+    LOG.debug("{} properties in the newer version of extension use a newer vocabulary", vocabulariesUpdated.size());
+
+    // set of new terms (terms to add)
+    Set<ExtensionProperty> added = new HashSet<>();
+    for (ExtensionProperty property : newer.getProperties()) {
+      // older extension contain this property?
+      if (!current.hasProperty(property.qualifiedName())) {
+        added.add(property);
+      }
+    }
+    LOG.debug("Newer version of extension has {} new properties", added.size());
+
+    for (ExtensionMapping extensionMapping : r.getMappings(current.getRowType())) {
+      migrateExtensionMapping(extensionMapping, newer, deprecated);
+    }
+  }
+
+  /**
+   * Migrate an ExtensionMapping to use a newer version of that extension:
+   * 1. Migrate property mappings for deprecated terms that have been replaced by another term. Careful, the replacing
+   * term must be included in the newer extension version, and cannot already be mapped
+   * 2. Remove property mappings for deprecated terms that have NOT been replaced by another term
+   *
+   * @param extensionMapping ExtensionMapping to migrate to use newer version of Extension
+   * @param newer            newer version of Extension ExtensionMapping is based on
+   * @param deprecated       set of ExtensionProperty deprecated in newer version of Extension
+   */
+  private ExtensionMapping migrateExtensionMapping(ExtensionMapping extensionMapping, Extension newer,
+                                                   Set<ExtensionProperty> deprecated) {
+    LOG.debug("Migrating extension mapping...");
+    // update Extension
+    extensionMapping.setExtension(newer);
+    // migrate or remove property mappings to deprecated terms
+    for (ExtensionProperty deprecatedProperty : deprecated) {
+      Term replacedBy = TERMS_REPLACED_BY_ANOTHER_TERM.get(deprecatedProperty.qualifiedName());
+      // replacing term must exist in new extension, and it cannot already be mapped!
+      if (replacedBy != null && newer.getProperty(replacedBy) != null && !extensionMapping.isMapped(replacedBy)) {
+        PropertyMapping pm = extensionMapping.getField(deprecatedProperty.qualifiedName());
+        ExtensionProperty ep = newer.getProperty(replacedBy);
+        if (pm != null && ep != null) {
+          pm.setTerm(ep);
+          LOG.debug("Mapping to deprecated term {} has been migrated to term {}", deprecatedProperty.qualifiedName(), replacedBy.qualifiedName());
+        }
+      }
+      // otherwise, simply remove the property mapping
+      else {
+        LOG.debug("Mapping to deprecated term {} cannot be migrated therefore it is being removed!",
+            deprecatedProperty.qualifiedName());
+        removePropertyMapping(extensionMapping, deprecatedProperty.qualifiedName());
+      }
+    }
+    return extensionMapping;
+  }
+
+  /**
+   * Remove a PropertyMapping from an ExtensionMapping.
+   *
+   * @param extensionMapping ExtensionMapping
+   * @param qualifiedName    of PropertyMapping term to remove
+   */
+  private void removePropertyMapping(ExtensionMapping extensionMapping, String qualifiedName) {
+    PropertyMapping pm = extensionMapping.getField(qualifiedName);
+    Set<PropertyMapping> propertyMappings = extensionMapping.getFields();
+    if (pm != null && propertyMappings.contains(pm)) {
+      propertyMappings.remove(pm);
+      LOG.debug("Removed mapping to term {}", pm.getTerm().qualifiedName());
+    }
+  }
+
+  @Override
+  public Extension get(String rowType) {
+    return extensionsHolder.getExtensionsByRowtype().get(normalizeRowType(rowType));
+  }
+
+  /**
+   * Return the latest versions of core extensions (that the IPT is configured to use) from the registry.
+   *
+   * @return list containing latest versions of core extensions
+   */
+  private List<Extension> getCoreTypes() {
+    List<Extension> coreTypes = new ArrayList<>();
+    try {
+      for (Extension ext : registryManager.getExtensions()) {
+        if (ext.getRowType() != null && AppConfig.getCoreRowTypes().contains(ext.getRowType())) {
+          if (ext.isLatest()) { // must be the latest version
+            coreTypes.add(ext);
+          }
+        }
+      }
+    } catch (RegistryException e) {
+      // add startup error message about Registry error
+      String msg = RegistryException.logRegistryException(e, baseAction);
+      warnings.addStartupError(msg);
+      LOG.error(msg);
+
+      // add startup error message that explains the consequence of the Registry error
+      msg = baseAction.getText("admin.extensions.couldnt.load", new String[]{cfg.getRegistryUrl()});
+      warnings.addStartupError(msg);
+      LOG.error(msg);
+    }
+
+    // throw exception if not all core type extensions could not be loaded
+    if (AppConfig.getCoreRowTypes().size() != coreTypes.size()) {
+      String msg = "Not all core extensions were loaded!";
+      LOG.error(msg);
+      throw new InvalidConfigException(TYPE.INVALID_DATA_DIR, msg);
+    }
+    return coreTypes;
+  }
+
+  /**
+   * Retrieve extension file by its unique rowType.
+   *
+   * @param rowType rowType of extension
+   * @return extension file
+   */
+  private File getExtensionFile(String rowType) {
+    String filename = IptFileUtils.getSuffixedFileName(rowType, EXTENSION_FILE_SUFFIX);
+    return dataDir.configFile(CONFIG_FOLDER + "/" + filename);
+  }
+
+  /**
+   * Download and install an extension into local file. The final filename is based on the extension's rowType.
+   *
+   * @param url the URL of the xml based extension definition
+   * @return the installed extension
+   * @throws InvalidConfigException if Extension failed to be installed
+   */
+  @Override
+  public synchronized Extension install(URL url) throws InvalidConfigException {
+    Objects.requireNonNull(url);
+
+    try {
+      File tmpFile = download(url);
+      Extension extension = loadFromFile(tmpFile);
+      finishInstall(tmpFile, extension);
+      return extension;
+    } catch (InvalidConfigException e) {
+      throw e;
+    } catch (Exception e) {
+      String msg = baseAction.getText("admin.extension.install.error", new String[]{url.toString()});
+      LOG.error(msg, e);
+      throw new InvalidConfigException(TYPE.INVALID_EXTENSION, msg, e);
+    }
+  }
+
+  /**
+   * Move and rename a temporary file to the final version. Update extensions loaded into a local lookup.
+   *
+   * @param tmpFile   downloaded extension file (in temporary location with temporary filename)
+   * @param extension extension being installed
+   * @throws IOException if moving file fails
+   */
+  private void finishInstall(File tmpFile, Extension extension) throws IOException {
+    Objects.requireNonNull(tmpFile);
+    Objects.requireNonNull(extension);
+    Objects.requireNonNull(extension.getRowType());
+
+    try {
+      File installedFile = getExtensionFile(extension.getRowType());
+      FileUtils.moveFile(tmpFile, installedFile);
+      // keep extension in local lookup: allowed one installed extension per rowType
+      extensionsHolder.getExtensionsByRowtype().put(extension.getRowType(), extension);
+    } catch (IOException e) {
+      LOG.error("Installing extension failed, while trying to move and rename extension file: {}",
+          e.getMessage(), e);
+      throw e;
+    }
+  }
+
+
+  /**
+   * Download an extension into a temporary file and return it.
+   *
+   * @param url URL of extension to download
+   * @return the temporary file extension was downloaded to, or null if it failed to be downloaded
+   */
+  private File download(URL url) throws IOException {
+    Objects.requireNonNull(url);
+    String filename = IptFileUtils.getSuffixedFileName(url.toString(), EXTENSION_FILE_SUFFIX);
+    File tmpFile = dataDir.tmpFile(filename);
+    StatusLine statusLine = downloader.download(url, tmpFile);
+    if (success(statusLine)) {
+      LOG.info("Successfully downloaded extension: {}", url);
+      return tmpFile;
+    } else {
+      String msg =
+          "Failed to download extension: " + url + ". Response=" + statusLine.getStatusCode();
+      LOG.error(msg);
+      throw new IOException(msg);
+    }
+  }
+
+  /**
+   * Install core extensions (that the IPT is configured to use).
+   *
+   * @throws InvalidConfigException if any installation fails
+   */
+  @Override
+  public void installCoreTypes() throws InvalidConfigException {
+    List<Extension> extensions = getCoreTypes();
+    for (Extension ext : extensions) {
+      install(ext.getUrl());
+    }
+  }
+
+  @Override
+  public List<Extension> list() {
+    return new ArrayList<>(extensionsHolder.getExtensionsByRowtype().values());
+  }
+
+  @Override
+  public List<Extension> list(String coreRowType) {
+    if (coreRowType != null) {
+      if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_OCCURRENCE)) {
+        return search(OCCURRENCE_KEYWORD, true, false);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_TAXON)) {
+        return search(TAXON_KEYWORD, true, false);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_EVENT)) {
+        return search(EVENT_KEYWORD, true, false);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_MATERIAL_ENTITY)) {
+        Set<Extension> suitableExtensionsSet = new HashSet<>(search(MATERIAL_ENTITY_KEYWORD, true, false));
+        suitableExtensionsSet.addAll(search(OCCURRENCE_KEYWORD, true, false));
+        return new ArrayList<>(suitableExtensionsSet);
+      } else {
+        return search(coreRowType, true, false);
+      }
+    }
+    return list();
+  }
+
+  @Override
+  public List<Extension> listCore(String coreRowType) {
+    if (coreRowType != null) {
+      if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_OCCURRENCE)) {
+        return search(OCCURRENCE_KEYWORD, false, true);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_TAXON)) {
+        return search(TAXON_KEYWORD, false, true);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_EVENT)) {
+        return search(EVENT_KEYWORD, false, true);
+      } else if (coreRowType.equalsIgnoreCase(Constants.DWC_ROWTYPE_MATERIAL_ENTITY)) {
+        return search(MATERIAL_ENTITY_KEYWORD, false, true);
+      } else {
+        return search(coreRowType, false, true);
+      }
+    }
+    return listCore();
+  }
+
+  @Override
+  public List<Extension> listCore() {
+    List<Extension> list = new ArrayList<>();
+    for (String rowType : AppConfig.getCoreRowTypes()) {
+      Extension e = get(rowType);
+      if (e != null) {
+        list.add(e);
+      }
+    }
+    return list;
+  }
+
+  @Override
+  public int load() {
+    File extensionDir = dataDir.configFile(CONFIG_FOLDER);
+    int counter = 0;
+
+    List<Extension> allRegisteredExtensions;
+    try {
+      allRegisteredExtensions = registryManager.getLatestExtensions();
+    } catch (Exception e) {
+      LOG.error("Failed to load extensions from the Registry. Cannot check the latest extensions", e);
+      allRegisteredExtensions = Collections.emptyList();
+    }
+
+    if (extensionDir.isDirectory()) {
+      List<File> extensionFiles = new ArrayList<>();
+      FilenameFilter ff = new SuffixFileFilter(EXTENSION_FILE_SUFFIX, IOCase.INSENSITIVE);
+      extensionFiles.addAll(Arrays.asList(extensionDir.listFiles(ff)));
+      for (File ef : extensionFiles) {
+        try {
+          Extension extension = loadFromFile(ef);
+          // update isLatest
+          extension.setLatest(isLatest(extension, allRegisteredExtensions));
+
+          // keep extension in local lookup: allowed one installed extension per rowType
+          extensionsHolder.getExtensionsByRowtype().put(extension.getRowType(), extension);
+          counter++;
+        } catch (InvalidConfigException e) {
+          // when IPT is in test mode, remove/uninstall invalid extension definition and prompt admin to reinstall it
+          if (cfg.isTestInstallation()) {
+            FileUtils.deleteQuietly(ef);
+            warnings.addStartupError("Extension " + ef.getAbsolutePath()
+                + " has been deleted from the IPT data directory because it was invalid or out-of-date."
+                + " Please install the latest version of this extension if needed and restart your web server."
+                + " Cause: " + e.getMessage(), e);
+          }
+          // when IPT is in production mode, just warn user invalid extension was encountered while trying to load it
+          else {
+            warnings.addStartupError("Can't load local extension definition: " + e.getMessage(), e);
+          }
+        }
+      }
+    }
+    return counter;
+  }
+
+  /**
+   * Reads an extension from file and returns it.
+   *
+   * @param localFile extension file to read from
+   * @return extension loaded from file
+   * @throws InvalidConfigException if extension could not be loaded successfully
+   */
+  protected Extension loadFromFile(File localFile) throws InvalidConfigException {
+    Objects.requireNonNull(localFile);
+    if (!localFile.exists()) {
+      throw new IllegalStateException();
+    }
+
+    try (InputStream fileIn = new FileInputStream(localFile)) {
+      Extension extension = factory.build(fileIn);
+      // normalise rowtype
+      extension.setRowType(normalizeRowType(extension.getRowType()));
+      LOG.info("Successfully loaded extension {}", extension.getRowType());
+      return extension;
+    } catch (IOException e) {
+      LOG.error("Can't access local extension file ({})", localFile.getAbsolutePath(), e);
+      throw new InvalidConfigException(TYPE.INVALID_EXTENSION, "Can't access local extension file");
+    } catch (SAXException e) {
+      LOG.error("Can't parse local extension file ({})", localFile.getAbsolutePath(), e);
+      throw new InvalidConfigException(TYPE.INVALID_EXTENSION, "Can't parse local extension file: " + e.getMessage());
+    } catch (ParserConfigurationException e) {
+      LOG.error("Can't create sax parser", e);
+      throw new InvalidConfigException(TYPE.INVALID_EXTENSION, "Can't create sax parser");
+    }
+  }
+
+
+  /**
+   * List all available extensions matching a registered keyword.
+   * </br>
+   * For example, searching by keyword "dwc:Taxon" will return a list of extensions that have "dwc:Taxon" in their
+   * subject.
+   *
+   * @param keyword             keyword to filter extensions by
+   * @param includeEmptySubject true to include extensions with empty subject, false otherwise. An extension with an
+   *                            empty subject indicates the extension is suitable for all core extensions.
+   * @param searchForCores      true if core type extensions should be listed or false if non-core type extensions
+   *                            should be listed
+   */
+  private List<Extension> search(String keyword, boolean includeEmptySubject, boolean searchForCores) {
+    List<Extension> list = new ArrayList<>();
+    keyword = StringUtils.trimToNull(keyword);
+    if (keyword != null) {
+      keyword = keyword.toLowerCase();
+      for (Extension e : extensionsHolder.getExtensionsByRowtype().values()) {
+        if ((searchForCores && !e.isCore()) || (!searchForCores && e.isCore())) {
+          continue;
+        }
+        if ((includeEmptySubject && StringUtils.trimToNull(e.getSubject()) == null)
+            || Strings.CI.contains(e.getSubject(), keyword)) {
+          list.add(e);
+        }
+      }
+    }
+    return list;
+  }
+
+  @Override
+  public List<String> getRedundantGroups(Extension extension, Extension core) {
+    List<String> groups = extension.getGroups();
+    List<String> coreGroups = core.getGroups();
+    if (!groups.isEmpty() && !coreGroups.isEmpty()) {
+      // retain groups already included in core extension...
+      coreGroups.retainAll(groups);
+      // exclude Record-Level since this cannot ever be a redundant class
+      coreGroups.remove(RECORD_LEVEL_CLASS);
+      return coreGroups;
+    } else {
+      return new ArrayList<>();
+    }
+  }
+
+  @Override
+  public boolean isLatest(Extension extension, List<Extension> latestExtensions) {
+    for (Extension rExtension : latestExtensions) {
+      // check if registered extension is latest, and if it is, try to use it in comparison
+      if (extension.getRowType().equalsIgnoreCase(rExtension.getRowType())) {
+        Date installedExtensionIssuedDate = extension.getIssued();
+        Date latestExtensionIssuedDate = rExtension.getIssued();
+        if (installedExtensionIssuedDate == null && latestExtensionIssuedDate != null) {
+          LOG.debug("Installed extension with rowType {} has no issued date. A newer version issued {} exists.", extension.getRowType(), latestExtensionIssuedDate);
+          return false;
+        } else if (latestExtensionIssuedDate != null && latestExtensionIssuedDate.compareTo(installedExtensionIssuedDate) > 0) {
+          LOG.debug("Installed extension with rowType {} was issued {}. A newer version issued {} exists.", extension.getRowType(), installedExtensionIssuedDate, latestExtensionIssuedDate);
+          return false;
+        } else {
+          LOG.debug("Installed extension with rowType {} is the latest version", extension.getRowType());
+          return true;
+        }
+      }
+    }
+
+    return true;
+  }
+}

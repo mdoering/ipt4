@@ -1,0 +1,237 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.utils;
+
+import org.gbif.ipt.model.UrlMetadata;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+/**
+ * Renamed to {@code IptFileUtils} to avoid confusiong with {@code org.gbif.utils.file.FileUtils} and
+ * {@code org.apache.commons.io.FileUtils}
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class IptFileUtils {
+
+  private static final Logger LOG = LogManager.getLogger(IptFileUtils.class);
+
+  public static final String UTF8 = "UTF8";
+  private static final int BUFFER_SIZE = 8192;
+  private static final int TEMP_DIR_ATTEMPTS = 10000;
+
+  public static void copyStreams(InputStream in, OutputStream out) throws IOException {
+    // write the file to the file specified
+    int bytesRead;
+    byte[] buffer = new byte[BUFFER_SIZE];
+
+    while ((bytesRead = in.read(buffer, 0, BUFFER_SIZE)) != -1) {
+      out.write(buffer, 0, bytesRead);
+    }
+
+    out.close();
+    in.close();
+  }
+
+  public static void copyStreamToFile(InputStream in, File out) throws IOException {
+    copyStreams(in, new FileOutputStream(out));
+  }
+
+  public static String formatSize(long longSize, int decimalPos) {
+    return formatSize(longSize, decimalPos, false);
+  }
+
+  public static String formatSize(long longSize, int decimalPos, boolean inseparableDelimiter) {
+    return formatSize(longSize, decimalPos, Locale.UK.toString(), inseparableDelimiter);
+  }
+
+  public static String formatSize(long longSize, int decimalPos, String strLocale, boolean inseparableDelimiter) {
+    String delimiter = inseparableDelimiter ? "&nbsp;" : " ";
+
+    Locale locale = Optional.ofNullable(strLocale).map(LocaleUtils::toLocale).orElse(Locale.UK);
+
+    NumberFormat fmt = NumberFormat.getNumberInstance(locale);
+    if (decimalPos >= 0) {
+      fmt.setMaximumFractionDigits(decimalPos);
+    }
+
+    double val = longSize / (1000f * 1000f * 1000f);
+    if (val > 1) {
+      return fmt.format(val) + delimiter + "GB";
+    }
+
+    val = longSize / (1000f * 1000f);
+    if (val > 1) {
+      return fmt.format(val) + delimiter + "MB";
+    }
+
+    val = longSize / 1000f;
+    if (val > 1) {
+      return fmt.format(val) + delimiter +  "KB";
+    }
+
+    return longSize + delimiter + "bytes";
+  }
+
+  public static Reader getUtf8Reader(File file) throws FileNotFoundException {
+    Reader reader;
+    reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+    return reader;
+  }
+
+  public static Writer startNewUtf8File(File file) throws IOException {
+    try {
+      org.apache.commons.io.FileUtils.touch(file);
+    } catch (IOException e) {
+      // io error can happen on Windows if last modification cannot be set
+      // see http://commons.apache.org/io/api-1.4/org/apache/commons/io/FileUtils.html#touch(java.io.File)
+      // we catch this and check if the file was created
+      if (file.exists() && file.canWrite()) {
+        LOG.warn("Cant touch file, but it was created: {}", e.getMessage());
+        LOG.debug(e);
+      } else {
+        throw e;
+      }
+    }
+    return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Construct filename for a persisted file (e.g. vocabulary or extension) replacing certain characters with an
+   * underscore, and appending a suffix.
+   *
+   * @param name   original name, excluding suffix
+   * @param suffix suffix to add to filename
+   *
+   * @return constructed filename
+   */
+  public static String getSuffixedFileName(String name, String suffix) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(suffix);
+    return name.replaceAll("[/.:]+", "_") + suffix;
+  }
+
+  /**
+   * Atomically creates a new directory somewhere beneath the system's temporary directory (as
+   * defined by the {@code java.io.tmpdir} system property), and returns its name.
+   *
+   * <p>Use this method instead of {@link File#createTempFile(String, String)} when you wish to
+   * create a directory, not a regular file. A common pitfall is to call {@code createTempFile},
+   * delete the file and create a directory in its place, but this leads a race condition which can
+   * be exploited to create security vulnerabilities, especially when executable files are to be
+   * written into the directory.
+   *
+   * <p>This method assumes that the temporary volume is writable, has free inodes and free blocks,
+   * and that it will not be called thousands of times per second.
+   *
+   * <p>Copied from guava.
+   *
+   * @return the newly created directory
+   * @throws IllegalStateException if the directory could not be created
+   */
+  public static File createTempDir() {
+    File baseDir = new File(System.getProperty("java.io.tmpdir"));
+    String baseName = System.currentTimeMillis() + "-";
+
+    for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
+      File tempDir = new File(baseDir, baseName + counter);
+      if (tempDir.mkdir()) {
+        return tempDir;
+      }
+    }
+    throw new IllegalStateException(
+        "Failed to create directory within "
+            + TEMP_DIR_ATTEMPTS
+            + " attempts (tried "
+            + baseName
+            + "0 to "
+            + baseName
+            + (TEMP_DIR_ATTEMPTS - 1)
+            + ')');
+  }
+
+  /**
+   * Returns file extension.
+   *
+   * @param file file
+   * @return extension of the file
+   */
+  public static String getFileExtension(File file) {
+    String fileName = file.getName();
+    int lastIndexOfDot = fileName.lastIndexOf(".");
+    if (lastIndexOfDot == -1) {
+      return "";
+    }
+    return fileName.substring(lastIndexOfDot + 1);
+  }
+
+  public static UrlMetadata fetchUrlMetadata(String url) throws IOException {
+    URL remoteUrl = new URL(url);
+    HttpURLConnection conn = (HttpURLConnection) remoteUrl.openConnection();
+    conn.setRequestMethod("HEAD");
+    conn.connect();
+
+    int status = conn.getResponseCode();
+    String contentType = conn.getContentType();
+    long contentLength = conn.getContentLengthLong();
+    String lastModified = conn.getHeaderField("Last-Modified");
+    String acceptRanges = conn.getHeaderField("Accept-Ranges");
+
+    return new UrlMetadata(status, contentType, contentLength, lastModified, acceptRanges);
+  }
+
+  /**
+   * Method deletes the entire directory if it exclusively contains a single file. This method can be used to clean up
+   * a resource directory containing an invalid eml.xml/datapackage.json.
+   *
+   * @param file file enclosed in a resource directory
+   */
+  public static void deleteDirectoryContainingSingleFile(File file) {
+    File parent = file.getParentFile();
+    File[] files = parent.listFiles();
+    if (files != null && files.length == 1 && files[0].equals(file)) {
+      try {
+        org.apache.commons.io.FileUtils.deleteDirectory(parent);
+        LOG.info("Deleted directory: {}", parent.getAbsolutePath());
+      } catch (IOException e) {
+        LOG.error("Failed to delete directory {}: {}", parent.getAbsolutePath(), e.getMessage(), e);
+      }
+    }
+  }
+}
