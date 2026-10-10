@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "automerge": false,
+      "description": "Vendored front-end libraries: re-vendor the files and check the pages visually"
+    },
+    {
+      "matchPackageNames": ["io.frictionlessdata:tableschema-java"],
+      "automerge": false,
+      "description": "GBIF fork pins Jackson 2; FrictionlessJackson2CompatibilityTest must pass"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^tools/assets/manifest\\.json$/"],
+      "matchStrings": ["\"npm\": \"(?<depName>[^\"]+)\", \"version\": \"(?<currentValue>[^\"]+)\""],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "schedule": ["after 11pm every weekday", "before 5am every weekday", "every weekend"],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 20
+}

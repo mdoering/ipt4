@@ -1,0 +1,22 @@
+{
+  "comment": "Third-party front-end libraries vendored under ipt-app/src/main/resources/static. Renovate proposes updates via the npm datasource; re-vendor the files by hand and review the pages visually. Keep each library on one line.",
+  "libraries": [
+    {"name": "bootstrap", "npm": "bootstrap", "version": "5.0.1", "paths": ["js/bootstrap/bootstrap.bundle.min.js", "styles/bootstrap/bootstrap.min.css"]},
+    {"name": "bootstrap-icons", "npm": "bootstrap-icons", "version": null, "paths": ["styles/bootstrap-icons/font/bootstrap-icons.css"]},
+    {"name": "jquery", "npm": "jquery", "version": "3.7.1", "paths": ["js/jquery/jquery-3.7.1.min.js"]},
+    {"name": "jquery-ui", "npm": "jquery-ui", "version": "1.14.2", "paths": ["js/jquery/jquery-ui-1.14.2.min.js"]},
+    {"name": "jquery-ui-css", "npm": null, "version": "1.12.1", "paths": ["styles/jquery/jquery-ui.min-1.12.1.css"]},
+    {"name": "datatables", "npm": "datatables.net", "version": "1.13.6", "paths": ["js/jquery/jquery.dataTables-1.13.6.min.js", "styles/dataTables/jquery.dataTables-1.13.6.min.css"]},
+    {"name": "datatables-responsive", "npm": "datatables.net-responsive", "version": "2.5.0", "paths": ["js/jquery/dataTables.responsive-2.5.0.min.js", "styles/dataTables/responsive.dataTables-2.5.0.min.css"]},
+    {"name": "select2", "npm": "select2", "version": "4.0.13", "paths": ["js/select2/select2-4.0.13.full.min.js", "js/select2/select2-4.0.13.min.js", "styles/select2/select2-4.0.13.min.css"]},
+    {"name": "select2-bootstrap4-theme", "npm": "@ttskch/select2-bootstrap4-theme", "version": null, "paths": ["styles/select2/select2-bootstrap4.min.css"]},
+    {"name": "bootstrap-datepicker", "npm": "bootstrap-datepicker", "version": "1.9.0", "paths": ["js/datepicker/bootstrap-datepicker.min.js", "styles/datepicker/bootstrap-datepicker.min.css"]},
+    {"name": "leaflet", "npm": "leaflet", "version": "0.7.7", "paths": ["js/leaflet/leaflet.js", "styles/leaflet/leaflet.css"]},
+    {"name": "leaflet-locationfilter", "npm": null, "version": "0.1", "paths": ["js/leaflet/locationfilter.js", "styles/leaflet/locationfilter.css"]},
+    {"name": "jszip", "npm": "jszip", "version": "3.10.1", "paths": ["js/jszip/jszip-3.10.1.min.js"]},
+    {"name": "html5sortable", "npm": "html5sortable", "version": "0.13.3", "paths": ["js/sortable/html5sortable-0.13.3.js", "js/sortable/html5sortable-0.13.3.min.js"]},
+    {"name": "modernizr", "npm": null, "version": "2.6.2", "paths": ["js/modernizr.js"]},
+    {"name": "jconfirmation", "npm": null, "version": null, "paths": ["js/jconfirmation.jquery.js"]},
+    {"name": "ajaxfileupload", "npm": null, "version": null, "paths": ["js/ajaxfileupload.js"]}
+  ]
+}
