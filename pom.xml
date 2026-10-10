@@ -59,6 +59,14 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+    <!-- GeoTools, a dependency of the frictionless tableschema fork; same id as in that pom so mirrors apply -->
+    <repository>
+      <id>osgeo.org</id>
+      <url>https://repo.osgeo.org/repository/release/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <dependencyManagement>
