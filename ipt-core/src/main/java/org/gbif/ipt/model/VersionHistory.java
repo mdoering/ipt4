@@ -43,6 +43,10 @@ public class VersionHistory {
   private int recordsPublished;
   private Map<String, Integer> recordsByExtension = new HashMap<>();
 
+  /** For JSON persistence. */
+  private VersionHistory() {
+  }
+
   public VersionHistory(BigDecimal version, Date released, PublicationStatus publicationStatus) {
     this.version = version.toPlainString();
     this.released = released;

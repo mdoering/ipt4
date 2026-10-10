@@ -794,6 +794,17 @@ public class Resource implements Serializable, Comparable<Resource> {
     return maps;
   }
 
+  /**
+   * All data package mappings, whatever schema they belong to. For persistence; the UI uses
+   * {@link #getDataPackageMappings()}.
+   */
+  public List<DataPackageMapping> getAllDataPackageMappings() {
+    if (dataPackageMappings == null) {
+      dataPackageMappings = new ArrayList<>();
+    }
+    return dataPackageMappings;
+  }
+
   public Source getSource(String name) {
     if (name == null) {
       return null;

@@ -1,0 +1,37 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.persistence;
+
+import org.gbif.ipt.model.DataPackageSchema;
+import org.gbif.ipt.model.Extension;
+import org.gbif.ipt.model.Organisation;
+import org.gbif.ipt.model.User;
+
+import javax.annotation.Nullable;
+
+/** Finds the managed objects a stored resource refers to by key. Null means "not installed / not known". */
+public interface ReferenceLookup {
+
+  @Nullable
+  User user(String email);
+
+  @Nullable
+  Organisation organisation(String key);
+
+  @Nullable
+  Extension extension(String rowType);
+
+  @Nullable
+  DataPackageSchema dataPackageSchema(String identifier);
+}
