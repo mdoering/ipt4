@@ -58,4 +58,14 @@ class LocaleChangeTest {
           .andExpect(content().string("en_GB"));
     }
   }
+
+  @Test
+  void emptyLocaleParameterKeepsTheChosenLanguage() throws Exception {
+    MockHttpSession session = new MockHttpSession();
+    mvc.perform(get("/_probe/locale").param("request_locale", "fr").session(session))
+        .andExpect(content().string("fr"));
+    mvc.perform(get("/_probe/locale").param("request_locale", "").session(session))
+        .andExpect(content().string("fr"));
+    mvc.perform(get("/_probe/locale").session(session)).andExpect(content().string("fr"));
+  }
 }

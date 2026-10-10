@@ -3,11 +3,18 @@ spring:
     name: ipt
   main:
     banner-mode: off
+  web:
+    resources:
+      cache:
+        # Asset file names are not versioned, so keep this short; browsers revalidate with Last-Modified after it
+        cachecontrol:
+          max-age: 1h
 
 server:
   port: 8080
   shutdown: graceful
-  forward-headers-strategy: framework
+  # X-Forwarded-* headers are applied by TrustedProxyForwardedHeaderFilter, only for ipt.trusted-proxies
+  forward-headers-strategy: none
   servlet:
     encoding:
       charset: UTF-8
@@ -25,3 +32,5 @@ ipt:
   log-dir: ${IPT_LOG_DIR:${IPT_DATA_DIR:${java.io.tmpdir}/ipt4}/logs}
   default-locale: en
   dev-mode: false
+  # Regex of reverse-proxy addresses whose X-Forwarded-* headers are trusted; default: loopback and private networks
+  # trusted-proxies: 10\.0\.0\.5

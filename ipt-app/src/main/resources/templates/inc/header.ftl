@@ -50,6 +50,7 @@
     <script src="${baseURL}/js/jquery/jquery-3.7.1.min.js"></script>
     <script src="${baseURL}/js/jquery/jquery-ui-1.14.2.min.js"></script>
     <script src="${baseURL}/js/global.js"></script>
+    <script src="${baseURL}/js/csrf.js"></script>
 
     <script>
         window.addEventListener("scroll", () => {

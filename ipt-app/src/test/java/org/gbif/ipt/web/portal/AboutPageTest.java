@@ -145,4 +145,34 @@ class AboutPageTest {
   void rootRedirectsToAboutUntilThePortalHomeIsPorted() throws Exception {
     mvc.perform(get("/")).andExpect(status().isFound()).andExpect(redirectedUrl("/about"));
   }
+
+  @Test
+  void staticAssetsAreCacheable() throws Exception {
+    String cacheControl =
+        mvc.perform(get("/styles/main.css")).andReturn().getResponse().getHeader("Cache-Control");
+
+    assertThat(cacheControl).isNotNull().contains("max-age=").doesNotContain("no-store", "no-cache");
+  }
+
+  @Test
+  void loadsTheCsrfAjaxHelper() throws Exception {
+    assertThat(html(get("/about"))).contains("<script src=\"http://localhost/js/csrf.js\"></script>");
+    mvc.perform(get("/js/csrf.js")).andExpect(status().isOk());
+  }
+
+  @Test
+  void ignoresForwardedHeadersFromUntrustedClients() throws Exception {
+    String html =
+        html(
+            get("/about")
+                .with(
+                    request -> {
+                      request.setRemoteAddr("203.0.113.9");
+                      return request;
+                    })
+                .header("X-Forwarded-Proto", "https")
+                .header("X-Forwarded-Host", "evil.example"));
+
+    assertThat(html).doesNotContain("evil.example").contains("href=\"http://localhost/styles/main.css\"");
+  }
 }

@@ -19,6 +19,8 @@ jobs:
           cache: maven
       - name: Build and test
         run: mvn -B verify
+      - name: JavaScript tests
+        run: node --test 'ipt-app/src/test/js/*.test.js'
       - name: Template migration tool
         run: tools/ftl-migrate/test.sh
       - name: Docker image
