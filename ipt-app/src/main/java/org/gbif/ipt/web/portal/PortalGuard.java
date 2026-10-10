@@ -23,6 +23,7 @@ import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.web.support.action.ActionPage;
 
 import java.math.BigDecimal;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * IPT 3's portal interceptors: {@code ResourceSessionInterceptor} (remembers the requested resource in the session)
@@ -40,27 +42,47 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class PortalGuard {
 
+  private static final Pattern VERSION = Pattern.compile("\\d{1,9}(\\.\\d{1,9})?");
+
   private final ResourceManager resourceManager;
 
   public PortalGuard(ResourceManager resourceManager) {
     this.resourceManager = resourceManager;
   }
 
-  /** @return a result to show instead of the page, or null to go on */
+  /**
+   * Checks the resource the page will show: the {@code r} parameter, else the one remembered in the session (IPT 3
+   * remembered the requested resource before checking it, so a private one could then be read without {@code r}).
+   *
+   * @return a result to show instead of the page, or null to go on
+   */
   @Nullable
   public String check(HttpServletRequest request, @Nullable User user) {
-    if (request.getParameterMap().containsKey(Constants.REQ_PARAM_RESOURCE)) {
-      String requested = StringUtils.trimToNull(request.getParameter(Constants.REQ_PARAM_RESOURCE));
-      if (requested == null) {
-        if (request.getSession(false) != null) {
-          request.getSession().removeAttribute(Constants.SESSION_RESOURCE);
-        }
-        return ActionPage.NOT_FOUND;
+    boolean fromParameter = request.getParameterMap().containsKey(Constants.REQ_PARAM_RESOURCE);
+    HttpSession session = request.getSession(false);
+    String requested = fromParameter
+        ? StringUtils.trimToNull(request.getParameter(Constants.REQ_PARAM_RESOURCE))
+        : session == null ? null : (String) session.getAttribute(Constants.SESSION_RESOURCE);
+    if (requested == null) {
+      if (session != null) {
+        session.removeAttribute(Constants.SESSION_RESOURCE);
       }
-      request.getSession().setAttribute(Constants.SESSION_RESOURCE, requested);
-      return privateOrDeleted(requested, request.getParameter(Constants.REQ_PARAM_VERSION), user);
+      return fromParameter ? ActionPage.NOT_FOUND : null;
     }
-    return null;
+    String blocked = privateOrDeleted(requested, request.getParameter(Constants.REQ_PARAM_VERSION), user);
+    if (blocked == null) {
+      request.getSession().setAttribute(Constants.SESSION_RESOURCE, requested);
+    } else if (session != null) {
+      session.removeAttribute(Constants.SESSION_RESOURCE);
+    }
+    return blocked;
+  }
+
+  /** A version as the IPT writes them ({@code 1.0}, {@code 12.3}); anything else is not a version of a resource. */
+  @Nullable
+  public static BigDecimal parseVersion(@Nullable String version) {
+    String v = StringUtils.trimToNull(version);
+    return v != null && VERSION.matcher(v).matches() ? new BigDecimal(v) : null;
   }
 
   @Nullable
@@ -72,17 +94,18 @@ public class PortalGuard {
     boolean manager = ResourceAccessPolicy.canManage(user, resource);
     String version = StringUtils.trimToNull(versionParam);
     if (version != null) {
-      try {
-        VersionHistory history = resource.findVersionHistory(new BigDecimal(version));
-        if (history != null) {
-          if (history.getPublicationStatus() == PublicationStatus.PRIVATE && !manager) {
-            return ActionPage.NOT_ALLOWED;
-          } else if (history.getPublicationStatus() == PublicationStatus.DELETED && !manager) {
-            return ActionPage.GONE;
-          }
-        }
-      } catch (NumberFormatException e) {
+      BigDecimal parsed = parseVersion(version);
+      if (parsed == null) {
+        // also keeps exponents like 1e100000000 from turning into huge numbers
         return ActionPage.NOT_FOUND;
+      }
+      VersionHistory history = resource.findVersionHistory(parsed);
+      if (history != null && !manager) {
+        if (history.getPublicationStatus() == PublicationStatus.PRIVATE) {
+          return ActionPage.NOT_ALLOWED;
+        } else if (history.getPublicationStatus() == PublicationStatus.DELETED) {
+          return ActionPage.GONE;
+        }
       }
       return null;
     }

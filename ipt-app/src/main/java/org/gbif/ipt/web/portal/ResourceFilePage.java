@@ -225,7 +225,8 @@ public class ResourceFilePage extends PortalBasePage {
       // see if we have a conditional get with If-Modified-Since header
       try {
         long since = req.getDateHeader("If-Modified-Since");
-        if (since >= lastModified) {
+        // a date in the future is invalid and ignored (RFC 9110)
+        if (since >= lastModified && since <= System.currentTimeMillis()) {
           return NOT_MODIFIED;
         }
       } catch (IllegalArgumentException e) {

@@ -91,18 +91,34 @@ class LoginTest {
     assertThat(Files.readString(dataDir.resolve("config/users.json"))).contains("lastLogin");
   }
 
-  /** Spring Security forwards a failed login to the form (MockMvc records the forward without following it). */
   @Test
   void wrongPasswordShowsTheLoginPageAgain() throws Exception {
-    assertThat(login(new MockHttpSession(), EMAIL, "wrong-password").getResponse().getForwardedUrl())
-        .isEqualTo("/login?error");
-    MockHttpServletResponse form = mvc.perform(get("/login").param("error", "").param("email", EMAIL)
-        .param("password", "wrong-password")).andReturn().getResponse();
+    MockHttpSession session = new MockHttpSession();
+    assertThat(login(session, EMAIL, "wrong-password").getResponse().getRedirectedUrl()).isEqualTo("/login?error");
+    MockHttpServletResponse form = mvc.perform(get("/login").param("error", "").session(session)).andReturn()
+        .getResponse();
     assertThat(form.getStatus()).isEqualTo(200);
     assertThat(form.getContentAsString())
         .contains("The email – password combination does not exist.")
         .contains("value=\"" + EMAIL + "\"")
         .doesNotContain("wrong-password");
+  }
+
+  @Test
+  void theAdminContactCannotBeSetByUrl() throws Exception {
+    assertThat(mvc.perform(get("/login.do").param("adminEmail", "attacker@evil.example.org")).andReturn()
+        .getResponse().getContentAsString()).doesNotContain("attacker@evil.example.org");
+  }
+
+  @Test
+  void cancelOnTheAccountFormSavesNothing() throws Exception {
+    MockHttpSession session = (MockHttpSession) login(new MockHttpSession(), EMAIL, PASSWORD).getRequest()
+        .getSession();
+    MockHttpServletResponse cancelled = mvc.perform(post("/account.do").session(session).with(csrf())
+        .param("user.firstname", "CHANGED").param("user.lastname", "Manager").param("cancel", "Cancel"))
+        .andReturn().getResponse();
+    assertThat(cancelled.getRedirectedUrl()).endsWith("/home.do");
+    assertThat(users.get(EMAIL).getFirstname()).isEqualTo("Maria");
   }
 
   @Test

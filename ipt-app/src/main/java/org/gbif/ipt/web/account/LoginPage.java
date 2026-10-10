@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gbif.ipt.web.security.LocalPaths;
+import org.gbif.ipt.web.security.LoginFailureHandler;
 import org.gbif.ipt.web.support.action.StrutsParameter;
 
 import lombok.Getter;
@@ -115,6 +116,11 @@ public class LoginPage extends PostActionPage {
     }
     if (req.getParameter("error") != null) {
       addActionError(getText("admin.user.wrong.email.password.combination"));
+      // the email of the failed attempt, kept for the form once
+      if (req.getSession(false) != null && session.get(LoginFailureHandler.FAILED_EMAIL) instanceof String failed) {
+        email = failed;
+        session.remove(LoginFailureHandler.FAILED_EMAIL);
+      }
     }
     // IPT 3 wrote the rejected password back into the form
     password = null;
@@ -157,7 +163,7 @@ public class LoginPage extends PostActionPage {
     this.password = password;
   }
 
-  @StrutsParameter
+  // not a request parameter (IPT 3 allowed it): the contact links must not be settable by URL
   public void setAdminEmail(String adminEmail) {
     this.adminEmail = adminEmail;
   }

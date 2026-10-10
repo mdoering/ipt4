@@ -30,9 +30,10 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Runs a page the way IPT 3's Struts interceptor stack ran an action: {@code prepare()}, bind the request parameters
- * that {@link StrutsParameter} allows, {@code validate()} (except for input/back/cancel/list), and when there are no
- * errors the requested method; with errors the result is {@link ActionPage#INPUT}.
+ * Runs a page the way IPT 3's Struts interceptor stack ran an action: {@code prepare()}, a {@code cancel} parameter
+ * marks the page as cancelled, bind the request parameters that {@link StrutsParameter} allows, {@code validate()}
+ * (except for input/back/cancel/list), and when there are no errors the requested method; with errors the result is
+ * {@link ActionPage#INPUT}.
  */
 @Component
 public class ActionRunner {
@@ -50,6 +51,10 @@ public class ActionRunner {
   public String run(ActionPage page, HttpServletRequest request, String methodName, ActionMethod method)
       throws Exception {
     page.prepare();
+    // IPT 3's SetupAndCancelInterceptor: any cancel parameter cancels
+    if (request.getParameterMap().containsKey(ActionPage.CANCEL)) {
+      page.setCancel("true");
+    }
     bind(page, request);
     if (!NOT_VALIDATED.contains(methodName)) {
       page.validate();

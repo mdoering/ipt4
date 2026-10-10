@@ -40,3 +40,9 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Startup warnings | Listed before the page's own warnings, also on pages reached by a redirect | Listed after the page's own warnings, only on rendered pages | The page shows three warnings; the user's last action comes first | M2 |
 | Unknown URLs | Unknown actions showed the home page of their area (Struts default action); other paths got the servlet container's page | `error/404.ftl` with status 404 | A missing page should say so | M2 |
 | CSRF token missing or stale | n/a (only the login form had a token) | 403 with `error/error.ftl` | Every form is protected now | M2 |
+| Last requested resource | Remembered in the session before the access check; later requests without `r` (`eml.do`, `archive.do`, ...) served it, private or not | Checked like `r`, and remembered only once access is granted | Private data must not be downloadable by visitors | M2 |
+| Version parameter `v` | Any number, including exponents (`1e100000000` built a 100 MB page) | Plain versions only (`12`, `1.3`); anything else is 404 | Unauthenticated memory exhaustion | M2 |
+| `If-Modified-Since` in the future | 304 | Ignored, file served (RFC 9110) | Clients with a wrong clock get the file | M2 |
+| `adminEmail` request parameter on the login page | Replaced the admin contact in the account request and password reset links | Ignored | Phishing through links on the IPT's own domain | M2 |
+| Setup steps 3 and 4 | Open to any visitor until setup was complete | Once the admin exists, only for the logged-in admin | A visitor could set the base URL during setup | M2 |
+| Private resources (portal pages and downloads) | 401 (`error/401.ftl`) for visitors | Unchanged: 401 (the M2 plan's "404" was a slip; IPT 3 parity kept) | — | M2 |

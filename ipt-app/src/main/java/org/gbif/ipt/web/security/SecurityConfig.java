@@ -23,18 +23,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.ForwardAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.header.writers.CacheControlHeadersWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -82,8 +85,17 @@ public class SecurityConfig {
             .usernameParameter("email")
             .passwordParameter("password")
             .successHandler(new LoginSuccessHandler(users, cfg))
-            // re-renders login.ftl with the error and the entered email, as IPT 3 did
-            .failureHandler(new ForwardAuthenticationFailureHandler("/login?error")))
+            .failureHandler(new LoginFailureHandler())
+            // a POST without credentials (the menu's Login button) shows the form, as in IPT 3
+            .withObjectPostProcessor(new ObjectPostProcessor<UsernamePasswordAuthenticationFilter>() {
+              @Override
+              public <O extends UsernamePasswordAuthenticationFilter> O postProcess(O filter) {
+                filter.setRequiresAuthenticationRequestMatcher(new AndRequestMatcher(
+                    PathPatternRequestMatcher.pathPattern(HttpMethod.POST, "/login"),
+                    request -> request.getParameter("email") != null));
+                return filter;
+              }
+            }))
         .authenticationProvider(authenticationProvider)
         // logged-in users without rights get IPT 3's 401 pages; a missing or stale CSRF token stays a 403
         .exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))

@@ -127,6 +127,14 @@ class SetupWizardTest {
     MockHttpSession adminSession = (MockHttpSession) admin.getRequest().getSession();
     assertThat(adminSession.getId()).isNotEqualTo(anonymousSessionId);
 
+    // once the admin exists, only the admin finishes the setup (IPT 3 let any visitor choose mode and base URL)
+    perform(post("/setupMode.do").with(csrf()).param("modeSelected", "Production"));
+    assertThat(cfg.getRegistryType()).isNull();
+    MockHttpServletResponse stranger = perform(post("/setupPublicUrl.do").with(csrf()).param("setupPublicUrl", "true")
+        .param("baseURL", "https://evil.example.org"));
+    assertThat(cfg.getBaseUrl()).isNotEqualTo("https://evil.example.org");
+    assertThat(stranger.getRedirectedUrl()).isNotNull();
+
     assertThat(perform(get("/setupMode.do").session(adminSession)).getStatus()).isEqualTo(200);
     assertThat(perform(post("/setupMode.do").session(adminSession).with(csrf()).param("modeSelected", "Test"))
         .getRedirectedUrl()).endsWith("/setupPublicUrl.do");

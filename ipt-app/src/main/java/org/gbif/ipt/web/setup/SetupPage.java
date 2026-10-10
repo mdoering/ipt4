@@ -252,6 +252,15 @@ public class SetupPage extends ActionPage {
     return INPUT;
   }
 
+  /**
+   * Once the admin account exists, the remaining steps are the admin's: IPT 3 let any visitor choose the mode and the
+   * base URL until setup was complete.
+   */
+  private boolean isSetupAdmin() {
+    User current = getCurrentUser();
+    return current != null && current.hasAdminRights();
+  }
+
   public String setupMode() {
     // this step only owns the registry type: once it's been selected, never allow it to be
     // changed again via this action, regardless of whether later wizard steps are done
@@ -263,6 +272,9 @@ public class SetupPage extends ActionPage {
     List<User> admins = userManager.list(Role.Admin);
     if (admins == null || admins.isEmpty()) {
       return ERROR;
+    }
+    if (!isSetupAdmin()) {
+      return LOGIN;
     }
 
     if (isHttpPost()) {
@@ -302,6 +314,9 @@ public class SetupPage extends ActionPage {
     REGISTRY_TYPE registryType = cfg.getRegistryType();
     if (registryType == null) {
       return ERROR;
+    }
+    if (!isSetupAdmin()) {
+      return LOGIN;
     }
 
     // form has been submitted

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -133,6 +134,38 @@ class DownloadsTest {
   void privateResourcesStayPrivate() throws Exception {
     assertThat(fetch("/eml.do?r=private1").getStatus()).isEqualTo(401);
     assertThat(fetch("/archive.do?r=gone1").getStatus()).isEqualTo(410);
+  }
+
+  /** IPT 3 remembered the last requested resource in the session, before checking access to it. */
+  @Test
+  void privateResourcesStayPrivateWithoutTheResourceParameter() throws Exception {
+    PortalFixture.publish("private1", dataDir, resources, publications, users, registrations);
+    MockHttpSession session = new MockHttpSession();
+    assertThat(mvc.perform(get("/eml.do?r=private1").session(session)).andReturn().getResponse().getStatus())
+        .isEqualTo(401);
+    for (String url : new String[]{"/eml.do", "/metadata.do", "/archive.do", "/publicationlog.do", "/rtf.do"}) {
+      MockHttpServletResponse r = mvc.perform(get(url).session(session)).andReturn().getResponse();
+      assertThat(r.getStatus()).as(url).isNotEqualTo(200);
+      assertThat(r.getContentType()).as(url).doesNotStartWith("application/zip").doesNotStartWith("text/xml");
+    }
+  }
+
+  @Test
+  void hugeVersionNumbersAreNotFound() throws Exception {
+    for (String v : new String[]{"1e100000000", "1E+999999999", "99999999999999999999.1", "-1"}) {
+      long start = System.nanoTime();
+      MockHttpServletResponse r = fetch("/eml.do?r=res1&v=" + v);
+      assertThat(r.getStatus()).as(v).isEqualTo(404);
+      assertThat(r.getContentAsByteArray().length).as(v).isLessThan(200_000);
+      assertThat(System.nanoTime() - start).as(v).isLessThan(2_000_000_000L);
+      assertThat(fetch("/resource?r=res1&v=" + v).getContentAsByteArray().length).as(v).isLessThan(200_000);
+    }
+  }
+
+  @Test
+  void futureIfModifiedSinceServesTheFile() throws Exception {
+    assertThat(mvc.perform(get("/eml.do?r=res1").header("If-Modified-Since", "Fri, 01 Jan 2100 00:00:00 GMT"))
+        .andReturn().getResponse().getStatus()).isEqualTo(200);
   }
 
   @Test

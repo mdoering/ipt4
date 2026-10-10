@@ -82,11 +82,12 @@ public class PortalBasePage extends ActionPage {
     }
     // look for version parameter
     String v = StringUtils.trimToNull(req.getParameter(Constants.REQ_PARAM_VERSION));
-    if (StringUtils.isNotBlank(v)) {
-      try {
-        setVersion(new BigDecimal(v));
-      } catch (NumberFormatException e) {
-        LOG.error("Parameter version (v) was not a valid number: {}", v);
+    if (v != null) {
+      BigDecimal parsed = PortalGuard.parseVersion(v);
+      if (parsed == null) {
+        LOG.error("Parameter version (v) was not a valid version: {}", StringUtils.abbreviate(v, 40));
+      } else {
+        setVersion(parsed);
       }
     }
   }
