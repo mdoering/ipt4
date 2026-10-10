@@ -13,6 +13,9 @@
  */
 package org.gbif.ipt.web.portal;
 
+import org.gbif.ipt.model.User;
+import org.gbif.ipt.service.admin.UserAccountManager;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AboutPageTest {
 
   @Autowired MockMvc mvc;
+  @Autowired UserAccountManager users;
 
   private String html(MockHttpServletRequestBuilder request) throws Exception {
     return mvc.perform(request)
@@ -128,8 +132,14 @@ class AboutPageTest {
   }
 
   @Test
-  @WithMockUser(roles = "ADMIN")
+  @WithMockUser(username = "admin@example.org", roles = "ADMIN")
   void adminMenuHasManageAndAdminLinks() throws Exception {
+    User admin = new User();
+    admin.setEmail("admin@example.org");
+    admin.setFirstname("Ada");
+    admin.setLastname("Admin");
+    admin.setRole(User.Role.Admin);
+    users.save(admin);
     assertThat(html(get("/about")))
         .contains("href=\"http://localhost/manage/\"")
         .contains("href=\"http://localhost/admin/\"");

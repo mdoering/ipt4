@@ -30,13 +30,30 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.web.support.feedback.FeedbackFlashInterceptor;
+import org.gbif.ipt.web.support.feedback.RequestFeedback;
+import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.servlet.support.RequestContextUtils;
+
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration(proxyBeanMethods = false)
 public class WebConfig implements WebMvcConfigurer {
 
   /** IPT 3 request parameter for switching the UI language. */
   public static final String LOCALE_PARAMETER = "request_locale";
+
+  private final ObjectProvider<RequestFeedback> feedback;
+
+  public WebConfig(ObjectProvider<RequestFeedback> feedback) {
+    this.feedback = feedback;
+  }
 
   /** Replaces Spring Boot's {@code server.forward-headers-strategy=framework}, trusting only proxy addresses. */
   @Bean
@@ -60,14 +77,24 @@ public class WebConfig implements WebMvcConfigurer {
     return registration;
   }
 
-  /** M1 switches the default to the language configured in the data directory. */
+  /** The default language is the one chosen in the admin UI ({@code ipt.properties}), else {@code ipt.default-locale}. */
   @Bean(name = DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME)
-  public LocaleResolver localeResolver(IptProperties props) {
-    return new IptLocaleResolver(props::defaultLocale);
+  public LocaleResolver localeResolver(IptProperties props, AppConfig cfg) {
+    return new IptLocaleResolver(() -> StringUtils.hasText(cfg.getDefaultLocale()) ? cfg.getDefaultLocale()
+        : props.defaultLocale());
+  }
+
+  /** The messages and errors of the current request; also injectable as core's {@code Feedback}. */
+  @Bean
+  @RequestScope
+  public RequestFeedback requestFeedback(CurrentUser currentUser, HttpServletRequest request) {
+    Locale locale = IptLocaleResolver.supported(LocaleContextHolder.getLocale()).orElse(Locale.UK);
+    return new RequestFeedback(locale, currentUser.get(), RequestContextUtils.getInputFlashMap(request));
   }
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(new FeedbackFlashInterceptor(feedback));
     LocaleChangeInterceptor localeChange =
         new LocaleChangeInterceptor() {
           /** A blank value would reset the visitor's choice; treat it as invalid, i.e. ignore it. */

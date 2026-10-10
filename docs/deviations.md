@@ -24,3 +24,4 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Registry unreachable at start-up | IPT fails to start | IPT starts and shows a start-up warning | An outage of the GBIF registry should not take IPTs down | M1 |
 | Vocabularies without registry | Installed vocabularies are only loaded when the GBIF registry answers; publishing then fails | Installed vocabularies are loaded anyway | An outage of the GBIF registry should not stop publishing | M1 |
 | Uploaded IPT 3 resource folders | Read with XStream allowing any Java type | Read with XStream limited to the IPT's own classes and JDK value types | Uploaded files must not be able to instantiate arbitrary classes | M1 |
+| Action messages | Rendered with `?interpret`, so FreeMarker code inside a message ran | Rendered as HTML without evaluation | Messages can contain user input (resource titles); no server-side template injection | M2 |

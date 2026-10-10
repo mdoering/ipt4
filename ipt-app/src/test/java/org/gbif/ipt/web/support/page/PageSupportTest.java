@@ -13,24 +13,28 @@
  */
 package org.gbif.ipt.web.support.page;
 
-import org.gbif.ipt.app.IptProperties;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.model.IptColorScheme;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.web.support.feedback.RequestFeedback;
 import org.gbif.ipt.i18n.BundleMessages;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PageSupportTest {
 
   private static PageSupport page(Locale locale) {
-    SiteConfig cfg = new SiteConfig(new IptProperties(null, null, "en", null, false, null), Optional.empty(), Optional.empty());
-    return new PageSupport(
-        new PageContext(
-            new BundleMessages(), locale, cfg, "http://localhost", "http://localhost/about", false, false, false));
+    AppConfig cfg = mock(AppConfig.class);
+    when(cfg.getColorSchemeConfig()).thenReturn(new IptColorScheme());
+    return new PageSupport(new PageContext(new BundleMessages(), locale, cfg, mock(RegistrationManager.class),
+        "http://localhost", "http://localhost/about", null, new RequestFeedback(locale, null, null)));
   }
 
   @Test

@@ -14,31 +14,39 @@
 package org.gbif.ipt.web.support.page;
 
 import org.gbif.ipt.app.IptProperties;
+import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.i18n.BundleMessages;
+import org.gbif.ipt.model.User;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.web.support.feedback.RequestFeedback;
 
 import java.util.Locale;
-import java.util.Optional;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GlobalModelTest {
 
-  @AfterEach
-  void clearSecurityContext() {
-    SecurityContextHolder.clearContext();
+  private static User user(User.Role role) {
+    User u = new User();
+    u.setEmail("u@example.org");
+    u.setRole(role);
+    return u;
   }
 
-  private static GlobalModel globalModel(String baseUrl) {
-    SiteConfig cfg =
-        new SiteConfig(new IptProperties(null, baseUrl, "en", null, false, null), Optional.empty(), Optional.empty());
-    return new GlobalModel(cfg, new BundleMessages());
+  @SuppressWarnings("unchecked")
+  private static GlobalModel globalModel(String propsBaseUrl, String configuredBaseUrl, User user) {
+    AppConfig cfg = mock(AppConfig.class);
+    when(cfg.getBaseUrl()).thenReturn(configuredBaseUrl);
+    ObjectProvider<RequestFeedback> feedback = mock(ObjectProvider.class);
+    when(feedback.getObject()).thenReturn(new RequestFeedback(Locale.UK, user, null));
+    return new GlobalModel(cfg, new IptProperties(null, propsBaseUrl, "en", null, false, null), new BundleMessages(),
+        mock(RegistrationManager.class), feedback);
   }
 
   private static MockHttpServletRequest request() {
@@ -50,22 +58,28 @@ class GlobalModelTest {
 
   @Test
   void derivesBaseUrlFromRequestIncludingContextPath() {
-    PageContext ctx = globalModel(null).pageContext(request(), Locale.UK);
+    PageContext ctx = globalModel(null, null, null).pageContext(request(), Locale.UK);
 
     assertThat(ctx.baseUrl()).isEqualTo("http://localhost/ipt");
     assertThat(ctx.requestUrl()).isEqualTo("http://localhost/ipt/about");
   }
 
   @Test
-  void configuredBaseUrlWins() {
-    PageContext ctx = globalModel("https://ipt.example.org/").pageContext(request(), Locale.UK);
-
+  void theBaseUrlFromSetupWins() {
+    PageContext ctx = globalModel(null, "https://ipt.example.org/", null).pageContext(request(), Locale.UK);
     assertThat(ctx.baseUrl()).isEqualTo("https://ipt.example.org");
   }
 
   @Test
+  void theDeploymentBaseUrlWinsOverSetup() {
+    PageContext ctx = globalModel("https://proxy.example.org", "https://ipt.example.org", null)
+        .pageContext(request(), Locale.UK);
+    assertThat(ctx.baseUrl()).isEqualTo("https://proxy.example.org");
+  }
+
+  @Test
   void anonymousVisitorsHaveNoRights() {
-    PageContext ctx = globalModel(null).pageContext(request(), Locale.UK);
+    PageContext ctx = globalModel(null, null, null).pageContext(request(), Locale.UK);
 
     assertThat(ctx.loggedIn()).isFalse();
     assertThat(ctx.managerRights()).isFalse();
@@ -74,12 +88,7 @@ class GlobalModelTest {
 
   @Test
   void publisherHasManagerButNotAdminRights() {
-    SecurityContextHolder.getContext()
-        .setAuthentication(
-            UsernamePasswordAuthenticationToken.authenticated(
-                "p@example.org", "n/a", AuthorityUtils.createAuthorityList("ROLE_PUBLISHER")));
-
-    PageContext ctx = globalModel(null).pageContext(request(), Locale.UK);
+    PageContext ctx = globalModel(null, null, user(User.Role.Publisher)).pageContext(request(), Locale.UK);
 
     assertThat(ctx.loggedIn()).isTrue();
     assertThat(ctx.managerRights()).isTrue();
@@ -88,12 +97,7 @@ class GlobalModelTest {
 
   @Test
   void adminHasAllRights() {
-    SecurityContextHolder.getContext()
-        .setAuthentication(
-            UsernamePasswordAuthenticationToken.authenticated(
-                "a@example.org", "n/a", AuthorityUtils.createAuthorityList("ROLE_ADMIN")));
-
-    PageContext ctx = globalModel(null).pageContext(request(), Locale.UK);
+    PageContext ctx = globalModel(null, null, user(User.Role.Admin)).pageContext(request(), Locale.UK);
 
     assertThat(ctx.managerRights()).isTrue();
     assertThat(ctx.adminRights()).isTrue();
@@ -101,6 +105,6 @@ class GlobalModelTest {
 
   @Test
   void unsupportedLocaleRendersBritishEnglish() {
-    assertThat(globalModel(null).pageContext(request(), Locale.GERMAN).locale()).isEqualTo(Locale.UK);
+    assertThat(globalModel(null, null, null).pageContext(request(), Locale.GERMAN).locale()).isEqualTo(Locale.UK);
   }
 }

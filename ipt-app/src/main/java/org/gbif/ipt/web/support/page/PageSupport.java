@@ -13,6 +13,15 @@
  */
 package org.gbif.ipt.web.support.page;
 
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.feedback.Feedback;
+import org.gbif.ipt.model.Ipt;
+import org.gbif.ipt.model.Organisation;
+import org.gbif.ipt.model.User;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -32,7 +41,7 @@ public class PageSupport {
     return ctx;
   }
 
-  public SiteConfig getCfg() {
+  public AppConfig getCfg() {
     return ctx.cfg();
   }
 
@@ -74,54 +83,73 @@ public class PageSupport {
     return ctx.managerRights();
   }
 
-  /** The logged-in IPT user; user accounts arrive in M2. */
-  public Object getCurrentUser() {
-    return null;
+  /** The logged-in IPT user, or null for visitors. */
+  @Nullable
+  public User getCurrentUser() {
+    return ctx.currentUser();
   }
 
-  /** The registered IPT installation; registration arrives in M1. */
-  public Object getRegisteredIpt() {
-    return null;
+  /** The registered IPT installation, or null if the IPT is not registered. */
+  @Nullable
+  public Ipt getRegisteredIpt() {
+    return ctx.registrations().getIpt();
   }
 
-  public Object getDefaultOrganisation() {
-    return null;
+  /** The "No organisation" organisation, or null. */
+  @Nullable
+  public Organisation getDefaultOrganisation() {
+    return ctx.registrations().get(Constants.DEFAULT_ORG_KEY);
+  }
+
+  /** Where messages, warnings and errors of this request go. */
+  public Feedback getFeedback() {
+    return ctx.feedback();
   }
 
   public List<String> getActionWarnings() {
-    return List.of();
+    return ctx.feedback().getActionWarnings();
+  }
+
+  public List<String> getWarnings() {
+    return ctx.feedback().getActionWarnings();
   }
 
   public List<String> getActionErrors() {
-    return List.of();
+    return ctx.feedback().getActionErrors();
   }
 
   public List<String> getActionMessages() {
-    return List.of();
+    return ctx.feedback().getActionMessages();
   }
 
   public String getPrimaryColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().primaryColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getPrimaryColor());
   }
 
   public String getNavbarColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().navbarColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getNavbarColor());
   }
 
   public String getNavbarLinkColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().navbarLinkColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getNavbarLinkColor());
   }
 
   public String getNavbarGbifLogoColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().navbarGbifLogoColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getNavbarGbifLogoColor());
   }
 
   public String getNavbarActiveTabColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().navbarActiveTabColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getNavbarActiveTabColor());
   }
 
   public String getLinkColor() {
-    return ColorScheme.toRgb(ctx.cfg().getColorSchemeConfig().linkColor());
+    return toRgb(ctx.cfg().getColorSchemeConfig().getLinkColor());
+  }
+
+  /** {@code "#61a861"} to {@code "97,168,97"}, the form the CSS variables in inc/header.ftl expect. */
+  static String toRgb(String hex) {
+    return Integer.valueOf(hex.substring(1, 3), 16) + "," + Integer.valueOf(hex.substring(3, 5), 16) + ","
+        + Integer.valueOf(hex.substring(5, 7), 16);
   }
 
   public String getText(String key) {

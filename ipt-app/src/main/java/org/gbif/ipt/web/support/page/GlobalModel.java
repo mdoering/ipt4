@@ -13,18 +13,18 @@
  */
 package org.gbif.ipt.web.support.page;
 
+import org.gbif.ipt.app.IptProperties;
+import org.gbif.ipt.config.AppConfig;
 import org.gbif.ipt.i18n.Messages;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.web.support.feedback.RequestFeedback;
 import org.gbif.ipt.web.support.freemarker.IptFreeMarkerView;
 import org.gbif.ipt.web.support.i18n.IptLocaleResolver;
 
 import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
 
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,8 +33,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Adds the default page bean to every controller model. Controllers needing page-specific getters replace
- * {@value #PAGE} with a {@link PageSupport} subclass built from the {@value #PAGE_CONTEXT} attribute.
+ * Adds what every IPT 3 page had on the value stack: the default page bean, the request's messages and field errors.
+ * Controllers needing page-specific getters replace {@value #PAGE} with a {@link PageSupport} subclass built from the
+ * {@value #PAGE_CONTEXT} attribute.
  */
 @ControllerAdvice
 public class GlobalModel {
@@ -42,12 +43,19 @@ public class GlobalModel {
   public static final String PAGE = IptFreeMarkerView.PAGE;
   public static final String PAGE_CONTEXT = "pageCtx";
 
-  private final SiteConfig cfg;
+  private final AppConfig cfg;
+  private final IptProperties props;
   private final Messages messages;
+  private final RegistrationManager registrations;
+  private final ObjectProvider<RequestFeedback> feedback;
 
-  public GlobalModel(SiteConfig cfg, Messages messages) {
+  public GlobalModel(AppConfig cfg, IptProperties props, Messages messages, RegistrationManager registrations,
+                     ObjectProvider<RequestFeedback> feedback) {
     this.cfg = cfg;
+    this.props = props;
     this.messages = messages;
+    this.registrations = registrations;
+    this.feedback = feedback;
   }
 
   @ModelAttribute
@@ -55,26 +63,30 @@ public class GlobalModel {
     PageContext ctx = pageContext(request, locale);
     model.addAttribute(PAGE_CONTEXT, ctx);
     model.addAttribute(PAGE, new PageSupport(ctx));
+    // live views: what the handler adds later still shows
+    model.addAttribute(RequestFeedback.MESSAGES, ctx.feedback().getActionMessages());
+    model.addAttribute(RequestFeedback.WARNINGS, ctx.feedback().getActionWarnings());
+    model.addAttribute(RequestFeedback.ERRORS, ctx.feedback().getActionErrors());
+    model.addAttribute("fieldErrors", ctx.feedback().getFieldErrors());
   }
 
   PageContext pageContext(HttpServletRequest request, Locale locale) {
-    String baseUrl =
-        Optional.ofNullable(cfg.getBaseUrl())
-            .orElseGet(() -> ServletUriComponentsBuilder.fromContextPath(request).build().toUriString());
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    boolean loggedIn = auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
-    Set<String> roles = loggedIn ? AuthorityUtils.authorityListToSet(auth.getAuthorities()) : Set.of();
-    boolean admin = roles.contains("ROLE_ADMIN");
-    boolean manager = admin || roles.contains("ROLE_MANAGER") || roles.contains("ROLE_PUBLISHER");
+    String baseUrl = baseUrl(request);
     Locale pageLocale = IptLocaleResolver.supported(locale).orElse(Locale.UK);
-    return new PageContext(
-        messages,
-        pageLocale,
-        cfg,
-        baseUrl,
-        RequestUrls.withoutLocaleParameter(baseUrl, request),
-        loggedIn,
-        admin,
-        manager);
+    RequestFeedback f = feedback.getObject();
+    return new PageContext(messages, pageLocale, cfg, registrations, baseUrl,
+        RequestUrls.withoutLocaleParameter(baseUrl, request), f.getCurrentUser(), f);
+  }
+
+  /** {@code ipt.base-url}, else the base URL set during setup, else the URL the request came in on. */
+  String baseUrl(HttpServletRequest request) {
+    String base = StringUtils.trimToNull(props.baseUrl());
+    if (base == null) {
+      base = StringUtils.trimToNull(cfg.getBaseUrl());
+    }
+    if (base == null) {
+      base = ServletUriComponentsBuilder.fromContextPath(request).build().toUriString();
+    }
+    return base.replaceAll("/+$", "");
   }
 }

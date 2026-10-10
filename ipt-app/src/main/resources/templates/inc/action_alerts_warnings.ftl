@@ -10,7 +10,7 @@
                 <div class="overflow-x-hidden pt-1">
                     <span>
                         [#if w?has_content]
-                            <span>[@w?interpret /]</span>
+                            <span>${w?no_esc}</span>
                         [/#if]
                         [#if w?index == 2 && warnings?size > 3](There are more warnings, see logs for details)[/#if]
                     </span>

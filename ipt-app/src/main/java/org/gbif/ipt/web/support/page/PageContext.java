@@ -13,6 +13,13 @@
  */
 package org.gbif.ipt.web.support.page;
 
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.model.User;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.web.support.feedback.RequestFeedback;
+
+import javax.annotation.Nullable;
+
 import org.gbif.ipt.i18n.Messages;
 
 import java.util.Locale;
@@ -21,9 +28,22 @@ import java.util.Locale;
 public record PageContext(
     Messages messages,
     Locale locale,
-    SiteConfig cfg,
+    AppConfig cfg,
+    RegistrationManager registrations,
     String baseUrl,
     String requestUrl,
-    boolean loggedIn,
-    boolean adminRights,
-    boolean managerRights) {}
+    @Nullable User currentUser,
+    RequestFeedback feedback) {
+
+  public boolean loggedIn() {
+    return currentUser != null;
+  }
+
+  public boolean adminRights() {
+    return currentUser != null && currentUser.hasAdminRights();
+  }
+
+  public boolean managerRights() {
+    return currentUser != null && currentUser.hasManagerRights();
+  }
+}
