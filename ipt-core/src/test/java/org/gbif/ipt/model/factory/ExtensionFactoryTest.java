@@ -22,8 +22,7 @@ import org.gbif.ipt.model.Extension;
 import org.gbif.ipt.model.ExtensionProperty;
 import org.gbif.ipt.model.Vocabulary;
 import org.gbif.ipt.service.admin.VocabulariesManager;
-import org.gbif.utils.HttpClient;
-import org.gbif.utils.HttpUtil;
+import org.gbif.ipt.http.IptHttp;
 
 import java.net.URL;
 import java.text.DateFormat;
@@ -44,7 +43,7 @@ public class ExtensionFactoryTest extends IptBaseTest {
 
   public static ExtensionFactory getFactory() throws Exception {
     SAXParserFactory sax = TestBeanProvider.provideNsAwareSaxParserFactory();
-    HttpClient client = HttpUtil.newDefaultMultithreadedClient();
+    IptHttp client = TestBeanProvider.provideHttpClient();
 
     VocabulariesManager vocabulariesManager = mock(VocabulariesManager.class);
     Vocabulary v = new Vocabulary();

@@ -17,9 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gbif.ipt.utils.InputStreamUtils;
 import org.gbif.ipt.utils.PBEEncrypt;
-import org.gbif.utils.HttpClient;
-import org.gbif.utils.HttpUtil;
-import org.gbif.utils.PreemptiveAuthenticationInterceptor;
+import org.gbif.ipt.http.IptHttp;
 
 
 import javax.xml.parsers.SAXParserFactory;
@@ -33,10 +31,8 @@ public class TestBeanProvider {
   private static final Logger LOG = LogManager.getLogger(TestBeanProvider.class);
 
   protected static final int CONNECTION_TIMEOUT_MSEC = 30_000;
-  protected static final int MAX_CONNECTIONS = 100;
-  protected static final int MAX_PER_ROUTE = 10;
 
-  public static HttpClient provideHttpClient() {
+  public static IptHttp provideHttpClient() {
     // new threadsafe, multithreaded http client with support for HTTP and HTTPS.
     String version = "unknown";
     try (InputStream configStream = new InputStreamUtils().classpathStream(AppConfig.CLASSPATH_PROPFILE)) {
@@ -58,12 +54,7 @@ public class TestBeanProvider {
         System.getProperty("os.name", "?")
     );
 
-    return HttpUtil.newMultithreadedClient(
-        CONNECTION_TIMEOUT_MSEC,
-        MAX_CONNECTIONS,
-        MAX_PER_ROUTE,
-        userAgent,
-        new PreemptiveAuthenticationInterceptor());
+    return new IptHttp(userAgent, java.time.Duration.ofMillis(CONNECTION_TIMEOUT_MSEC));
   }
 
   public static JdbcSupport provideJdbcSupport() {

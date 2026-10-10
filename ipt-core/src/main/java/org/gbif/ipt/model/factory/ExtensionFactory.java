@@ -16,11 +16,12 @@ package org.gbif.ipt.model.factory;
 import org.gbif.ipt.model.Extension;
 import org.gbif.ipt.model.ExtensionProperty;
 import org.gbif.ipt.model.ExtensionPropertyTranslation;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.digester.Digester;
-import org.apache.http.HttpEntity;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -50,9 +49,9 @@ public class ExtensionFactory {
   public static final String EXTENSION_NAMESPACE = "http://rs.gbif.org/extension/";
   private final ThesaurusHandlingRule thesaurusRule;
   private final SAXParserFactory saxf;
-  private final HttpClient client;
+  private final IptHttp client;
 
-  public ExtensionFactory(ThesaurusHandlingRule thesaurusRule, SAXParserFactory factory, org.gbif.utils.HttpClient client) {
+  public ExtensionFactory(ThesaurusHandlingRule thesaurusRule, SAXParserFactory factory, IptHttp client) {
     this.thesaurusRule = thesaurusRule;
     this.saxf = factory;
     this.client = client;
@@ -218,11 +217,9 @@ public class ExtensionFactory {
   public Extension build(String url) throws IOException, SAXException {
     // execute
     try {
-      ExtendedResponse response = client.get(url);
-      HttpEntity entity = response.getResponse().getEntity();
-      if (entity != null) {
-        // copy stream to local file
-        try (InputStream is = entity.getContent()) {
+      IptHttp.Response response = client.get(url);
+      if (IptHttp.success(response) && response.getContent() != null) {
+        try (InputStream is = new ByteArrayInputStream(response.getContent().getBytes(StandardCharsets.UTF_8))) {
           Extension e = build(is);
           LOG.info("Successfully parsed extension: {}", e.getTitle());
           return e;
@@ -230,8 +227,6 @@ public class ExtensionFactory {
         } catch (SAXException e) {
           LOG.error("Unable to parse XML for extension: {}", e.getMessage(), e);
         }
-        // close http connection
-        EntityUtils.consume(entity);
       }
     } catch (Exception e) {
       LOG.error(e);

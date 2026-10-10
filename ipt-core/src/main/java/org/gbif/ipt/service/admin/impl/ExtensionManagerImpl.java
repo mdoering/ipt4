@@ -38,7 +38,7 @@ import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import jakarta.inject.Inject;
 import java.io.File;
@@ -64,12 +64,11 @@ import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.StatusLine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import static org.gbif.utils.HttpUtil.success;
+import static org.gbif.ipt.http.IptHttp.success;
 
 public class ExtensionManagerImpl extends BaseManager implements ExtensionManager {
 
@@ -83,7 +82,7 @@ public class ExtensionManagerImpl extends BaseManager implements ExtensionManage
   private final static String MATERIAL_ENTITY_KEYWORD = "dwc:materialentity";
   private final static String RECORD_LEVEL_CLASS = "Record-level";
   private final ExtensionFactory factory;
-  private final HttpClient downloader;
+  private final IptHttp downloader;
   private final ConfigWarnings warnings;
   private final RegistryManager registryManager;
   private final ExtensionsHolder extensionsHolder;
@@ -107,7 +106,7 @@ public class ExtensionManagerImpl extends BaseManager implements ExtensionManage
       AppConfig cfg,
       DataDir dataDir,
       ExtensionFactory factory,
-      HttpClient client,
+      IptHttp client,
       ConfigWarnings warnings,
       SimpleTextProvider textProvider,
       RegistrationManager registrationManager,
@@ -500,7 +499,7 @@ public class ExtensionManagerImpl extends BaseManager implements ExtensionManage
     Objects.requireNonNull(url);
     String filename = IptFileUtils.getSuffixedFileName(url.toString(), EXTENSION_FILE_SUFFIX);
     File tmpFile = dataDir.tmpFile(filename);
-    StatusLine statusLine = downloader.download(url, tmpFile);
+    IptHttp.Response statusLine = downloader.download(url, tmpFile);
     if (success(statusLine)) {
       LOG.info("Successfully downloaded extension: {}", url);
       return tmpFile;

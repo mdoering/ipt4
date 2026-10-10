@@ -37,8 +37,7 @@ import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.service.registry.impl.RegistryManagerImpl;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.FileUtils;
 
 import java.io.File;
@@ -56,9 +55,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
@@ -94,18 +90,17 @@ public class ExtensionManagerImplTest extends IptBaseTest {
     RegistrationManager mockRegistrationManager = mock(RegistrationManager.class);
 
     // construct ExtensionFactory using injected parameters
-    HttpClient httpClient = TestBeanProvider.provideHttpClient();
+    IptHttp httpClient = TestBeanProvider.provideHttpClient();
     ThesaurusHandlingRule thesaurusRule = new ThesaurusHandlingRule(mock(VocabulariesManagerImpl.class));
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);
 
     // construct mock RegistryManager:
     // mock getExtensions() response from Registry with local test resource (list of extensions from extensions.json)
-    HttpClient mockHttpUtil = mock(HttpClient.class);
-    HttpResponse mockResponse = mock(HttpResponse.class);
-    ExtendedResponse extResponse = new ExtendedResponse(mockResponse);
+    IptHttp mockHttpUtil = mock(IptHttp.class);
+    IptHttp.Response extResponse = null;
 
-    extResponse.setContent(IOUtils
+    extResponse = new IptHttp.Response(200, null, IOUtils
       .toString(
           Objects.requireNonNull(ExtensionManagerImplTest.class.getResourceAsStream("/responses/extensions_sandbox.json")),
           StandardCharsets.UTF_8));
@@ -163,8 +158,7 @@ public class ExtensionManagerImplTest extends IptBaseTest {
 
     // Mock downloading extension into tmpFile - we're cheating by handling the actual file already as if it
     // were downloaded already. Furthermore, mock download() response with StatusLine with 200 OK response code
-    StatusLine sl = mock(StatusLine.class);
-    when(sl.getStatusCode()).thenReturn(HttpStatus.SC_OK);
+    IptHttp.Response sl = new IptHttp.Response(200, null, null);
     when(mockHttpUtil.download(any(URL.class), any(File.class))).thenReturn(sl);
 
     // mock returning newly created occurrence core extension file
@@ -304,7 +298,7 @@ public class ExtensionManagerImplTest extends IptBaseTest {
   public void testMigrateResourceToNewExtensionVersion() throws IOException {
     ExtensionManagerImpl manager =
       new ExtensionManagerImpl(mock(AppConfig.class), mock(DataDir.class), extensionFactory,
-          mock(HttpClient.class), mock(ConfigWarnings.class), mock(SimpleTextProvider.class),
+          mock(IptHttp.class), mock(ConfigWarnings.class), mock(SimpleTextProvider.class),
           mock(RegistrationManager.class), mock(RegistryManager.class), mock(ExtensionsHolder.class));
     File myTmpDir = IptFileUtils.createTempDir();
 
@@ -408,7 +402,7 @@ public class ExtensionManagerImplTest extends IptBaseTest {
   public void testGetRedundantGroups() throws IOException {
     ExtensionManagerImpl manager =
       new ExtensionManagerImpl(mock(AppConfig.class), mock(DataDir.class), extensionFactory,
-        mock(HttpClient.class), mock(ConfigWarnings.class), mock(SimpleTextProvider.class),
+        mock(IptHttp.class), mock(ConfigWarnings.class), mock(SimpleTextProvider.class),
         mock(RegistrationManager.class), mock(RegistryManager.class), mock(ExtensionsHolder.class));
     File myTmpDir = IptFileUtils.createTempDir();
 

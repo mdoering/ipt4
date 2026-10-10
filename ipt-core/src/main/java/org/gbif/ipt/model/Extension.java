@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A Darwin Core extension definition.
@@ -46,7 +46,7 @@ public class Extension implements Serializable {
   private String title; // human title
   private String name; // table, file & xml tag naming. no whitespace allowed
   private URL url;
-  @SerializedName("identifier")
+  @JsonProperty("identifier")
   private String rowType; // Custom serialized field for JSON.
   private String subject;
   private String description;

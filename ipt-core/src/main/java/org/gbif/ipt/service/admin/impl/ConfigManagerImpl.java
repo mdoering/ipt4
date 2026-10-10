@@ -32,22 +32,20 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.utils.URLUtils;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
+import org.gbif.ipt.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 
 public class ConfigManagerImpl extends BaseManager implements ConfigManager {
@@ -61,7 +59,7 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
   private final DataPackageSchemaManager schemaManager;
   private final RegistrationManager registrationManager;
   private final ConfigWarnings warnings;
-  private final HttpClient client;
+  private final IptHttp client;
   private final PublishingMonitor publishingMonitor;
   private final ExtensionMonitor extensionMonitor;
   private static final String PATH_TO_CSS = "/styles/main.css";
@@ -80,7 +78,7 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
       DataPackageSchemaManager schemaManager,
       RegistrationManager registrationManager,
       ConfigWarnings warnings,
-      HttpClient client,
+      IptHttp client,
       PublishingMonitor publishingMonitor,
       ExtensionMonitor extensionMonitor) {
     super(cfg, dataDir);
@@ -125,16 +123,11 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
       try {
         // prepare custom configuration with proxy and timeouts
         LOG.info("Testing new proxy by fetching {} with 4 second timeout", testUrl);
-        RequestConfig rs = RequestConfig.custom()
-            .setProxy(proxyHost)
-            .setConnectTimeout(DEFAULT_TO)
-            .setSocketTimeout(DEFAULT_TO)
-            .build();
-
-        ExtendedResponse response = client.get(testUrl, rs);
+        IptHttp.Response response = client.get(testUrl,
+            new IptHttp.RequestOptions(Duration.ofMillis(DEFAULT_TO), proxyHost));
 
         LOG.info("Proxy response is {}", response.getStatusLine());
-        proxyWorks = (200 == response.getStatusLine().getStatusCode());
+        proxyWorks = (200 == response.getStatusCode());
       } catch (Exception e) {
         proxyWorks = false;
         LOG.warn("Proxy failed because", e);
@@ -498,19 +491,10 @@ public class ConfigManagerImpl extends BaseManager implements ConfigManager {
       String testURL = baseURL + PATH_TO_CSS;
       LOG.info("Validating BaseURL with get request (having 4 second timeout) to: {}", testURL);
 
-      RequestConfig.Builder requestConfigBuilder = RequestConfig.custom()
-          .setConnectTimeout(DEFAULT_TO)
-          .setSocketTimeout(DEFAULT_TO);
+      IptHttp.Response response = client.get(testURL,
+          new IptHttp.RequestOptions(Duration.ofMillis(DEFAULT_TO), proxy));
 
-      if (proxy != null) {
-        requestConfigBuilder.setProxy(proxy);
-      }
-
-      ExtendedResponse response = client.get(testURL, requestConfigBuilder.build());
-
-      return 200 == response.getStatusLine().getStatusCode();
-    } catch (ClientProtocolException e) {
-      LOG.info("Protocol error connecting to new base URL [{}]", baseURL, e);
+      return 200 == response.getStatusCode();
     } catch (IOException e) {
       LOG.info("IO error connecting to new base URL [{}]", baseURL, e);
     } catch (Exception e) {

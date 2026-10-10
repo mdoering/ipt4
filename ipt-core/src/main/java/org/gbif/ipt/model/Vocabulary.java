@@ -28,7 +28,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,9 +38,9 @@ public class Vocabulary implements Comparable<Object>, Serializable {
 
   @Serial
   private static final long serialVersionUID = 22000013267L;
-  @SerializedName("identifier")
+  @JsonProperty("identifier")
   private String uriString; // identifier
-  @SerializedName("url")
+  @JsonProperty("url")
   private URI uriResolvable; // resolvable URI to its definition
   private String title;
   private String description;

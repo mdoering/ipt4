@@ -66,7 +66,7 @@ import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.metadata.eml.ipt.model.Agent;
 import org.gbif.metadata.eml.ipt.model.KeywordSet;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.FileUtils;
 
 import java.io.File;
@@ -250,7 +250,7 @@ public class GenerateDCATTest extends IptBaseTest {
     Feedback baseAction = new CollectingFeedback(null);
 
     // construct ExtensionFactory using injected parameters
-    HttpClient httpClient = TestBeanProvider.provideHttpClient();
+    IptHttp httpClient = TestBeanProvider.provideHttpClient();
     ThesaurusHandlingRule thesaurusRule = new ThesaurusHandlingRule(mock(VocabulariesManagerImpl.class));
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     ExtensionFactory extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);

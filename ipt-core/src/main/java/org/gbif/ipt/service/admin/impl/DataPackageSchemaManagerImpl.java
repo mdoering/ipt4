@@ -31,7 +31,7 @@ import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -54,15 +54,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.Strings;
-import org.apache.http.StatusLine;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.gbif.ipt.utils.FieldJson;
 
 import jakarta.inject.Inject;
 
 import static org.gbif.ipt.service.InvalidConfigException.TYPE.INVALID_DATA_SCHEMA;
-import static org.gbif.utils.HttpUtil.success;
+import static org.gbif.ipt.http.IptHttp.success;
 
 public class DataPackageSchemaManagerImpl extends BaseManager implements DataPackageSchemaManager {
 
@@ -72,8 +70,8 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
   private final ConfigWarnings warnings;
   private final DataSchemaFactory factory;
   private final RegistryManager registryManager;
-  private final HttpClient downloader;
-  private final Gson gson;
+  private final IptHttp downloader;
+  private final FieldJson gson;
 
   // create instance of Feedback - allows class to retrieve i18n terms via getText()
   private final Feedback baseAction;
@@ -92,14 +90,14 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
       SimpleTextProvider textProvider,
       RegistrationManager registrationManager,
       RegistryManager registryManager,
-      HttpClient downloader) {
+      IptHttp downloader) {
     super(cfg, dataDir);
     this.warnings = warnings;
     this.factory = factory;
     this.registryManager = registryManager;
     this.downloader = downloader;
     this.baseAction = new CollectingFeedback(null);
-    this.gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd").create();
+    this.gson = new FieldJson(true);
     // TODO: store in properties somewhere
     this.alternativeIdentifiers.put(Constants.DATA_PACKAGE_DWC_DP_IDENTIFIER, Set.of(Constants.DATA_PACKAGE_DWC_DP_IDENTIFIER_2));
   }
@@ -498,7 +496,7 @@ public class DataPackageSchemaManagerImpl extends BaseManager implements DataPac
     String filename = IptFileUtils
         .getSuffixedFileName(url.toString().replace(DATA_SCHEMA_FILE_SUFFIX, ""), DATA_SCHEMA_FILE_SUFFIX);
     File tmpFile = dataDir.tmpFile(filename);
-    StatusLine statusLine = downloader.download(url, tmpFile);
+    IptHttp.Response statusLine = downloader.download(url, tmpFile);
     if (success(statusLine)) {
       LOG.info("Successfully downloaded data schema: {}", url);
       return tmpFile;

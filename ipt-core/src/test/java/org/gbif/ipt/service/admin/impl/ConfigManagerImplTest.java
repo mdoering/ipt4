@@ -31,8 +31,7 @@ import org.gbif.ipt.service.admin.RegistrationManager;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.manage.ResourceManager;
-import org.gbif.utils.HttpClient;
-import org.gbif.utils.HttpUtil;
+import org.gbif.ipt.http.IptHttp;
 
 import java.net.URL;
 
@@ -49,7 +48,7 @@ import static org.mockito.Mockito.mock;
  */
 public class ConfigManagerImplTest extends IptBaseTest {
 
-  private HttpClient client;
+  private IptHttp client;
   private AppConfig appConfig;
 
   /**
@@ -67,7 +66,7 @@ public class ConfigManagerImplTest extends IptBaseTest {
     PublishingMonitor mockPublishingMonitor = mock(PublishingMonitor.class);
     ExtensionMonitor mockExtensionMonitor = mock(ExtensionMonitor.class);
 
-    client = HttpUtil.newMultithreadedClient(1000, 1, 1);
+    client = new IptHttp("GBIF-IPT/test", java.time.Duration.ofSeconds(1));
     appConfig = new AppConfig(mockedDataDir);
 
     return new ConfigManagerImpl(

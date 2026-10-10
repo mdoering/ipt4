@@ -19,7 +19,7 @@ import org.gbif.ipt.config.DataDir;
 import org.gbif.ipt.config.TestBeanProvider;
 import org.gbif.ipt.mock.MockDataDir;
 import org.gbif.ipt.service.manage.ResourceManager;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -27,14 +27,14 @@ public abstract class IptMockBaseTest extends IptBaseTest {
 
   protected DataDir dataDir;
   protected AppConfig cfg;
-  private HttpClient http;
+  private IptHttp http;
 
   public IptMockBaseTest() {
     this.dataDir = MockDataDir.buildMock();
     this.cfg = new AppConfig(dataDir);
   }
 
-  protected HttpClient buildHttpClient() {
+  protected IptHttp buildHttpClient() {
     // lazy load
     if (http == null) {
       http = TestBeanProvider.provideHttpClient();

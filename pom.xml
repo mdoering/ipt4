@@ -42,16 +42,12 @@
     <gbif-dwc-dp-analyser.version>0.0.11</gbif-dwc-dp-analyser.version>
     <gbif-metadata-profile.version>3.0</gbif-metadata-profile.version>
     <gbif-parsers.version>0.69</gbif-parsers.version>
-    <gbif-httputils.version>1.4</gbif-httputils.version>
     <apache-poi.version>5.5.1</apache-poi.version>
     <commons-digester.version>3.2</commons-digester.version>
     <commons-io.version>2.22.0</commons-io.version>
     <commons-collections4.version>4.6.0</commons-collections4.version>
     <commons-validator.version>1.11.0</commons-validator.version>
     <excel-streaming-reader.version>4.4.0</excel-streaming-reader.version>
-    <gson.version>2.14.0</gson.version>
-    <httpclient.version>4.5.14</httpclient.version>
-    <httpcore.version>4.4.16</httpcore.version>
     <jackson-datatype-jts.version>2.21.0</jackson-datatype-jts.version>
     <json-schema-validator.version>2.0.4</json-schema-validator.version>
     <jsr305.version>3.0.2</jsr305.version>
@@ -179,11 +175,6 @@
       </dependency>
       <dependency>
         <groupId>org.gbif</groupId>
-        <artifactId>gbif-httputils</artifactId>
-        <version>${gbif-httputils.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.gbif</groupId>
         <artifactId>gbif-api</artifactId>
         <version>${gbif-api.version}</version>
         <exclusions>
@@ -256,16 +247,6 @@
         <version>${commons-collections4.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>${httpclient.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>${httpcore.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-digester3</artifactId>
         <version>${commons-digester.version}</version>
@@ -289,11 +270,6 @@
         <groupId>com.github.librepdf</groupId>
         <artifactId>openrtf</artifactId>
         <version>${openrtf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>${gson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
@@ -359,5 +335,33 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>no-legacy-http-or-gson</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <message>IPT4 uses IptHttp (JDK HttpClient) and Jackson; HttpClient 4, gbif-httputils and Gson are not allowed.</message>
+                  <excludes>
+                    <exclude>org.apache.httpcomponents:httpclient</exclude>
+                    <exclude>org.apache.httpcomponents:httpcore</exclude>
+                    <exclude>org.gbif:gbif-httputils</exclude>
+                    <exclude>com.google.code.gson:gson</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>

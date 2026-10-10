@@ -20,15 +20,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import org.gbif.ipt.utils.FieldJson;
 
 public class DataSchemaFactory {
 
-  private final Gson gson;
+  private final FieldJson gson;
 
   public DataSchemaFactory() {
-    this.gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+    this.gson = new FieldJson();
   }
 
   /**

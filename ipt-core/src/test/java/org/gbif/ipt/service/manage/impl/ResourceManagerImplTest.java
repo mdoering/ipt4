@@ -77,7 +77,7 @@ import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.ResourceUtils;
 import org.gbif.metadata.eml.ipt.model.KeywordSet;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.CompressionUtil;
 import org.gbif.utils.file.FileUtils;
 
@@ -194,7 +194,7 @@ public class ResourceManagerImplTest extends IptBaseTest {
     when(mockAppConfig.getResourceGuid("res2")).thenReturn("http://localhost:7001/ipt/resource?id=res2");
 
     // construct ExtensionFactory using injected parameters
-    HttpClient httpClient = TestBeanProvider.provideHttpClient();
+    IptHttp httpClient = TestBeanProvider.provideHttpClient();
     ThesaurusHandlingRule thesaurusRule = new ThesaurusHandlingRule(mock(VocabulariesManagerImpl.class));
     SAXParserFactory saxf = TestBeanProvider.provideNsAwareSaxParserFactory();
     ExtensionFactory extensionFactory = new ExtensionFactory(thesaurusRule, saxf, httpClient);

@@ -31,7 +31,7 @@ import org.gbif.ipt.service.admin.VocabulariesManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,10 +58,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.http.StatusLine;
 import org.xml.sax.SAXException;
 
-import static org.gbif.utils.HttpUtil.success;
+import static org.gbif.ipt.http.IptHttp.success;
 
 /**
  * Manager for all vocabulary related methods. Keeps an internal map of locally existing and parsed vocabularies which
@@ -75,7 +74,7 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
   public static final String CONFIG_FOLDER = ".vocabularies";
   public static final String VOCAB_FILE_SUFFIX = ".vocab";
   private VocabularyFactory vocabFactory;
-  private final HttpClient downloader;
+  private final IptHttp downloader;
   private final RegistryManager registryManager;
 
   // these vocabularies are always updated on startup of the IPT
@@ -94,7 +93,7 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
       AppConfig cfg,
       DataDir dataDir,
       VocabularyFactory vocabFactory,
-      HttpClient client,
+      IptHttp client,
       RegistryManager registryManager,
       ConfigWarnings warnings,
       SimpleTextProvider textProvider,
@@ -308,7 +307,7 @@ public class VocabulariesManagerImpl extends BaseManager implements Vocabularies
     Objects.requireNonNull(url);
     String filename = url.toString().replaceAll("[/:.]+", "_") + ".xml";
     File tmpFile = dataDir.tmpFile(filename);
-    StatusLine statusLine = downloader.download(url, tmpFile);
+    IptHttp.Response statusLine = downloader.download(url, tmpFile);
     if (success(statusLine)) {
       LOG.info("Successfully downloaded vocabulary: {}", url);
       return tmpFile;

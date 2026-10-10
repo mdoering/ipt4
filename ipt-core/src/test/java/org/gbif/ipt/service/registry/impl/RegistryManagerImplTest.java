@@ -28,8 +28,7 @@ import org.gbif.ipt.service.RegistryException;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptMockBaseTest;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.FileUtils;
 
 import java.io.File;
@@ -47,7 +46,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,13 +69,13 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   private SAXParserFactory mockSAXParserFactory;
   private ConfigWarnings mockConfigWarnings;
   private SimpleTextProvider mockSimpleTextProvider;
-  private HttpClient mockHttpClient;
-  private ExtendedResponse extResponse;
+  private IptHttp mockHttpClient;
+  private IptHttp.Response extResponse;
 
   @BeforeEach
   public void setup() throws SAXException, ParserConfigurationException {
-    mockHttpClient = mock(HttpClient.class);
-    extResponse = new ExtendedResponse(mock(HttpResponse.class));
+    mockHttpClient = mock(IptHttp.class);
+    extResponse = null;
     mockAppConfig = mock(AppConfig.class);
     mockDataDir = mock(DataDir.class);
     mockSAXParserFactory = mock(SAXParserFactory.class);
@@ -88,7 +86,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   @Test
   public void testGetExtensions() throws SAXException, ParserConfigurationException, IOException, URISyntaxException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/extensions.json")),
           StandardCharsets.UTF_8));
@@ -116,7 +114,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   @Test
   public void testGetSandboxExtensions() throws SAXException, ParserConfigurationException, IOException, URISyntaxException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/extensions_sandbox.json")),
           StandardCharsets.UTF_8));
@@ -165,7 +163,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   public void testGetExtensionsEmptyContentThrowsRegistryException()
     throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
     // mock response from Registry as empty content
-    extResponse.setContent(null);
+    extResponse = new IptHttp.Response(200, null, null);
     when(mockHttpClient.get(anyString())).thenReturn(extResponse);
 
     // create instance of RegistryManager
@@ -185,7 +183,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   public void testGetExtensionsBadURLThrowsRegistryException()
     throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
     // mock response HttpUtil as URISyntaxException
-    when(mockHttpClient.get(anyString())).thenThrow(new URISyntaxException("httpgoog.c", "Wrong syntax!"));
+    when(mockHttpClient.get(anyString())).thenThrow(new IptHttp.InvalidUrlException("httpgoog.c", new URISyntaxException("httpgoog.c", "Wrong syntax!")));
 
     // create instance of RegistryManager
     RegistryManager manager =
@@ -204,7 +202,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   @Test
   public void testGetVocabularies() throws SAXException, ParserConfigurationException, IOException, URISyntaxException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/thesauri.json")),
           StandardCharsets.UTF_8));
@@ -223,7 +221,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   @Test
   public void testGetVocabulariesSandbox() throws SAXException, ParserConfigurationException, IOException, URISyntaxException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/thesauri_sandbox.json")),
           StandardCharsets.UTF_8));
@@ -252,7 +250,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   public void testGetOrganisationsResources()
     throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
         IOUtils.toString(
             Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/organisations_resources.json")),
           StandardCharsets.UTF_8));
@@ -272,7 +270,7 @@ public class RegistryManagerImplTest extends IptMockBaseTest {
   @Test
   public void testGetOrganisation() throws IOException, URISyntaxException, SAXException, ParserConfigurationException {
     // mock response from Registry with local test resource
-    extResponse.setContent(
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistryManagerImplTest.class.getResourceAsStream("/responses/organisation.json")),
           StandardCharsets.UTF_8));

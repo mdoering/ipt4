@@ -17,7 +17,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,6 +41,6 @@ public class DataPackageFieldConstraints implements Serializable {
   private Double maximum;
   private Double minimum;
   private String pattern;
-  @SerializedName("enum")
+  @JsonProperty("enum")
   private List<String> vocabulary;
 }

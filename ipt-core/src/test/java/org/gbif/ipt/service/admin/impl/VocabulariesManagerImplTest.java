@@ -27,8 +27,7 @@ import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.service.registry.impl.RegistryManagerImpl;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptFileUtils;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.FileUtils;
 
 import java.io.File;
@@ -42,9 +41,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,10 +77,9 @@ public class VocabulariesManagerImplTest extends IptBaseTest {
 
     // construct mock RegistryManager:
     // mock getVocabularies() response from Registry with local test resource (list of vocabularies from thesauri_sandbox.json)
-    HttpClient mockHttpClient = mock(HttpClient.class);
-    HttpResponse mockResponse = mock(HttpResponse.class);
-    ExtendedResponse extResponse = new ExtendedResponse(mockResponse);
-    extResponse.setContent(
+    IptHttp mockHttpClient = mock(IptHttp.class);
+    IptHttp.Response extResponse = null;
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(ExtensionManagerImplTest.class.getResourceAsStream("/responses/thesauri_sandbox.json")),
           StandardCharsets.UTF_8));
@@ -169,8 +164,7 @@ public class VocabulariesManagerImplTest extends IptBaseTest {
 
     // Mock downloading vocabulary into tmpFile - we're cheating by handling the actual file already as if it
     // were downloaded already. Furthermore, mock download() response with StatusLine with 200 OK response code
-    StatusLine sl = mock(StatusLine.class);
-    when(sl.getStatusCode()).thenReturn(HttpStatus.SC_OK);
+    IptHttp.Response sl = new IptHttp.Response(200, null, null);
     when(mockHttpClient.download(any(URL.class), any(File.class))).thenReturn(sl);
 
     manager =

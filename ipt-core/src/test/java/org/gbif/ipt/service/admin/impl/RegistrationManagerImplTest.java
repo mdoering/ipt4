@@ -30,8 +30,7 @@ import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.service.registry.impl.RegistryManagerImpl;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.utils.IptMockBaseTest;
-import org.gbif.utils.ExtendedResponse;
-import org.gbif.utils.HttpClient;
+import org.gbif.ipt.http.IptHttp;
 import org.gbif.utils.file.FileUtils;
 
 import java.io.File;
@@ -48,7 +47,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -85,9 +83,8 @@ public class RegistrationManagerImplTest extends IptMockBaseTest {
     SAXParserFactory mockSAXParserFactory = mock(SAXParserFactory.class);
     ConfigWarnings mockConfigWarnings = mock(ConfigWarnings.class);
     SimpleTextProvider mockSimpleTextProvider = mock(SimpleTextProvider.class);
-    HttpClient mockHttpClient;
-    HttpResponse mockResponse;
-    ExtendedResponse extResponse;
+    IptHttp mockHttpClient;
+    IptHttp.Response extResponse;
 
     // create Resource associated to Organisation
     Resource r1 = new Resource();
@@ -120,10 +117,9 @@ public class RegistrationManagerImplTest extends IptMockBaseTest {
     when(mockDataDir.configFile(RegistrationManagerImpl.PERSISTENCE_FILE_V2)).thenReturn(registrationXML2);
 
     // mock returning list of registered Organisation with local test resource
-    mockHttpClient = mock(HttpClient.class);
-    mockResponse = mock(HttpResponse.class);
-    extResponse = new ExtendedResponse(mockResponse);
-    extResponse.setContent(
+    mockHttpClient = mock(IptHttp.class);
+    extResponse = null;
+    extResponse = new IptHttp.Response(200, null, 
       IOUtils.toString(
           Objects.requireNonNull(RegistrationManagerImplTest.class.getResourceAsStream("/responses/organisation.json")),
           StandardCharsets.UTF_8));
