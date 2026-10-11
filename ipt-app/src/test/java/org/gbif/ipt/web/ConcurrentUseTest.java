@@ -39,6 +39,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -84,10 +85,10 @@ class ConcurrentUseTest {
         for (int i = 0; i < 50; i++) {
           String page = PAGES.get(i % PAGES.size());
           long start = System.nanoTime();
-          int status = mvc.perform(get(URI.create(page)).with(user(ADMIN))).andReturn().getResponse().getStatus();
+          MvcResult result = mvc.perform(get(URI.create(page)).with(user(ADMIN))).andReturn();
           durations.add((System.nanoTime() - start) / 1_000_000);
-          if (status >= 500) {
-            problems.add(status + " " + page);
+          if (result.getResponse().getStatus() >= 500) {
+            problems.add(result.getResponse().getStatus() + " " + page + " " + cause(result));
           }
         }
         return null;
@@ -125,5 +126,32 @@ class ConcurrentUseTest {
     Collections.sort(sorted);
     long p95 = sorted.get((int) (sorted.size() * 0.95) - 1);
     assertThat(p95).as("95th percentile response time (ms)").isLessThan(5_000);
+  }
+
+  /** The public resource page while the next version is being published (on a slow CI runner every read overlapped it). */
+  @Test
+  void resourcePageRendersDuringAPublication() throws Exception {
+    ManageFixture.user(users, ADMIN, User.Role.Admin);
+    PortalFixture.publishRes1(dataDir, resources, publications, users, registrations);
+    Resource res1 = resources.get("res1");
+    List<String> problems = new ArrayList<>();
+    int during = 0;
+    publications.publish(res1, res1.getNextVersion(), new org.gbif.ipt.feedback.CollectingFeedback(null, users.get(ADMIN)));
+    while (publications.isLocked("res1")) {
+      MvcResult result = mvc.perform(get("/resource.do?r=res1")).andReturn();
+      during++;
+      if (result.getResponse().getStatus() != 200) {
+        problems.add(result.getResponse().getStatus() + " " + cause(result));
+      }
+    }
+    assertThat(problems).as("%d requests during the publication", during).isEmpty();
+  }
+
+  private static String cause(MvcResult result) {
+    Throwable e = result.getResolvedException();
+    while (e != null && e.getCause() != null && e.getCause() != e) {
+      e = e.getCause();
+    }
+    return e == null ? "" : e.getClass().getSimpleName() + ": " + e.getMessage();
   }
 }
