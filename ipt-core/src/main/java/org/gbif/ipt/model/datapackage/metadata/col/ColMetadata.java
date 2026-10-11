@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import org.gbif.ipt.model.datapackage.metadata.DataPackageMetadata;
 
 import java.io.IOException;
@@ -77,7 +79,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
     "source",
     "notes"
 })
-public class ColMetadata implements DataPackageMetadata {
+public class ColMetadata implements DataPackageMetadata, Serializable {
 
   /**
    * single, primary DOI for the dataset

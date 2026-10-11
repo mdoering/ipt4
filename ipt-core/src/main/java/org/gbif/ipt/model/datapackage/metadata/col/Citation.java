@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +70,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "accessed",
     "note"
 })
-public class Citation {
+public class Citation implements Serializable {
 
   /**
    * identifier for the source, can be referenced from individual data records via sourceID to indicate the provenance on a record level

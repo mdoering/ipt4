@@ -14,6 +14,7 @@
 package org.gbif.ipt.web.support.action;
 
 import org.gbif.ipt.model.datapackage.metadata.DataPackageMetadata;
+import org.gbif.ipt.model.datapackage.metadata.camtrap.CamtrapContributor;
 import org.gbif.ipt.model.datapackage.metadata.camtrap.CamtrapLicense;
 import org.gbif.ipt.model.datapackage.metadata.camtrap.CamtrapMetadata;
 import org.gbif.ipt.model.datapackage.metadata.camtrap.CamtrapSource;
@@ -45,8 +46,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.core.convert.converter.ConditionalGenericConverter;
-import org.springframework.core.convert.support.GenericConversionService;
 
 /**
  * IPT 3's struts2.converter classes for the properties its {@code *-conversion.properties} files named. Those files
@@ -54,10 +53,14 @@ import org.springframework.core.convert.support.GenericConversionService;
  * back to Struts' default conversion there; IPT4 applies the converters as intended. The files for classes the
  * baseline no longer had (Contributor, DataPackageLicense, DataPackageSource) are left out.
  */
-public final class StrutsConversions implements ConditionalGenericConverter {
+public final class StrutsConversions implements ConversionService {
 
-  /** Only these properties: everything else keeps Spring's default conversion. */
-  public static final ConversionService SERVICE = service();
+  /**
+   * Only these properties: everything else keeps Spring's default conversion. Not a GenericConversionService: that
+   * caches converters by type and annotations, not by the property's class, so a lookalike property converted first
+   * would switch a rule off for the whole application.
+   */
+  public static final ConversionService SERVICE = new StrutsConversions();
 
   private record Rule(Class<?> owner, Set<String> properties, Function<String, Object> convert) {
   }
@@ -72,33 +75,46 @@ public final class StrutsConversions implements ConditionalGenericConverter {
       new Rule(CamtrapMetadata.class, Set.of("homepage"), StrutsConversions::uri),
       new Rule(CamtrapLicense.class, Set.of("name", "path", "title"), StrutsConversions::emptyToNull),
       new Rule(CamtrapSource.class, Set.of("version"), StrutsConversions::emptyToNull),
+      new Rule(CamtrapContributor.class, Set.of("role"), StrutsConversions::camtrapRole),
       new Rule(Project.class, Set.of("title", "acronym", "description"), StrutsConversions::emptyToNull),
       new Rule(Taxonomic.class, Set.of("taxonID", "scientificName"), StrutsConversions::emptyToNull),
       new Rule(Temporal.class, Set.of("start", "end"), StrutsConversions::emptyToNull),
       new Rule(Geojson.class, Set.of("type"), value -> StringUtils.isEmpty(value) ? null : Geojson.Type.fromValue(value)));
 
-  private static ConversionService service() {
-    GenericConversionService service = new GenericConversionService();
-    service.addConverter(new StrutsConversions());
-    return service;
-  }
-
   private StrutsConversions() {
   }
 
   @Override
-  public Set<ConvertiblePair> getConvertibleTypes() {
-    return Set.of(new ConvertiblePair(String.class, Object.class));
+  public boolean canConvert(@Nullable Class<?> sourceType, Class<?> targetType) {
+    return canConvert(sourceType == null ? null : TypeDescriptor.valueOf(sourceType), TypeDescriptor.valueOf(targetType));
   }
 
   @Override
-  public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
-    return rule(targetType) != null;
+  public boolean canConvert(@Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
+    if (sourceType == null) {
+      return false;
+    }
+    if (sourceType.getType() == String[].class) {
+      // forms.ftl's checkbox sends "true" and a hidden "false"; Struts converted a parameter array to a scalar
+      // property from its first value
+      return targetType.getObjectType() == Boolean.class;
+    }
+    return sourceType.getType() == String.class && rule(targetType) != null;
   }
 
   @Override
   @Nullable
-  public Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+  @SuppressWarnings("unchecked")
+  public <T> T convert(@Nullable Object source, Class<T> targetType) {
+    return (T) convert(source, TypeDescriptor.forObject(source), TypeDescriptor.valueOf(targetType));
+  }
+
+  @Override
+  @Nullable
+  public Object convert(@Nullable Object source, @Nullable TypeDescriptor sourceType, TypeDescriptor targetType) {
+    if (source instanceof String[] values) {
+      return values.length == 0 ? null : Boolean.valueOf(StringUtils.trimToNull(values[0]));
+    }
     Rule rule = rule(targetType);
     return source == null || rule == null ? null : rule.convert().apply((String) source);
   }
@@ -122,6 +138,18 @@ public final class StrutsConversions implements ConditionalGenericConverter {
       }
     }
     return null;
+  }
+
+  /**
+   * CamtrapContributorRoleConverter, except that a vocabulary key (the select's option value) becomes the role
+   * value: IPT 3 stored the key, which its select and JSON reader did not recognise again.
+   */
+  @Nullable
+  static String camtrapRole(String value) {
+    if (StringUtils.isEmpty(value)) {
+      return null;
+    }
+    return CamtrapContributor.Role.VOCABULARY.getOrDefault(value, value);
   }
 
   /** DateFormatConverter: a year alone is that year plus one millisecond (EmlFactory#calendarDate). */

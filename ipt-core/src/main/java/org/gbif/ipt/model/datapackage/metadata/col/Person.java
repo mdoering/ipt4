@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -43,7 +45,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
   "given",
   "literal"
 })
-public class Person {
+public class Person implements Serializable {
 
   @JsonProperty("family")
   private String family;

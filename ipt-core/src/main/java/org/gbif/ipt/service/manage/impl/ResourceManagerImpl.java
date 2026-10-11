@@ -254,7 +254,8 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
       resource = switch (fileExtension) {
         case "xml" -> resourceImportService.createFromEml(shortname, archiveOrSingleFile, creator, alog);
         case "json" -> resourceImportService.createFromPackageDescriptor(shortname, type, archiveOrSingleFile, creator, alog);
-        case "yml" -> resourceImportService.createFromColDpMetadata(shortname, archiveOrSingleFile, creator, alog);
+        // IPT4: also .yaml, the name ColDP gives its metadata file (IPT 3 accepted .yml only)
+        case "yml", "yaml" -> resourceImportService.createFromColDpMetadata(shortname, archiveOrSingleFile, creator, alog);
         default -> throw new ImportException("Invalid file extension: " + fileExtension);
       };
     }

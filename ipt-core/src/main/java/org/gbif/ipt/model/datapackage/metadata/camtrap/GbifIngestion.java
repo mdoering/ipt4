@@ -13,13 +13,15 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.camtrap;
 
+import java.io.Serializable;
+
 import java.util.Objects;
 import java.util.StringJoiner;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-public class GbifIngestion {
+public class GbifIngestion implements Serializable {
 
   @JsonDeserialize(using = ObservationLevel.ObservationLevelDeserializer.class)
   @JsonProperty("observationLevel")

@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import java.net.URI;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -47,7 +49,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "url",
     "note"
 })
-public class Agent {
+public class Agent implements Serializable {
 
   /**
    * ORCID person ID, https://orcid.org  example: 0000-0001-9745-636X

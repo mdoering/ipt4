@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,7 +33,7 @@ import java.util.StringJoiner;
     "author",
     "typeMaterial"
 })
-public class UrlFormatter {
+public class UrlFormatter implements Serializable {
 
   @JsonProperty("name")
   private String name;

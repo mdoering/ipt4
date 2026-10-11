@@ -13,7 +13,9 @@
  */
 package org.gbif.ipt.web.support.action;
 
+import org.gbif.ipt.model.datapackage.metadata.FrictionlessContributor;
 import org.gbif.ipt.model.datapackage.metadata.FrictionlessMetadata;
+import org.gbif.ipt.model.datapackage.metadata.camtrap.CamtrapContributor;
 import org.gbif.ipt.model.datapackage.metadata.camtrap.Geojson;
 import org.gbif.ipt.model.datapackage.metadata.camtrap.Project;
 import org.gbif.metadata.eml.ipt.model.Eml;
@@ -25,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.validation.DataBinder;
@@ -34,11 +37,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 /** IPT 3's struts2.converter classes, applied to the properties its *-conversion.properties named. */
 class StrutsConversionsTest {
 
+  /** A property annotated exactly like Project.acronym, without a conversion rule. */
+  public static class Lookalike {
+    @JsonProperty("acronym")
+    private String acronym;
+
+    @JsonProperty("acronym")
+    public String getAcronym() {
+      return acronym;
+    }
+
+    @JsonProperty("acronym")
+    public void setAcronym(String acronym) {
+      this.acronym = acronym;
+    }
+  }
+
   public static class Form {
     private final Eml eml = new Eml();
     private final FrictionlessMetadata<?, ?, ?> metadata = new FrictionlessMetadata<>();
     private final Project project = new Project();
     private final Geojson geojson = new Geojson();
+    private boolean flag;
+    private String plain;
+    private final Lookalike lookalike = new Lookalike();
+    private final CamtrapContributor person = new CamtrapContributor();
+    private final FrictionlessContributor contributor = new FrictionlessContributor();
+    private Boolean wrapped;
 
     public Eml getEml() {
       return eml;
@@ -54,6 +79,42 @@ class StrutsConversionsTest {
 
     public Geojson getGeojson() {
       return geojson;
+    }
+
+    public FrictionlessContributor getContributor() {
+      return contributor;
+    }
+
+    public CamtrapContributor getPerson() {
+      return person;
+    }
+
+    public Lookalike getLookalike() {
+      return lookalike;
+    }
+
+    public String getPlain() {
+      return plain;
+    }
+
+    public void setPlain(String plain) {
+      this.plain = plain;
+    }
+
+    public boolean isFlag() {
+      return flag;
+    }
+
+    public void setFlag(boolean flag) {
+      this.flag = flag;
+    }
+
+    public Boolean getWrapped() {
+      return wrapped;
+    }
+
+    public void setWrapped(Boolean wrapped) {
+      this.wrapped = wrapped;
     }
   }
 
@@ -112,5 +173,56 @@ class StrutsConversionsTest {
     assertThat(form.getProject().getAcronym()).isNull();
     assertThat(form.getProject().getTitle()).isEqualTo("Camera traps");
     assertThat(form.getGeojson().getType()).isEqualTo(Geojson.Type.fromValue("MultiPolygon"));
+  }
+
+  /** forms.ftl's checkbox sends "true" then a hidden "false"; Struts used the first value. */
+  @Test
+  void checkboxWithItsHiddenFalseUsesTheFirstValue() {
+    Form form = new Form();
+    DataBinder binder = bind(form, new MutablePropertyValues()
+        .add("flag", new String[] {"true", "false"}).add("wrapped", new String[] {"true", "false"}));
+    assertThat(binder.getBindingResult().getFieldErrors()).isEmpty();
+    assertThat(form.isFlag()).isTrue();
+    assertThat(form.getWrapped()).isTrue();
+
+    binder = bind(form, new MutablePropertyValues().add("flag", new String[] {"false"}));
+    assertThat(binder.getBindingResult().getFieldErrors()).isEmpty();
+    assertThat(form.isFlag()).isFalse();
+  }
+
+  /** The service is shared: converting a property without a rule first must not hide the rules of others. */
+  @Test
+  void rulesApplyWhateverWasConvertedBefore() {
+    Form form = new Form();
+    MutablePropertyValues values = new MutablePropertyValues();
+    values.add("plain", "");
+    values.add("lookalike.acronym", "");
+    values.add("contributor.title", "");
+    values.add("metadata.title", "");
+    values.add("project.acronym", "");
+    values.add("project.title", "");
+    assertThat(bind(form, values).getBindingResult().hasErrors()).isFalse();
+    assertThat(form.getPlain()).isEmpty();
+    assertThat(form.getLookalike().getAcronym()).isEmpty();
+    assertThat(form.getContributor().getTitle()).isEmpty();
+    assertThat(form.getMetadata().getTitle()).isNull();
+    assertThat(form.getProject().getAcronym()).isNull();
+    assertThat(form.getProject().getTitle()).isNull();
+  }
+
+  /**
+   * The role select posts the vocabulary key (PUBLISHER). IPT 3 stored the key, which its own select and JSON reader
+   * did not recognise again; IPT4 stores the role value.
+   */
+  @Test
+  void camtrapContributorRoleFromTheSelectKey() {
+    Form form = new Form();
+    assertThat(bind(form, new MutablePropertyValues().add("person.role", "PUBLISHER")).getBindingResult().hasErrors())
+        .isFalse();
+    assertThat(form.getPerson().getRole()).isEqualTo("publisher");
+    bind(form, new MutablePropertyValues().add("person.role", "principalInvestigator"));
+    assertThat(form.getPerson().getRole()).isEqualTo("principalInvestigator");
+    bind(form, new MutablePropertyValues().add("person.role", ""));
+    assertThat(form.getPerson().getRole()).isNull();
   }
 }

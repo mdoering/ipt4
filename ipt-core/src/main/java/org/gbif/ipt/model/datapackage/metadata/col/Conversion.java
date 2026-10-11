@@ -13,6 +13,8 @@
  */
 package org.gbif.ipt.model.datapackage.metadata.col;
 
+import java.io.Serializable;
+
 import java.net.URI;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -28,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "description",
     "url"
 })
-public class Conversion {
+public class Conversion implements Serializable {
 
   @JsonProperty("description")
   private String description;

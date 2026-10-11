@@ -81,61 +81,12 @@ class EmlEditorTest {
     return mvc.perform(request.with(user(ManageFixture.OWNER)).with(csrf())).andReturn().getResponse();
   }
 
-  /**
-   * What a browser submits for the section form, unchanged. The rich-text editors' hidden fields are filled by
-   * JavaScript on submit (DocBook to HTML and back); for an unchanged form that is the stored value.
-   */
   private MockHttpServletRequestBuilder submit(Document page, String section) {
     return submit(page, section, java.util.Map.of());
   }
 
-  /** The same, with some fields changed. */
   private MockHttpServletRequestBuilder submit(Document page, String section, java.util.Map<String, String> changed) {
-    org.springframework.beans.BeanWrapper eml =
-        new org.springframework.beans.BeanWrapperImpl(resources.get("eml1").getEml());
-    Element form = page.selectFirst("form[action*=metadata-" + section + "]");
-    assertThat(form).as(section).isNotNull();
-    // the form's action, query included, as a browser posts it
-    java.net.URI action = java.net.URI.create(form.absUrl("action"));
-    MockHttpServletRequestBuilder post = post(java.net.URI.create(action.getRawPath()
-        + (action.getRawQuery() == null ? "" : "?" + action.getRawQuery())));
-    for (Element field : form.select("input[name], select[name], textarea[name]")) {
-      String name = field.attr("name");
-      if (field.hasAttr("disabled") || name.equals("_csrf")) {
-        continue;
-      }
-      if (changed.containsKey(name)) {
-        post.param(name, changed.get(name));
-        continue;
-      }
-      switch (field.tagName()) {
-        case "select" -> {
-          List<Element> selected = new ArrayList<>(field.select("option[selected]"));
-          if (selected.isEmpty() && field.selectFirst("option") != null && !field.hasAttr("multiple")) {
-            selected.add(field.selectFirst("option"));
-          }
-          selected.forEach(o -> post.param(name, o.attr("value")));
-        }
-        case "textarea" -> post.param(name, field.wholeText());
-        default -> {
-          String type = field.attr("type").toLowerCase();
-          if ((type.equals("checkbox") || type.equals("radio")) && !field.hasAttr("checked")) {
-            continue;
-          }
-          if (type.equals("submit") || type.equals("button") || type.equals("file")) {
-            continue;
-          }
-          String value = field.attr("value");
-          if (type.equals("hidden") && value.isEmpty() && name.startsWith("eml.") && !name.contains("[")
-              && eml.isReadableProperty(name.substring(4))
-              && eml.getPropertyValue(name.substring(4)) instanceof String stored) {
-            value = stored;
-          }
-          post.param(name, value);
-        }
-      }
-    }
-    return post.param("save", "Save");
+    return BrowserForms.submit(page, "metadata-" + section, resources.get("eml1").getEml(), "eml", changed);
   }
 
   private MockHttpServletResponse saveUnchanged(String section) throws Exception {

@@ -16,7 +16,7 @@
   "sources": [
     {
       "title": "source 1",
-      "path": "/source1",
+      "path": "https://example.org/source1",
       "email": "source1@mail",
       "version": "1.0"
     },
