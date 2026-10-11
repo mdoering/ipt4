@@ -80,3 +80,6 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Registered IPT fields (`registeredIpt.*`) | Bindable on every page (any manager's form could change the IPT's registered name or contacts in memory) | Only the registration update form, applied after the registry accepted the update | Shared data changed only where it is edited | M5 |
 | Organisation that cannot be removed | Error page while showing the message | The organisation form with the message | The reason is visible | M5 |
 | Organisation login check failing | Logged the organisation's password | Logs the key only | No passwords in logs | M5 |
+| Delete a published version | GET link; returned to `/resource` without the resource; an unknown resource failed (500) | POST from the same confirmed link; returns to the resource page; unknown resource or version 404 | No state changes on GET | M5 |
+| Publication status JSON (`admin-api/publication-report(s)`) | Included the exception object as serialised by Struts | Its message and stack trace (the properties IPT 3 also had) without the object | Stable, bounded JSON | M5 |
+| Bulk publication log popup | Messages inserted as HTML | Shown as text | Messages carry resource titles | M5 |

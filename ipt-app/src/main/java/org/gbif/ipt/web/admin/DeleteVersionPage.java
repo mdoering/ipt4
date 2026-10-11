@@ -67,9 +67,21 @@ public class DeleteVersionPage extends PostActionPage {
     }
   }
 
+  /** IPT 3 ignored its own not-found check (and failed on an unknown resource). */
   @Override
   public String execute() {
-    resourcePublicationManager.removeVersion(resource, new BigDecimal(version));
+    if (notFound) {
+      return NOT_FOUND;
+    }
+    try {
+      resourcePublicationManager.removeVersion(resource, new BigDecimal(version));
+    } catch (NumberFormatException e) {
+      return NOT_FOUND;
+    }
     return SUCCESS;
+  }
+
+  public String getShortname() {
+    return resource == null ? null : resource.getShortname();
   }
 }

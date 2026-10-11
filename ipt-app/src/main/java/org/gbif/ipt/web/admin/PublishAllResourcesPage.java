@@ -35,6 +35,7 @@ import jakarta.inject.Inject;
 
 import java.io.Serial;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,12 +109,14 @@ public class PublishAllResourcesPage extends ActionPage {
     boolean skipIfNotChanged = false;
 
     if (publishMode == BulkPublicationType.SELECTED) {
+      List<String> selected = selectedResources == null ? List.of() : selectedResources;
       resources = allResources.stream()
-          .filter(res -> selectedResources.contains(res.getShortname()))
+          .filter(res -> selected.contains(res.getShortname()))
           .collect(Collectors.toList());
     } else if (publishMode == BulkPublicationType.EXCLUDED) {
+      List<String> excluded = excludedResources == null ? List.of() : excludedResources;
       resources = allResources.stream()
-          .filter(res -> !excludedResources.contains(res.getShortname()))
+          .filter(res -> !excluded.contains(res.getShortname()))
           .collect(Collectors.toList());
     } else if (publishMode == BulkPublicationType.CHANGED) {
       resources = allResources;
@@ -180,13 +183,17 @@ public class PublishAllResourcesPage extends ActionPage {
       }
     }
 
-    // wait around for all resources to finish publishing
-    // PublishingMonitor thread is running in the background completing asynchronous publishing tasks
-    while (!resourcePublicationManager.getProcessFutures().isEmpty()) {
+    // wait around for all resources to finish publishing; isLocked completes a finished publication (IPT 3 waited
+    // for the PublishingMonitor thread to do that)
+    for (String shortname : new ArrayList<>(resourcePublicationManager.getProcessFutures().keySet())) {
       try {
-        Thread.sleep(1000);
+        while (resourcePublicationManager.isLocked(shortname, this)) {
+          Thread.sleep(1000);
+        }
       } catch (InterruptedException e) {
         LOG.error("Thread waiting during publish all resources was interrupted", e);
+        Thread.currentThread().interrupt();
+        break;
       }
     }
 

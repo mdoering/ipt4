@@ -90,7 +90,9 @@
                     var msg = data.messages[i];
                     var level = msg.level && msg.level.standardLevel ? msg.level.standardLevel : 'INFO';
                     var time = new Date(msg.timestamp).toLocaleTimeString();
-                    content += '<li class="list-unstyled">[' + time + '] <strong>' + level + ':</strong> ' + msg.message + '</li>';
+                    // IPT4: messages carry resource titles; text, not markup
+                    content += '<li class="list-unstyled">[' + time + '] <strong>' + $('<span>').text(level).html()
+                        + ':</strong> ' + $('<span>').text(msg.message).html() + '</li>';
                 }
                 content += '</ul>';
 
