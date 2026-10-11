@@ -12,3 +12,5 @@ L1:<@s.select id="org" class="form-select" name="org" list=options value="b" emp
 L2:<@s.select name="lang" list=beans listKey="code" listValue="label" value="fr"/>
 U1:<@s.file name="file" cssClass="form-control" key="manage.resource.create.file" />
 U2:<@s.file id="custom-data-input" cssClass="d-none" />
+P4:<@s.property value="beans[1].label"/>
+P5:<@s.property value="stringKeyed['b']"/>|<@s.property value="beans[9].label"/>|

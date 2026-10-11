@@ -77,6 +77,9 @@ class TemplateShimTest {
         .contains("<option value=\"b\" selected=\"selected\">Beta &amp; Co</option>")
         .contains("<option value=\"fr\" selected=\"selected\">French</option>")
         .contains("<option value=\"en\">English</option>")
+        // OGNL indexes and map keys
+        .contains("P4:French")
+        .contains("P5:y||")
         // Struts 7 simple theme file.ftl
         .contains("U1:<input type=\"file\" name=\"file\" id=\"file\" class=\"form-control\"/>")
         .contains("U2:<input type=\"file\" name=\"\" id=\"custom-data-input\" class=\"d-none\"/>");

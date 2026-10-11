@@ -15,6 +15,8 @@ package org.gbif.ipt.web.support.freemarker;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateBooleanModel;
@@ -26,6 +28,7 @@ import freemarker.template.TemplateHashModel;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
+import freemarker.template.TemplateSequenceModel;
 
 /**
  * Struts {@code <@s.property value="eml.title"/>}: writes the (HTML-escaped) value of a dotted property path, looked
@@ -33,6 +36,9 @@ import freemarker.template.TemplateScalarModel;
  * nothing.
  */
 final class PropertyDirective implements TemplateDirectiveModel {
+
+  private static final Pattern STEP =
+      Pattern.compile("\\.?([A-Za-z_$][\\w$]*)|\\[(\\d+)]|\\['([^']*)']|\\[\"([^\"]*)\"]");
 
   @Override
   @SuppressWarnings("rawtypes")
@@ -47,18 +53,28 @@ final class PropertyDirective implements TemplateDirectiveModel {
       path = path.substring(2, path.length() - 1).trim();
     }
     TemplateModel value = null;
-    String[] parts = path.split("\\.");
-    for (int i = 0; i < parts.length; i++) {
-      if (i == 0) {
-        value = env.getVariable(parts[0]);
-      } else if (value instanceof TemplateHashModel hash) {
-        value = hash.get(parts[i]);
-      } else {
-        value = null;
+    // OGNL-style path: names, [index] and ['key']
+    Matcher step = STEP.matcher(path);
+    boolean first = true;
+    while (step.find()) {
+      String name = step.group(1);
+      String index = step.group(2);
+      String key = step.group(3) != null ? step.group(3) : step.group(4);
+      if (name != null) {
+        value = first ? env.getVariable(name) : value instanceof TemplateHashModel hash ? hash.get(name) : null;
+      } else if (index != null) {
+        int i = Integer.parseInt(index);
+        value = value instanceof TemplateSequenceModel seq && i < seq.size() ? seq.get(i) : null;
+      } else if (key != null) {
+        value = value instanceof TemplateHashModel hash ? hash.get(key) : null;
       }
+      first = false;
       if (value == null) {
         return;
       }
+    }
+    if (first) {
+      return;
     }
     boolean escape = params.get("escapeHtml") == null || TemplateParams.bool(params, "escapeHtml");
     String text = asString(value);

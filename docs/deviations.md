@@ -58,3 +58,7 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Cancel publication | GET link, no access check | POST (the links send one) for the resource's managers | State change without CSRF protection | M3 |
 | Remove co-manager / network links | GET | POST from the same links | No state changes on GET | M3 |
 | Remembered resource | Used by home and create too | Used only by pages working on a resource; one deleted meanwhile is forgotten | Home showed another resource's lock or error | M3 |
+| Rejected metadata section | The invalid values stayed on the resource in memory (and were published or saved with the next change) | The form shows the invalid values; the resource keeps its previous metadata | A rejected form must not change data | M4 |
+| DocBook text fields (description, acknowledgements, purpose, introduction, getting started) | The HTML filter removed every DocBook element the editors post, so these sections could not be saved with structured text | Passed as posted and checked against the EML schema; links must be web or mail links | The editors work | M4 |
+| EML type conversions | The conversion files for EML dates and coordinates were no longer found (classes moved), Struts' defaults applied | IPT's converters as intended (year-only dates, comma decimals, coordinate ranges) | Dates and coordinates behave as IPT documents them | M4 |
+| Resource logo upload | Any type, named after the type the browser declared | JPEG, GIF or PNG only | Only images are logos | M4 |

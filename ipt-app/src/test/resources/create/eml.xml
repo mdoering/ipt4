@@ -373,7 +373,7 @@ Champion and Seth (1968) classified the forests of India into 6 major ecological
           </rangeOfDates>
         </temporalCoverage>
         <taxonomicCoverage>
-         	<generalTaxonomicCoverage>The coverage of this database is mainly plants from Angiosperms, Gymnosperms and Pteridophytes. The highest number of records are from the family Poaceae (#613) followed by Asteraceae (#270), Fabaceae (#216), Acanthaceae (#145), Lamiaceae (#144), Rosaceae (#131), Euphorbiaceae (#107), Rubiaceae (#105), Cyperaceae (#96), Mimosaceae (#70), Verbenaceae (#64), Scrophulariaceae (#58), Ranunculaceae (#55), Apocynaceae, Malvaceae (#53 each), Lauraceae (#50) and rest of other families have individuals &lt;50.</generalTaxonomicCoverage>
+         	<generalTaxonomicCoverage>The coverage of this database is mainly plants from Angiosperms, Gymnosperms and Pteridophytes. The highest number of records are from the family Poaceae (#613) followed by Asteraceae (#270), Fabaceae (#216), Acanthaceae (#145), Lamiaceae (#144), Rosaceae (#131), Euphorbiaceae (#107), Rubiaceae (#105), Cyperaceae (#96), Mimosaceae (#70), Verbenaceae (#64), Scrophulariaceae (#58), Ranunculaceae (#55), Apocynaceae, Malvaceae (#53 each), Lauraceae (#50) and rest of other families have individuals under 50.</generalTaxonomicCoverage>
          <taxonomicClassification>
            	<taxonRankName>kingdom</taxonRankName>
            	<taxonRankValue>Plantae</taxonRankValue>
