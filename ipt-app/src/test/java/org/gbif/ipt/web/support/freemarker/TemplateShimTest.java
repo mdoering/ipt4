@@ -98,6 +98,14 @@ class TemplateShimTest {
     assertThat(render("/_probe/field")).contains("FIELD:from a field");
   }
 
+  /** Struts' value stack had the action before request and session attributes of the same name. */
+  @Test
+  void pagePropertiesComeBeforeSessionAttributes() throws Exception {
+    String html = mvc.perform(get("/_probe/precedence").sessionAttr("title", "from the session")).andReturn()
+        .getResponse().getContentAsString();
+    assertThat(html).contains("T:From page");
+  }
+
   @Test
   void topLevelNamesAreNotActionMethods() throws Exception {
     assertThat(render("/_probe/method")).contains("METHOD:none");

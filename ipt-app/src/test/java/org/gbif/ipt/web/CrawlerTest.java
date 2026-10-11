@@ -66,11 +66,13 @@ class CrawlerTest {
 
   private static final String BASE = "http://localhost:8080";
   private static final String ADMIN = "crawler.admin@example.org";
-  /** The admin area (M5) and logout (a POST). */
-  private static final List<String> NOT_YET = List.of("/admin", "/logout");
+  /** Logout (a POST), and the admin API and log files (not pages). */
+  private static final List<String> NOT_YET = List.of("/logout", "/admin-api", "/admin/logfile");
   private static final List<String> TEMPLATE_CODE = List.of("${", "<@s", "[@s", "<#", "[#", "FreeMarker template error");
   private static final int MAX_PAGES = 400;
   /** IPT 3's data package previews link to the downloads before the first publication too (404 until then). */
+  /** The registry's Occurrence core has a property with dc:relation='None', which the extension page links. */
+  private static final List<String> REGISTRY_DATA_LINKS = List.of("/admin/None");
   private static final Pattern UNPUBLISHED_DOWNLOAD = Pattern.compile("/(archive|metadata)\\.do\\?r=(cam1|col1)(&v=.*)?");
 
   static Path dataDir;
@@ -125,6 +127,10 @@ class CrawlerTest {
     assertThat(seen).hasSizeGreaterThan(15);
     // the metadata editors of an EML resource and of a Camtrap DP resource
     assertThat(seen).anyMatch(url -> url.startsWith("/manage/metadata-additional"))
+        .anyMatch(url -> url.startsWith("/admin/config")).anyMatch(url -> url.startsWith("/admin/users"))
+        .anyMatch(url -> url.startsWith("/admin/user.do?id=")).anyMatch(url -> url.startsWith("/admin/extension.do?id="))
+        .anyMatch(url -> url.startsWith("/admin/vocabulary")).anyMatch(url -> url.startsWith("/admin/dataPackage.do?id="))
+        .anyMatch(url -> url.startsWith("/admin/logs")).anyMatch(url -> url.startsWith("/admin/bulk-publication"))
         .anyMatch(url -> url.startsWith("/manage/camtrap-metadata-other"))
         .anyMatch(url -> url.startsWith("/manage/resource") && url.contains("r=col1"));
   }
@@ -136,7 +142,9 @@ class CrawlerTest {
     Deque<String> queue = new ArrayDeque<>(List.of("/", "/api/resources?start=0&length=100"));
     if (admin) {
       // the manage home loads its table with JavaScript too
-      queue.addAll(List.of("/manage/", "/manager-api/resources?start=0&length=100"));
+      queue.addAll(List.of("/manage/", "/manager-api/resources?start=0&length=100", "/admin/"));
+      // the user list and the organisation list open their forms with JavaScript
+      queue.addAll(List.of("/admin/user.do", "/admin/user.do?id=" + ADMIN, "/admin/organisation.do"));
     }
     List<String> problems = new ArrayList<>();
     while (!queue.isEmpty() && seen.size() < MAX_PAGES) {
@@ -156,7 +164,8 @@ class CrawlerTest {
         }
         continue;
       }
-      if (response.getStatus() >= 400 && !(response.getStatus() == 404 && UNPUBLISHED_DOWNLOAD.matcher(url).matches())) {
+      if (response.getStatus() >= 400 && !(response.getStatus() == 404
+          && (UNPUBLISHED_DOWNLOAD.matcher(url).matches() || REGISTRY_DATA_LINKS.contains(url)))) {
         problems.add(response.getStatus() + " " + url);
         continue;
       }

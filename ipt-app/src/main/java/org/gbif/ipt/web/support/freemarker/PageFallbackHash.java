@@ -16,6 +16,7 @@ package org.gbif.ipt.web.support.freemarker;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleHash;
@@ -31,13 +32,23 @@ final class PageFallbackHash extends SimpleHash {
   /** The one page method templates call by bare name; OGNL resolved other bare names as properties only. */
   private static final String GET_TEXT = "getText";
 
+  /** The hashes Spring's FreeMarkerView adds next to the model. */
+  private static final Set<String> SPRING_HASHES =
+      Set.of("JspTaglibs", "Application", "Session", "Request", "RequestParameters");
+
   private final SimpleHash base;
+  private final Set<String> modelKeys;
   private final Object page;
   private final TemplateHashModel pageModel;
 
-  PageFallbackHash(SimpleHash base, Object page, ObjectWrapper wrapper) {
+  /**
+   * @param modelKeys the model's names: they come before the page; request, session and application attributes,
+   *                  which {@code base} also resolves, come after it (Struts searched the action first)
+   */
+  PageFallbackHash(SimpleHash base, Set<String> modelKeys, Object page, ObjectWrapper wrapper) {
     super(wrapper);
     this.base = base;
+    this.modelKeys = modelKeys;
     this.page = page;
     try {
       this.pageModel = (TemplateHashModel) wrapper.wrap(page);
@@ -48,11 +59,16 @@ final class PageFallbackHash extends SimpleHash {
 
   @Override
   public TemplateModel get(String key) throws TemplateModelException {
-    TemplateModel value = base.get(key);
-    if (value != null) {
-      return value;
+    if (modelKeys.contains(key) || SPRING_HASHES.contains(key)) {
+      return base.get(key);
     }
-    value = pageModel.get(key);
+    TemplateModel value = pageValue(key);
+    // request, session and application attributes
+    return value != null ? value : base.get(key);
+  }
+
+  private TemplateModel pageValue(String key) throws TemplateModelException {
+    TemplateModel value = pageModel.get(key);
     if (value != null && (!(value instanceof TemplateMethodModel) || GET_TEXT.equals(key))) {
       return value;
     }

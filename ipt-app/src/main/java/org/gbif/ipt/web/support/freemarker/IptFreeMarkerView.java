@@ -55,6 +55,7 @@ public class IptFreeMarkerView extends FreeMarkerView {
       templateModel.put(ACTION, page);
     }
     SimpleHash base = super.buildTemplateModel(templateModel, request, response);
-    return page == null ? base : new PageFallbackHash(base, page, getObjectWrapper());
+    return page == null ? base
+        : new PageFallbackHash(base, java.util.Set.copyOf(templateModel.keySet()), page, getObjectWrapper());
   }
 }
