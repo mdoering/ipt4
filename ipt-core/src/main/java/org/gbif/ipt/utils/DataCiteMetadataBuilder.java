@@ -73,7 +73,8 @@ public class DataCiteMetadataBuilder {
 
   private static final Logger LOG = LogManager.getLogger(DataCiteMetadataBuilder.class);
   private static final ObjectFactory FACTORY = new ObjectFactory();
-  private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+  private static final ThreadLocal<SimpleDateFormat> dateFormat =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
   public static DataCiteMetadata createDataCiteMetadata(DOI doi, Resource resource) throws InvalidMetadataException {
 
@@ -647,14 +648,14 @@ public class DataCiteMetadataBuilder {
     // created date
     if (created != null) {
       DataCiteMetadata.Dates.Date createdDate = FACTORY.createDataCiteMetadataDatesDate();
-      createdDate.setValue(dateFormat.format(created));
+      createdDate.setValue(dateFormat.get().format(created));
       createdDate.setDateType(DateType.CREATED);
       dates.getDate().add(createdDate);
     }
 
     // updated date = now
     DataCiteMetadata.Dates.Date updatedDate = FACTORY.createDataCiteMetadataDatesDate();
-    updatedDate.setValue(dateFormat.format(new Date()));
+    updatedDate.setValue(dateFormat.get().format(new Date()));
     updatedDate.setDateType(DateType.UPDATED);
     dates.getDate().add(updatedDate);
 
@@ -662,14 +663,14 @@ public class DataCiteMetadataBuilder {
     for (TemporalCoverage coverage : coverages) {
       if (coverage.getType().equals(TemporalCoverageType.SINGLE_DATE)) {
         DataCiteMetadata.Dates.Date singleDate = FACTORY.createDataCiteMetadataDatesDate();
-        singleDate.setValue(dateFormat.format(coverage.getStartDate()));
+        singleDate.setValue(dateFormat.get().format(coverage.getStartDate()));
         singleDate.setDateType(DateType.VALID);
         dates.getDate().add(singleDate);
       } else if (coverage.getType().equals(TemporalCoverageType.DATE_RANGE)) {
         // construct range using RKMS-ISO8601 standard e.g. 2004-03-02/2005-06-02
         DataCiteMetadata.Dates.Date range = FACTORY.createDataCiteMetadataDatesDate();
-        String start = dateFormat.format(coverage.getStartDate());
-        String end = dateFormat.format(coverage.getEndDate());
+        String start = dateFormat.get().format(coverage.getStartDate());
+        String end = dateFormat.get().format(coverage.getEndDate());
         range.setValue(start + "/" + end);
         range.setDateType(DateType.VALID);
         dates.getDate().add(range);
@@ -679,7 +680,7 @@ public class DataCiteMetadataBuilder {
   }
 
   private String convertDateToYearMonthDay(Date date) {
-    return dateFormat.format(date);
+    return dateFormat.get().format(date);
   }
 
   /**

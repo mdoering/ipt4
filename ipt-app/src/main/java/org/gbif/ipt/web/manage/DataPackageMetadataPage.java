@@ -536,8 +536,8 @@ public class DataPackageMetadataPage extends ManagerBasePage {
           InferredCamtrapTemporalScope inferredTemporalScope = inferredCamtrapMetadata.getInferredTemporalScope();
 
           Temporal temporal = new Temporal();
-          temporal.setStart(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.format(inferredTemporalScope.getStartDate()));
-          temporal.setEnd(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.format(inferredTemporalScope.getEndDate()));
+          temporal.setStart(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.get().format(inferredTemporalScope.getStartDate()));
+          temporal.setEnd(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.get().format(inferredTemporalScope.getEndDate()));
 
           camtrapMetadata.setTemporal(temporal);
         }

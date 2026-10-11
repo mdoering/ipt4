@@ -65,9 +65,10 @@ import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -101,7 +102,8 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   private final ResourceLoader resourceLoader;
   private final ResourcePersister resourcePersister;
 
-  public static final SimpleDateFormat CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  public static final ThreadLocal<SimpleDateFormat> CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
   @Inject
   public ResourceManagerImpl(
@@ -746,7 +748,10 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
     // save into data dir
     File metadataFile = dataDir.resourceDatapackageMetadataFile(resource.getShortname(), resource.getCoreType());
     try {
-      metadataReader.writeValue(metadataFile, resource.getDataPackageMetadata());
+      // replaced all at once: publishing copies this file while a metadata save may be rewriting it
+      StringWriter metadata = new StringWriter();
+      metadataReader.writeValue(metadata, resource.getDataPackageMetadata());
+      AtomicFiles.writeString(metadataFile.toPath(), metadata.toString());
     } catch (IOException e) {
       LOG.error("Failed to save datapackage metadata!", e);
       throw new RuntimeException(e);

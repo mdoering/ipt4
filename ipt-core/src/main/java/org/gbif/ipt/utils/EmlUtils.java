@@ -14,6 +14,7 @@
 package org.gbif.ipt.utils;
 
 import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.persistence.AtomicFiles;
 import org.gbif.ipt.service.InvalidConfigException;
 import org.gbif.ipt.service.InvalidConfigException.TYPE;
 import org.gbif.metadata.eml.ipt.EmlFactory;
@@ -112,7 +113,8 @@ public class EmlUtils {
     try {
       synchronized (currentLocale) {
         Locale.setDefault(locale);
-        IptEmlWriter.writeEmlFile(emlFile, resource.getEml());
+        // replaced all at once: publishing copies eml.xml while a metadata save may be rewriting it
+        AtomicFiles.writeString(emlFile.toPath(), IptEmlWriter.writeEmlAsString(resource.getEml()));
         Locale.setDefault(currentLocale);
       }
     } catch (IOException e) {

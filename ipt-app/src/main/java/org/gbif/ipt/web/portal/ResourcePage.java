@@ -54,6 +54,7 @@ import java.io.Serial;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -240,8 +241,12 @@ public class ResourcePage extends PortalBasePage {
     Objects.requireNonNull(version);
     File emlFile = dataDir.resourceEmlFile(shortname, version);
     LOG.debug("Loading EML from file: {}", emlFile.getAbsolutePath());
-    InputStream in = Files.newInputStream(emlFile.toPath());
-    return stripXSS(EmlFactory.build(in));
+    try (InputStream in = Files.newInputStream(emlFile.toPath())) {
+      return stripXSS(EmlFactory.build(in));
+    } catch (NoSuchFileException e) {
+      // not found, as for a missing data package file (IPT 3 showed an error page)
+      throw new FileNotFoundException(e.getMessage());
+    }
   }
 
   /**

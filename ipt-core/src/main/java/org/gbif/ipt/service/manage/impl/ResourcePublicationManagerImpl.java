@@ -54,6 +54,7 @@ import org.gbif.ipt.service.manage.ResourcePublicationManager;
 import org.gbif.ipt.service.registry.RegistryManager;
 import org.gbif.ipt.i18n.SimpleTextProvider;
 import org.gbif.ipt.job.JobService;
+import org.gbif.ipt.persistence.AtomicFiles;
 import org.gbif.ipt.task.Eml2Rtf;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackage;
 import org.gbif.ipt.task.GenerateDarwinCoreDataPackageFactory;
@@ -91,6 +92,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -137,7 +139,8 @@ import static org.gbif.ipt.model.Resource.CoreRowType.METADATA;
 public class ResourcePublicationManagerImpl extends BaseManager implements ResourcePublicationManager, ReportHandler {
 
   private static final int MAX_PROCESS_FAILURES = 3;
-  public static final SimpleDateFormat CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+  public static final ThreadLocal<SimpleDateFormat> CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
   private final ResourceManager resourceManager;
   private final RegistryManager registryManager;
@@ -619,7 +622,7 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     File trunkFile = dataDir.resourceDatapackageMetadataFile(resource.getShortname(), resource.getCoreType());
     File versionedFile = dataDir.resourceDatapackageMetadataFile(resource.getShortname(), resource.getCoreType(), version);
     try {
-      FileUtils.copyFile(trunkFile, versionedFile);
+      AtomicFiles.write(versionedFile.toPath(), out -> Files.copy(trunkFile.toPath(), out));
     } catch (IOException e) {
       throw new PublicationException(PublicationException.TYPE.EML,
           "Can't publish metadata file for resource " + resource.getShortname(), e);
@@ -1481,8 +1484,8 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
       InferredCamtrapTemporalScope inferredTemporalScope = inferredMetadata.getInferredTemporalScope();
 
       Temporal temporal = new Temporal();
-      temporal.setStart(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.format(inferredTemporalScope.getStartDate()));
-      temporal.setEnd(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.format(inferredTemporalScope.getEndDate()));
+      temporal.setStart(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.get().format(inferredTemporalScope.getStartDate()));
+      temporal.setEnd(CAMTRAP_TEMPORAL_METADATA_DATE_FORMAT.get().format(inferredTemporalScope.getEndDate()));
 
       ((CamtrapMetadata) resource.getDataPackageMetadata()).setTemporal(temporal);
     }
@@ -1968,7 +1971,8 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
     File versionedFile = dataDir.resourceEmlFile(resource.getShortname(), version);
 
     try {
-      FileUtils.copyFile(trunkFile, versionedFile);
+      // the version is already in the history, so pages may read this file while it is being written
+      AtomicFiles.write(versionedFile.toPath(), out -> Files.copy(trunkFile.toPath(), out));
     } catch (IOException e) {
       throw new PublicationException(PublicationException.TYPE.EML,
           "Can't publish eml file for resource " + resource.getShortname(), e);

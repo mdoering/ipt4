@@ -19,6 +19,7 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +104,20 @@ class PortalPagesTest {
   @Test
   void badVersionIs404() throws Exception {
     assertThat(mvc.perform(get("/resource?r=res1&v=abc")).andReturn().getResponse().getStatus()).isEqualTo(404);
+  }
+
+  /** A publication lists the new version before its eml-v.xml is written; a page asked for it then is not found. */
+  @Test
+  void versionWithoutItsEmlFileIs404() throws Exception {
+    String version = resources.get("res1").getLastPublishedVersionsVersion().toPlainString();
+    Path eml = dataDir.resolve("resources/res1/eml-" + version + ".xml");
+    Path aside = eml.resolveSibling("aside.xml");
+    Files.move(eml, aside);
+    try {
+      assertThat(mvc.perform(get("/resource?r=res1&v=" + version)).andReturn().getResponse().getStatus()).isEqualTo(404);
+    } finally {
+      Files.move(aside, eml);
+    }
   }
 
   @Test

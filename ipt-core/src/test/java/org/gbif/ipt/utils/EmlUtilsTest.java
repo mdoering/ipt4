@@ -15,14 +15,21 @@ package org.gbif.ipt.utils;
 
 import org.gbif.ipt.IptBaseTest;
 import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.model.Resource;
 import org.gbif.metadata.eml.ipt.model.Eml;
 import org.gbif.metadata.eml.ipt.model.KeywordSet;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -85,4 +92,34 @@ public class EmlUtilsTest extends IptBaseTest {
     assertEquals(1, keywords.size());
   }
 
+
+  /** Publishing copies eml.xml while a metadata save may rewrite it: a reader must never see a partly written file. */
+  @Test
+  public void writeWithLocaleNeverExposesAPartlyWrittenFile(@TempDir Path dir) throws Exception {
+    Resource resource = new Resource();
+    resource.setShortname("big");
+    resource.setEml(eml);
+    eml.setTitle("Big");
+    eml.setDescription("x".repeat(200_000));
+    File file = dir.resolve("eml.xml").toFile();
+    EmlUtils.writeWithLocale(file, resource, Locale.US);
+    String complete = Files.readString(file.toPath());
+
+    AtomicBoolean writing = new AtomicBoolean(true);
+    Thread writer = new Thread(() -> {
+      for (int i = 0; i < 200; i++) {
+        EmlUtils.writeWithLocale(file, resource, Locale.US);
+      }
+      writing.set(false);
+    });
+    writer.start();
+    int torn = 0;
+    while (writing.get()) {
+      if (!Files.readString(file.toPath()).equals(complete)) {
+        torn++;
+      }
+    }
+    writer.join();
+    assertEquals(0, torn, "reads of a partly written eml.xml");
+  }
 }

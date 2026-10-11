@@ -128,7 +128,7 @@ class ConcurrentUseTest {
     assertThat(p95).as("95th percentile response time (ms)").isLessThan(5_000);
   }
 
-  /** The public resource page while the next version is being published (on a slow CI runner every read overlapped it). */
+  /** The public resource page while the next version is being published: never a server error (a torn eml-v.xml was one). */
   @Test
   void resourcePageRendersDuringAPublication() throws Exception {
     ManageFixture.user(users, ADMIN, User.Role.Admin);
@@ -140,7 +140,7 @@ class ConcurrentUseTest {
     while (publications.isLocked("res1")) {
       MvcResult result = mvc.perform(get("/resource.do?r=res1")).andReturn();
       during++;
-      if (result.getResponse().getStatus() != 200) {
+      if (result.getResponse().getStatus() >= 500) {
         problems.add(result.getResponse().getStatus() + " " + cause(result));
       }
     }

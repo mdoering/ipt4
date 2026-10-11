@@ -535,4 +535,22 @@ introduced each. Generated from `docs/deviations.md` by `tools/docs/deviations-t
 |Roboto served by the IPT itself (the same variable-font files, from `+@fontsource-variable/roboto+`)
 |Visitors' browsers make no requests to Google (privacy); works on networks without Internet access
 |M7
+
+|Metadata files during publication
+|`+eml.xml+` and `+datapackage.json+` rewritten in place, so a publication running alongside a metadata save could copy a truncated file into the published version
+|Written to a temporary file and moved into place; the published copy too
+|Bug fix: a torn file broke that version's resource page for good
+|M7
+
+|Resource page for a version whose EML file is missing
+|Error page (status 500)
+|Not found (404), as for a missing data package file; happens briefly for managers while a publication is writing the new version
+|A missing file is not a server error
+|M7
+
+|Dates formatted during concurrent requests
+|Formatters shared between threads: the home page's resource table, DataCite and DCAT dates and the camtrap temporal scope could fail or show wrong dates under load
+|One formatter per thread
+|Bug fix
+|M7
 |===

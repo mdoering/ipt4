@@ -150,8 +150,10 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
 
   private static final Logger LOG = LogManager.getLogger(OverviewPage.class);
 
-  private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-  private static final DateFormat DATE_FORMAT_UI = new SimpleDateFormat("d MMMM yyyy HH:mm");
+  private static final ThreadLocal<DateFormat> DATE_FORMAT =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"));
+  private static final ThreadLocal<DateFormat> DATE_FORMAT_UI =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("d MMMM yyyy HH:mm"));
   private static final String PUBLISHING = "publishing";
   private static final TermFactory TERM_FACTORY = TermFactory.instance();
 
@@ -874,11 +876,11 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
       // set "make public" date
       if (StringUtils.isNotEmpty(makePublicDateTime)) {
         try {
-          Date date = DATE_FORMAT.parse(makePublicDateTime);
+          Date date = DATE_FORMAT.get().parse(makePublicDateTime);
           resource.setMakePublicDate(date);
           saveResource();
           addActionMessage(
-              getText("manage.overview.changed.publication.status.become.public", new String[]{DATE_FORMAT_UI.format(date)})
+              getText("manage.overview.changed.publication.status.become.public", new String[]{DATE_FORMAT_UI.get().format(date)})
                   + " "
                   + getText("manage.overview.changed.publication.status.republication"));
         } catch (Exception e) {

@@ -52,7 +52,8 @@ public class ResourceDataTableViewManagerImpl extends BaseManager implements Res
 
   private static final Comparator<String> nullSafeStringComparator = Comparator.nullsFirst(String::compareToIgnoreCase);
   private static final Comparator<Date> nullSafeDateComparator = Comparator.nullsFirst(Date::compareTo);
-  private static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  private static final ThreadLocal<SimpleDateFormat> DATETIME_FORMAT =
+      ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
   private final ResourceManager resourceManager;
   private final VocabulariesManager vocabManager;
@@ -355,7 +356,7 @@ public class ResourceDataTableViewManagerImpl extends BaseManager implements Res
     if (date == null) {
       return "<span>--</span>";
     }
-    return DATETIME_FORMAT.format(date);
+    return DATETIME_FORMAT.get().format(date);
   }
 
   /**
@@ -376,8 +377,8 @@ public class ResourceDataTableViewManagerImpl extends BaseManager implements Res
 
     // highlight if next published is before now (something wrong)
     return date.before(now)
-        ? "<span class=\"text-gbif-danger\">" + DATETIME_FORMAT.format(date) + "</span>"
-        : DATETIME_FORMAT.format(date);
+        ? "<span class=\"text-gbif-danger\">" + DATETIME_FORMAT.get().format(date) + "</span>"
+        : DATETIME_FORMAT.get().format(date);
   }
 
   /**
