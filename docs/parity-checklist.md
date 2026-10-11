@@ -40,5 +40,5 @@ Each IPT 3 feature area, the tests that cover it on IPT4, and what is left. Inte
 
 ## Left for M7 (optional)
 
-Bootstrap 5.3, self-hosted fonts, a layout macro, replacing the `@s.*` tag shim, an `/api/v1` OpenAPI skeleton,
+Done in M7: Bootstrap 5.3.8 and the removal of the `@s.*` tag shim. Still optional: self-hosted fonts, a layout macro, an `/api/v1` OpenAPI skeleton,
 and the deferred minor review findings listed in the milestone ledgers.

@@ -298,6 +298,20 @@ table {
     color: #575757 !important;
 }
 
+/* Bootstrap 5.2+ colours the cells themselves; keep 5.0's grey text, emphasis colour and transparent cells */
+.table {
+    --bs-table-color: #575757;
+    --bs-table-bg: transparent;
+    --bs-table-striped-color: #212529;
+    --bs-table-active-color: #212529;
+    --bs-table-hover-color: #212529;
+}
+
+/* Bootstrap 5.3 greys out disabled fields only; the IPT shows read-only fields grey too, as with 5.0 */
+.form-control[readonly] {
+    background-color: #e9ecef;
+}
+
 /* Login container */
 .login-container {
     max-width: 500px;

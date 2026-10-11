@@ -1,7 +1,7 @@
 {
   "comment": "Third-party front-end libraries vendored under ipt-app/src/main/resources/static. Renovate proposes updates via the npm datasource; re-vendor the files by hand and review the pages visually. Keep each library on one line.",
   "libraries": [
-    {"name": "bootstrap", "npm": "bootstrap", "version": "5.0.1", "paths": ["js/bootstrap/bootstrap.bundle.min.js", "styles/bootstrap/bootstrap.min.css"]},
+    {"name": "bootstrap", "npm": "bootstrap", "version": "5.3.8", "paths": ["js/bootstrap/bootstrap.bundle.min.js", "styles/bootstrap/bootstrap.min.css"]},
     {"name": "bootstrap-icons", "npm": "bootstrap-icons", "version": null, "paths": ["styles/bootstrap-icons/font/bootstrap-icons.css"]},
     {"name": "jquery", "npm": "jquery", "version": "3.7.1", "paths": ["js/jquery/jquery-3.7.1.min.js"]},
     {"name": "jquery-ui", "npm": "jquery-ui", "version": "1.14.2", "paths": ["js/jquery/jquery-ui-1.14.2.min.js"]},

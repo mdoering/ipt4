@@ -49,4 +49,22 @@ class VendoredAssetsManifestTest {
       }
     }
   }
+
+  /** The vendored Bootstrap files are the version the manifest names (their banner says so). */
+  @Test
+  void bootstrapFilesAreTheManifestVersion() throws Exception {
+    JsonNode libraries = JsonMapper.builder().build().readTree(Files.readString(MANIFEST)).get("libraries");
+    for (int i = 0; i < libraries.size(); i++) {
+      JsonNode library = libraries.get(i);
+      if (library.get("name").asString().equals("bootstrap")) {
+        String version = library.get("version").asString();
+        for (JsonNode path : library.get("paths")) {
+          String head = Files.readString(STATIC.resolve(path.asString())).substring(0, 200);
+          assertThat(head).as(path.asString()).containsPattern("Bootstrap\\s+v" + java.util.regex.Pattern.quote(version) + "\\s");
+        }
+        return;
+      }
+    }
+    throw new AssertionError("no bootstrap entry in the manifest");
+  }
 }
