@@ -65,6 +65,8 @@ s = re.sub(r"^\s*HttpServletResponse response = response;\n", "", s, flags=re.M)
 s = s.replace("import org.gbif.ipt.i18n.StrutsI18n;", "import org.gbif.ipt.i18n.FeedbackI18n;")
 s = s.replace("import org.gbif.ipt.struts2.StrutsI18n;", "import org.gbif.ipt.i18n.FeedbackI18n;")
 s = s.replace("new StrutsI18n(this)", "new FeedbackI18n(this)")
+# IPT 3 kept the user in the session; IPT4 pages know the current user
+s = s.replace("session.get(Constants.SESSION_USER)", "getCurrentUser()")
 # the invoked method, which Struts read from the action invocation
 s = re.sub(r"ActionInvocation (\w+) = ActionContext\.getContext\(\)\.getActionInvocation\(\);\s*\n\s*String (\w+) = \1\.getProxy\(\)\.getMethod\(\);",
            r"String \2 = getInvokedMethod();", s)

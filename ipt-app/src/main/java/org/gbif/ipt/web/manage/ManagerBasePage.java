@@ -68,6 +68,14 @@ public abstract class ManagerBasePage extends PostActionPage {
     }
   }
 
+  /**
+   * The section of a {@code <prefix><section>[.do]} URL: IPT 3 read it between the prefix and the next dot, which the
+   * removed {@code .do} no longer gives; an empty string when the URL has no such prefix.
+   */
+  protected String sectionFromUri(String prefix) {
+    return StringUtils.removeEnd(StringUtils.substringAfterLast(req.getRequestURI(), prefix), ".do");
+  }
+
   protected void saveResource() {
     try {
       resourceManager.save(resource);

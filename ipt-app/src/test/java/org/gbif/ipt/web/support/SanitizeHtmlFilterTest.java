@@ -59,4 +59,20 @@ class SanitizeHtmlFilterTest {
     Map<String, String> flagged = (Map<String, String>) out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR);
     assertThat(flagged).containsOnlyKeys("eml.abstract");
   }
+
+  /** The editors post DocBook for these fields; EmlValidator checks it against the EML schema. */
+  @Test
+  void docBookFieldsPassUnchangedUnlessALinkIsNotAWebLink() throws Exception {
+    String docBook = "<para>Benthem &amp; Hooker\u2019s <emphasis>flora</emphasis> <ulink url=\"https://gbif.org\">"
+        + "<citetitle>GBIF</citetitle></ulink></para><itemizedlist><listitem><para>a</para></listitem></itemizedlist>"
+        + "<literalLayout>x</literalLayout>";
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/manage/metadata-basic.do");
+    request.addParameter("eml.description", docBook);
+    request.addParameter("eml.purpose", "<para><ulink url=\"javascript:alert(1)\">x</ulink></para>");
+    HttpServletRequest out = filtered(request);
+    assertThat(out.getParameter("eml.description")).isEqualTo(docBook);
+    @SuppressWarnings("unchecked")
+    Map<String, String> flagged = (Map<String, String>) out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR);
+    assertThat(flagged).containsOnlyKeys("eml.purpose");
+  }
 }

@@ -235,7 +235,7 @@ public class CamtrapMetadataPage extends ManagerBasePage {
   @Override
   public void prepare() {
     super.prepare();
-    if (session.get(Constants.SESSION_USER) == null) {
+    if (getCurrentUser() == null) {
       return;
     }
 
@@ -246,7 +246,7 @@ public class CamtrapMetadataPage extends ManagerBasePage {
 
   private void prepareCamtrap() {
     // take the section parameter from the requested url
-    section = CamtrapMetadataSection.fromName(StringUtils.substringBetween(req.getRequestURI(), "camtrap-metadata-", "."));
+    section = CamtrapMetadataSection.fromName(sectionFromUri("camtrap-metadata-"));
     CamtrapMetadata metadata = (CamtrapMetadata) resource.getDataPackageMetadata();
     DataPackageSchema dataPackageSchema = dataPackageSchemaManager.get(CAMTRAP_DP);
 

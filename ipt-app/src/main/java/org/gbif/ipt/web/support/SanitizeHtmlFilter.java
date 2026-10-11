@@ -97,6 +97,18 @@ public class SanitizeHtmlFilter implements Filter {
       )));
 
   /**
+   * IPT4: parameters the metadata editors post as DocBook (their JavaScript converts the editor's HTML), which
+   * EmlValidator checks against the EML schema. IPT 3 ran them through the HTML policy, which removed every DocBook
+   * element, so a structured description could not be saved. They pass unchanged, unless a link is not a web or mail
+   * link (the schema does not check those).
+   */
+  private static final Set<String> DOCBOOK_PARAMETERS = Set.of(
+      "eml.description", "eml.acknowledgements", "eml.purpose", "eml.introduction", "eml.gettingStarted");
+
+  private static final java.util.regex.Pattern UNSAFE_LINK = java.util.regex.Pattern.compile(
+      "\\burl\\s*=\\s*[\"']\\s*(?!(?:https?|mailto|ftp):)", java.util.regex.Pattern.CASE_INSENSITIVE);
+
+  /**
    * Tags allowed in rich-text parameters, matching the "Allowed HTML tags" list shown to users
    * in the form help text: div, p, ul, ol, li, h1, pre, a, b, em, sup, sub.
    * <p>
@@ -200,6 +212,12 @@ public class SanitizeHtmlFilter implements Filter {
         return null;
       }
 
+      if (DOCBOOK_PARAMETERS.contains(parameter)) {
+        if (UNSAFE_LINK.matcher(value).find()) {
+          flaggedFields.put(parameter, RICH_TEXT_FLAG_MESSAGE);
+        }
+        return value;
+      }
       if (RICH_TEXT_PARAMETERS.contains(parameter)) {
         return sanitizeRichText(parameter, value);
       }
