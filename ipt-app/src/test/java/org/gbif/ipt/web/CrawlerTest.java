@@ -20,6 +20,7 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
 import org.gbif.ipt.service.manage.ResourcePublicationManager;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
@@ -28,6 +29,7 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,6 +41,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,8 +51,10 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 /**
  * Follows every link and GET form within the IPT from the home page, logged out and as admin: no errors, no template
@@ -61,11 +66,12 @@ class CrawlerTest {
 
   private static final String BASE = "http://localhost:8080";
   private static final String ADMIN = "crawler.admin@example.org";
-  /** The admin area (M5), the metadata editors (M4) and logout (a POST). */
-  private static final List<String> NOT_YET = List.of("/admin", "/logout", "/manage/metadata-",
-      "/manage/camtrap-metadata-", "/manage/datapackage-metadata-", "/manage/uploadlogo");
+  /** The admin area (M5) and logout (a POST). */
+  private static final List<String> NOT_YET = List.of("/admin", "/logout");
   private static final List<String> TEMPLATE_CODE = List.of("${", "<@s", "[@s", "<#", "[#", "FreeMarker template error");
   private static final int MAX_PAGES = 400;
+  /** IPT 3's data package previews link to the downloads before the first publication too (404 until then). */
+  private static final Pattern UNPUBLISHED_DOWNLOAD = Pattern.compile("/(archive|metadata)\\.do\\?r=(cam1|col1)(&v=.*)?");
 
   static Path dataDir;
 
@@ -93,6 +99,19 @@ class CrawlerTest {
       admin.setPassword("Secret-pass-1");
       users.create(admin);
     }
+    dataPackage("cam1", "camtrap-dp", "camtrap-datapackage.json", "datapackage.json");
+    dataPackage("col1", "coldp", "coldp-metadata.yaml", "metadata.yaml");
+  }
+
+  private void dataPackage(String shortname, String type, String fixture, String fileName) throws Exception {
+    if (resources.get(shortname) == null) {
+      try (InputStream in = getClass().getResourceAsStream("/create/" + fixture)) {
+        mvc.perform(multipart("/manage/create.do").file(new MockMultipartFile("file", fileName, "text/plain",
+                in.readAllBytes())).param("shortname", shortname).param("resourceType", type)
+            .with(user(ADMIN)).with(csrf()));
+      }
+    }
+    assertThat(resources.get(shortname)).as(shortname).isNotNull();
   }
 
   @Test
@@ -102,7 +121,12 @@ class CrawlerTest {
 
   @Test
   void asAdmin() throws Exception {
-    assertThat(crawl(true)).hasSizeGreaterThan(15);
+    Set<String> seen = crawl(true);
+    assertThat(seen).hasSizeGreaterThan(15);
+    // the metadata editors of an EML resource and of a Camtrap DP resource
+    assertThat(seen).anyMatch(url -> url.startsWith("/manage/metadata-additional"))
+        .anyMatch(url -> url.startsWith("/manage/camtrap-metadata-other"))
+        .anyMatch(url -> url.startsWith("/manage/resource") && url.contains("r=col1"));
   }
 
   private Set<String> crawl(boolean admin) throws Exception {
@@ -132,7 +156,7 @@ class CrawlerTest {
         }
         continue;
       }
-      if (response.getStatus() >= 400) {
+      if (response.getStatus() >= 400 && !(response.getStatus() == 404 && UNPUBLISHED_DOWNLOAD.matcher(url).matches())) {
         problems.add(response.getStatus() + " " + url);
         continue;
       }
