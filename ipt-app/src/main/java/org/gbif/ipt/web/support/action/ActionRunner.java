@@ -26,6 +26,7 @@ import org.gbif.ipt.model.Source;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.Vocabulary;
 import org.gbif.ipt.model.VocabularyConcept;
+import org.gbif.ipt.web.support.SanitizeHtmlFilter;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -101,6 +102,13 @@ public class ActionRunner {
     List<UploadedFile> files = upload(page, request);
     try {
       bind(page, request);
+      // IPT 3's XssFieldErrorInterceptor: what SanitizeHtmlFilter had to clean is a field error, the form returns
+      if (request.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR) instanceof Map<?, ?> flagged
+          && !flagged.isEmpty()) {
+        flagged.forEach((field, message) -> page.addFieldError(String.valueOf(field), String.valueOf(message)));
+        return page instanceof ValidationErrorAware aware
+            ? aware.actionErrorOccurred(ActionPage.INPUT) : ActionPage.INPUT;
+      }
       if (!NOT_VALIDATED.contains(methodName)) {
         page.validate();
       }

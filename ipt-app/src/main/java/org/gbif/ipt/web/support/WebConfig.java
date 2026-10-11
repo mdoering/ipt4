@@ -110,6 +110,15 @@ public class WebConfig implements WebMvcConfigurer {
     return properties.createMultipartConfig();
   }
 
+  /** IPT 3's SanitizeHtmlFilter on every request: tags leave all parameters but the EML rich-text fields. */
+  @Bean
+  public FilterRegistrationBean<SanitizeHtmlFilter> sanitizeHtmlFilter() {
+    FilterRegistrationBean<SanitizeHtmlFilter> registration = new FilterRegistrationBean<>(new SanitizeHtmlFilter());
+    registration.addUrlPatterns("/*");
+    registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 30);
+    return registration;
+  }
+
   @Bean(name = DispatcherServlet.FLASH_MAP_MANAGER_BEAN_NAME)
   public FlashMapManager flashMapManager() {
     return new DoSuffixFlashMapManager();
