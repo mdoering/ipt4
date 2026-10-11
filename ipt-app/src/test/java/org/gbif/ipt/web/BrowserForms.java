@@ -15,8 +15,10 @@ package org.gbif.ipt.web;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,13 +50,16 @@ public final class BrowserForms {
     URI action = URI.create(form.absUrl("action"));
     MockHttpServletRequestBuilder post = post(URI.create(action.getRawPath()
         + (action.getRawQuery() == null ? "" : "?" + action.getRawQuery())));
+    Set<String> sent = new HashSet<>();
     for (Element field : form.select("input[name], select[name], textarea[name]")) {
       String name = field.attr("name");
       if (field.hasAttr("disabled") || name.equals("_csrf")) {
         continue;
       }
       if (changed.containsKey(name)) {
-        post.param(name, changed.get(name));
+        if (sent.add(name)) {
+          post.param(name, changed.get(name));
+        }
         continue;
       }
       switch (field.tagName()) {
@@ -84,6 +89,12 @@ public final class BrowserForms {
         }
       }
     }
-    return post.param("save", "Save");
+    // the clicked button, or fields outside the form element (form="id"), or ones a crafted request adds
+    changed.forEach((name, value) -> {
+      if (!sent.contains(name)) {
+        post.param(name, value);
+      }
+    });
+    return changed.containsKey("save") ? post : post.param("save", "Save");
   }
 }

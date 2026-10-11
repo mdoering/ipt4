@@ -101,6 +101,8 @@ public class UserAccountsPage extends PostActionPage {
   private String password2;
   private boolean resetPassword;
   private boolean newUser;
+  /** The account being edited, as stored. */
+  private User stored;
   @Getter
   private List<User> users;
 
@@ -242,6 +244,7 @@ public class UserAccountsPage extends PostActionPage {
       newUser = true;
     } else {
       try {
+        stored = user;
         user = (User) user.clone();
       } catch (CloneNotSupportedException e) {
         LOG.error("An exception occurred while retrieving user: {}", e.getMessage(), e);
@@ -252,6 +255,11 @@ public class UserAccountsPage extends PostActionPage {
   @Override
   public String save() {
     User currentUser = getCurrentUser();
+    if (stored != null) {
+      // the form posts neither (the email field is disabled): an edit changes neither the account nor its password
+      user.setEmail(stored.getEmail());
+      user.setPassword(stored.getPassword());
+    }
 
     try {
       if (id == null) {
