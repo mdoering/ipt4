@@ -83,7 +83,7 @@ resourcesTable macro: Generates a data table that has searching, pagination, and
             var dt = $('#rtable').DataTable({
                 ajax: {
                     url: <#if shownPublicly>'${baseURL}/api/resources'<#else>'${baseURL}/manager-api/resources'</#if>,
-                    type: 'POST'
+                    type: 'GET'
                 },
                 responsive: true,
                 "bProcessing": true,

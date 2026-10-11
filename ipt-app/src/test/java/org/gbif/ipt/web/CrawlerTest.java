@@ -30,6 +30,7 @@ import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
@@ -40,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
@@ -56,6 +58,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 
 /**
  * Follows every link and GET form within the IPT from the home page, logged out and as admin: no errors, no template
@@ -134,6 +137,22 @@ class CrawlerTest {
         .anyMatch(url -> url.startsWith("/admin/logs")).anyMatch(url -> url.startsWith("/admin/bulk-publication"))
         .anyMatch(url -> url.startsWith("/manage/camtrap-metadata-other"))
         .anyMatch(url -> url.startsWith("/manage/resource") && url.contains("r=col1"));
+  }
+
+  /** The resource tables load their rows with the HTTP method the page declares (browsers do, the crawler doesn't). */
+  @Test
+  void resourceTablesLoadWithTheDeclaredMethod() throws Exception {
+    Pattern ajax = Pattern.compile("url: *'([^']+)'.*?type: *'(\\w+)'", Pattern.DOTALL);
+    for (String page : List.of("/", "/manage/")) {
+      String html = mvc.perform(get(page).with(user(ADMIN))).andReturn().getResponse().getContentAsString();
+      Matcher m = ajax.matcher(html);
+      assertThat(m.find()).as(page).isTrue();
+      String url = URI.create(m.group(1)).getPath() + "?draw=1&start=0&length=10";
+      MockHttpServletResponse rows = mvc.perform(request(HttpMethod.valueOf(m.group(2)), url).with(user(ADMIN))
+          .with(csrf())).andReturn().getResponse();
+      assertThat(rows.getStatus()).as(m.group(2) + " " + url).isEqualTo(200);
+      assertThat(rows.getContentAsString()).contains("aaData");
+    }
   }
 
   private Set<String> crawl(boolean admin) throws Exception {
