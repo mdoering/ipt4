@@ -40,7 +40,8 @@ import com.sun.net.httpserver.HttpServer;
  */
 public final class StubRegistry {
 
-  public record Request(String method, String path, String body) {
+  /** A recorded request; {@code user} is the HTTP Basic user name, if any. */
+  public record Request(String method, String path, String body, String user) {
   }
 
   private record Answer(int status, String contentType, String body) {
@@ -88,7 +89,8 @@ public final class StubRegistry {
       String method = exchange.getRequestMethod();
       String path = exchange.getRequestURI().getPath();
       String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-      requests.add(new Request(method, exchange.getRequestURI().toString(), body));
+      requests.add(new Request(method, exchange.getRequestURI().toString(), body,
+          basicUser(exchange.getRequestHeaders().getFirst("Authorization"))));
       Answer answer = answers.get(method + " " + path);
       if (answer == null && "GET".equals(method)) {
         answer = login(path, exchange.getRequestHeaders().getFirst("Authorization"));
@@ -163,6 +165,14 @@ public final class StubRegistry {
       }
     }
     return null;
+  }
+
+  private static String basicUser(String authorization) {
+    if (authorization == null || !authorization.startsWith("Basic ")) {
+      return null;
+    }
+    String decoded = new String(java.util.Base64.getDecoder().decode(authorization.substring(6)), StandardCharsets.UTF_8);
+    return decoded.substring(0, Math.max(0, decoded.indexOf(':')));
   }
 
   private static String normalized(String s) {
