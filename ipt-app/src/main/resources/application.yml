@@ -32,6 +32,11 @@ server:
     encoding:
       charset: UTF-8
       force: true
+    session:
+      cookie:
+        # not sent with other sites' cross-site posts (CSRF defence in depth)
+        same-site: lax
+        http-only: true
 
 management:
   endpoints:
