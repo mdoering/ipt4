@@ -19,7 +19,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-/** Template-wide variables: the Struts tag shim {@code s} and the {@code csrfField} directive. */
+/** Template-wide variables: the text function {@code t}, the Struts tag shim {@code s} and the {@code csrfField} directive. */
 @Component
 public class IptTemplateVariables implements FreeMarkerSharedVariables {
 
@@ -31,6 +31,6 @@ public class IptTemplateVariables implements FreeMarkerSharedVariables {
 
   @Override
   public Map<String, Object> variables() {
-    return Map.of("s", new IptTagLibrary(messages), "csrfField", new CsrfFieldDirective());
+    return Map.of("t", new TextFunction(messages), "s", new IptTagLibrary(messages), "csrfField", new CsrfFieldDirective());
   }
 }
