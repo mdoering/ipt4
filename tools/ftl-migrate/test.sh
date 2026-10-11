@@ -13,4 +13,7 @@ diff -ru "$here/test/expected" "$out/twice"
 
 grep -q "angle.ftl:9: Struts/OGNL construct '%{' needs manual migration" "$out/report.txt"
 grep -q "script.ftl:3: POST form not at line start, add the CSRF field manually" "$out/report.txt"
+grep -q "shim.ftl:12: Struts tag s.text needs manual migration" "$out/report.txt"
+grep -q "shim.ftl:25: Struts tag s.property needs manual migration" "$out/report.txt"
+grep -q "shim.ftl:26: Struts tag s.select needs manual migration" "$out/report.txt"
 echo "ftl-migrate: OK"
