@@ -1,7 +1,7 @@
 # IPT 4
 
 The GBIF Integrated Publishing Toolkit, rebuilt on Spring Boot 4 and Java 25.
-The design is in [docs/design.md](docs/design.md). It is ported from IPT 3 at the commit named in [docs/BASELINE.md](docs/BASELINE.md).
+The design is in [docs/design.md](docs/design.md). User documentation is the Antora component in [docs/modules/ROOT/pages](docs/modules/ROOT/pages); what is covered and what is left before 4.0 is in [docs/parity-checklist.md](docs/parity-checklist.md). It is ported from IPT 3 at the commit named in [docs/BASELINE.md](docs/BASELINE.md).
 
 ## Build and run
 
