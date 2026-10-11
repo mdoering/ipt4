@@ -153,6 +153,8 @@ public class ActionRunner {
     binder.setAllowedFields(
         allowedFields.computeIfAbsent(pageType, type -> allowed(type, page.extraAllowedFields())));
     binder.setFieldMarkerPrefix("__checkbox_");
+    // IPT 3's *-conversion.properties
+    binder.setConversionService(StrutsConversions.SERVICE);
     binder.setAutoGrowCollectionLimit(100_000);
     binder.bind(request);
     BindingResult result = binder.getBindingResult();

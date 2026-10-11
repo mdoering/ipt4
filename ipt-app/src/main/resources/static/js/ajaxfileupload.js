@@ -41,6 +41,12 @@ jQuery.extend({
         jQuery(oldElement).appendTo(form);
         jQuery(resource).appendTo(form);
         jQuery(validate).appendTo(form);
+        // IPT4: the CSRF token (meta tags in inc/header.ftl), as this form is posted through an iframe, not XHR
+        var csrfParameter = jQuery('meta[name="_csrf_parameter"]').attr('content');
+        var csrfToken = jQuery('meta[name="_csrf"]').attr('content');
+        if (csrfParameter && csrfToken) {
+            jQuery('<input type="hidden"/>').attr('name', csrfParameter).val(csrfToken).appendTo(form);
+        }
         //set attributes
         jQuery(form).css('position', 'absolute');
         jQuery(form).css('top', '-1200px');
