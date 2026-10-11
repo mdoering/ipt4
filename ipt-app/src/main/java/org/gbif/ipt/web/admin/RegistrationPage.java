@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -234,9 +235,28 @@ public class RegistrationPage extends PostActionPage {
     return validatedBaseURL;
   }
 
+  /** The registered IPT the update form binds to; it replaces the registered one's fields once the registry has it. */
+  private Ipt workingIpt;
+
+  /** IPT 3 bound {@code registeredIpt.*} on every page; here only the update form's fields, onto a copy. */
+  @Override
+  protected List<String> extraAllowedFields() {
+    return List.of("registeredIpt.name", "registeredIpt.description", "registeredIpt.primaryContactName",
+        "registeredIpt.primaryContactFirstName", "registeredIpt.primaryContactLastName",
+        "registeredIpt.primaryContactEmail");
+  }
+
+  @Override
+  public Ipt getRegisteredIpt() {
+    return workingIpt != null ? workingIpt : super.getRegisteredIpt();
+  }
+
   @Override
   public void prepare() {
     super.prepare();
+    if (isHttpPost() && registrationManager.getIpt() != null) {
+      workingIpt = SerializationUtils.clone(registrationManager.getIpt());
+    }
     // will not be session scoping the list of organisations from the registry as this is basically a 1 time step
     if (getRegisteredIpt() == null) {
       loadOrganisations();
@@ -289,8 +309,15 @@ public class RegistrationPage extends PostActionPage {
       if (cancel) {
         return cancel();
       }
-      registryManager.updateIpt(getRegisteredIpt());
-      updateResources(getRegisteredIpt());
+      registryManager.updateIpt(workingIpt);
+      Ipt registered = registrationManager.getIpt();
+      registered.setName(workingIpt.getName());
+      registered.setDescription(workingIpt.getDescription());
+      registered.setPrimaryContactName(workingIpt.getPrimaryContactName());
+      registered.setPrimaryContactFirstName(workingIpt.getPrimaryContactFirstName());
+      registered.setPrimaryContactLastName(workingIpt.getPrimaryContactLastName());
+      registered.setPrimaryContactEmail(workingIpt.getPrimaryContactEmail());
+      updateResources(registered);
       registrationManager.save();
       addActionMessage(getText("admin.registration.success.update"));
     } catch (RegistryException e) {
@@ -336,7 +363,7 @@ public class RegistrationPage extends PostActionPage {
         getHostingOrganisation().setPassword(hostingOrganisationToken);
       }
       if (StringUtils.isNotEmpty(registeredIptPassword)) {
-        getRegisteredIpt().setWsPassword(registeredIptPassword);
+        registrationManager.getIpt().setWsPassword(registeredIptPassword);
       }
       registrationManager.save();
       addActionMessage(getText("admin.ipt.success.update"));

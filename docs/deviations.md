@@ -76,3 +76,7 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Synchronise extensions and vocabularies | Also on a GET with `?synchronise=true` | Only from the page's button (POST) | No state changes on GET | M5 |
 | Install an extension by URL | Any URL, including `file:` | Web links (http, https) only | A file URL read a local file | M5 |
 | Unknown data package schema page | Error page (500) | 404 | An old link should not look like a crash | M5 |
+| Organisation passwords (GBIF and DOI agency) in the organisation form | Written into the page | Never shown; an empty field keeps the stored password | Secrets do not belong in pages | M5 |
+| Registered IPT fields (`registeredIpt.*`) | Bindable on every page (any manager's form could change the IPT's registered name or contacts in memory) | Only the registration update form, applied after the registry accepted the update | Shared data changed only where it is edited | M5 |
+| Organisation that cannot be removed | Error page while showing the message | The organisation form with the message | The reason is visible | M5 |
+| Organisation login check failing | Logged the organisation's password | Logs the key only | No passwords in logs | M5 |

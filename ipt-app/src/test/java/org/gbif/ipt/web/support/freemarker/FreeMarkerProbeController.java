@@ -37,6 +37,7 @@ public class FreeMarkerProbeController {
     model.addAttribute("fieldErrors", Map.of("email", List.of("Email is <required>")));
     model.addAttribute("options", new TreeMap<>(Map.of("a", "Alpha", "b", "Beta & Co")));
     model.addAttribute("beans", List.of(new Lang("en", "English"), new Lang("fr", "French")));
+    model.addAttribute("chosen", "fr");
     model.addAttribute("page", new ProbePage());
     model.addAttribute(IptFreeMarkerView.PAGE, new ProbePage());
     return "probe/" + view;

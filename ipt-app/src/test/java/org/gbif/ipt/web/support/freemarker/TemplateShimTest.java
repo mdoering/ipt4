@@ -87,7 +87,10 @@ class TemplateShimTest {
         .contains("H1:<input type=\"hidden\" name=\"page.title\" value=\"From page\" id=\"page.title\"/>")
         .contains("H2:<input type=\"hidden\" name=\"removeLogo\" value=\"false\" id=\"removeLogo\"/>")
         .contains("H3:<input type=\"hidden\" name=\"html\" value=\"&lt;b&gt;bold&lt;/b&gt;\" id=\"html\"/>")
-        .contains("H4:<input type=\"hidden\" name=\"no.such.thing\" id=\"no_such_thing\"/>");
+        .contains("H4:<input type=\"hidden\" name=\"no.such.thing\" id=\"no_such_thing\"/>")
+        // Struts evaluated list and value as expressions
+        .containsPattern("L3:<select name=\"org.key\" id=\"org.key\">\\s*<option value=\"en\">English</option>\\s*"
+            + "<option value=\"fr\" selected=\"selected\">French</option>");
   }
 
   @Test

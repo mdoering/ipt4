@@ -62,6 +62,12 @@ final class PropertyDirective implements TemplateDirectiveModel {
 
   /** The value of an OGNL-style path (names, {@code [index]}, {@code ['key']}) as text, or null when missing. */
   static String lookup(Environment env, String path) throws TemplateException {
+    TemplateModel value = lookupModel(env, path);
+    return value == null ? null : asString(value);
+  }
+
+  /** The value of an OGNL-style path, or null when missing. */
+  static TemplateModel lookupModel(Environment env, String path) throws TemplateException {
     TemplateModel value = null;
     Matcher step = STEP.matcher(path);
     boolean first = true;
@@ -82,7 +88,7 @@ final class PropertyDirective implements TemplateDirectiveModel {
         return null;
       }
     }
-    return first ? null : asString(value);
+    return first ? null : value;
   }
 
   private static String asString(TemplateModel value) throws TemplateException {

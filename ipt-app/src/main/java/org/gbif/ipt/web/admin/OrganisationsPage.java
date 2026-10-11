@@ -148,6 +148,11 @@ public class OrganisationsPage extends PostActionPage {
     } catch (IOException e) {
       addActionError(getText("admin.organisation.cantSave") + ": " + e.getMessage());
     }
+    // the form again, with the organisation as stored (a POST loads none; IPT 3 failed rendering it)
+    Organisation fromDisk = registrationManager.getFromDisk(id);
+    if (organisation == null && fromDisk != null) {
+      organisation = new Organisation(fromDisk);
+    }
     return INPUT;
   }
 
@@ -288,6 +293,18 @@ public class OrganisationsPage extends PostActionPage {
 
   @Override
   public void validate() {
+    if (isHttpPost() && !cancel && !delete && id != null && organisation != null) {
+      // the form shows no passwords: an empty field keeps the stored one (IPT 3 wrote them into the page)
+      Organisation stored = registrationManager.getFromDisk(id);
+      if (stored != null) {
+        if (StringUtils.isEmpty(organisation.getPassword())) {
+          organisation.setPassword(stored.getPassword());
+        }
+        if (StringUtils.isEmpty(organisation.getAgencyAccountPassword())) {
+          organisation.setAgencyAccountPassword(stored.getAgencyAccountPassword());
+        }
+      }
+    }
     if (isHttpPost() && !cancel && !delete & !synchronise) {
       boolean validated = true;
       if (organisation.isAgencyAccountPrimary()) {

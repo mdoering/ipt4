@@ -13,6 +13,7 @@
  */
 package org.gbif.ipt.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -21,7 +22,7 @@ import jakarta.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class AgentBase {
+public abstract class AgentBase implements Serializable {
 
   private UUID key;
   protected String description;

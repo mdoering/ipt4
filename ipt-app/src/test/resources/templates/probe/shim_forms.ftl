@@ -18,3 +18,4 @@ H1:<@s.hidden name="page.title" id="page.title"/>
 H2:<@s.hidden name="removeLogo" id="removeLogo" value="false" required="true"/>
 H3:<@s.hidden name="html"/>
 H4:<@s.hidden name="no.such.thing"/>
+L3:<@s.select id="org.key" name="org.key" list="beans" listKey="code" listValue="label" value="chosen"/>

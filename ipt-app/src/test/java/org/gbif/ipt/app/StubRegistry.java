@@ -49,6 +49,7 @@ public final class StubRegistry {
   private final HttpServer server;
   private final Map<String, Answer> answers = new ConcurrentHashMap<>();
   private final List<Request> requests = new CopyOnWriteArrayList<>();
+  private final Map<String, String> organisationPasswords = new ConcurrentHashMap<>();
 
   private StubRegistry() throws IOException {
     server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
@@ -73,6 +74,11 @@ public final class StubRegistry {
     answers.put(method + " " + path, new Answer(status, contentType, body));
   }
 
+  /** The password the registry's organisation login accepts for this key. */
+  public void organisationPassword(String key, String password) {
+    organisationPasswords.put(key, password);
+  }
+
   public List<Request> requests() {
     return List.copyOf(requests);
   }
@@ -84,6 +90,9 @@ public final class StubRegistry {
       String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
       requests.add(new Request(method, exchange.getRequestURI().toString(), body));
       Answer answer = answers.get(method + " " + path);
+      if (answer == null && "GET".equals(method)) {
+        answer = login(path, exchange.getRequestHeaders().getFirst("Authorization"));
+      }
       if (answer == null && "GET".equals(method)) {
         answer = listingOrFile(path);
       }
@@ -97,7 +106,32 @@ public final class StubRegistry {
     }
   }
 
+  /** The organisation login ({@code /registry/organisation/<key>?op=login}) with HTTP Basic credentials. */
+  private Answer login(String path, String authorization) {
+    java.util.regex.Matcher login = java.util.regex.Pattern.compile("/registry/organisation/([0-9a-f-]{36})")
+        .matcher(path);
+    if (!login.matches()) {
+      return null;
+    }
+    String password = organisationPasswords.get(login.group(1));
+    String expected = password == null ? null : "Basic " + java.util.Base64.getEncoder()
+        .encodeToString((login.group(1) + ":" + password).getBytes(StandardCharsets.UTF_8));
+    return expected != null && expected.equals(authorization)
+        ? new Answer(200, "application/json", "{}") : new Answer(401, "text/plain", "unauthorized");
+  }
+
   private Answer listingOrFile(String path) throws IOException {
+    if (path.equals("/registry/organisation.json") || path.equals("/registry/network.json")) {
+      URL listing = StubRegistry.class.getResource("/registry" + path.substring("/registry".length()));
+      return new Answer(200, "application/json", listing == null ? "[]" : resource("/registry" + path.substring(9)));
+    }
+    java.util.regex.Matcher organisation = java.util.regex.Pattern
+        .compile("/registry/organisation/([0-9a-f-]{36})\\.json").matcher(path);
+    if (organisation.matches()) {
+      URL detail = StubRegistry.class.getResource("/registry/organisation/" + organisation.group(1) + ".json");
+      return detail == null ? null
+          : new Answer(200, "application/json", resource("/registry/organisation/" + organisation.group(1) + ".json"));
+    }
     if (path.matches("/registry/(extensions|thesauri|dataPackages)\\.json")) {
       String listing = resource("/registry" + path.substring("/registry".length()));
       // only the download URLs come here; identifiers stay as registered

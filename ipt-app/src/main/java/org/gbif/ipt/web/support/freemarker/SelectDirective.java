@@ -47,6 +47,13 @@ final class SelectDirective implements TemplateDirectiveModel {
     String name = a.string("name");
     String id = a.string("id") != null ? a.string("id") : HtmlTag.idFor(name);
     String selected = a.raw("value") == null ? null : String.valueOf(DeepUnwrap.unwrap((TemplateModel) a.raw("value")));
+    // Struts evaluated a string value as an expression (value="organisation.key"); one naming nothing is literal
+    if (a.raw("value") != null && DeepUnwrap.unwrap((TemplateModel) a.raw("value")) instanceof String) {
+      String evaluated = PropertyDirective.lookup(env, selected);
+      if (evaluated != null && !evaluated.isEmpty()) {
+        selected = evaluated;
+      }
+    }
     StringBuilder sb = new StringBuilder(new HtmlTag("select").attr("name", name == null ? "" : name)
         .attr("size", a.string("size")).flag("disabled", a.bool("disabled")).attr("tabindex", a.string("tabindex"))
         .attr("id", id).attr("class", a.string("cssClass")).attr("style", a.string("cssStyle"))
@@ -58,7 +65,7 @@ final class SelectDirective implements TemplateDirectiveModel {
     if (a.bool("emptyOption")) {
       sb.append("    <option value=\"\"></option>\n");
     }
-    for (Map.Entry<String, String> o : options(a).entrySet()) {
+    for (Map.Entry<String, String> o : options(env, a).entrySet()) {
       option(sb, o.getKey(), o.getValue(), selected);
     }
     env.getOut().write(sb.append("</select>").toString());
@@ -70,8 +77,13 @@ final class SelectDirective implements TemplateDirectiveModel {
         .append(HtmlTag.escape(label)).append("</option>\n");
   }
 
-  private static Map<String, String> options(TagAttributes a) throws TemplateException {
-    Object list = a.raw("list") == null ? null : DeepUnwrap.unwrap((TemplateModel) a.raw("list"));
+  private static Map<String, String> options(Environment env, TagAttributes a) throws TemplateException {
+    TemplateModel model = (TemplateModel) a.raw("list");
+    // Struts evaluated a string list as an expression (list="organisations")
+    if (model != null && DeepUnwrap.unwrap(model) instanceof String expression) {
+      model = PropertyDirective.lookupModel(env, expression);
+    }
+    Object list = model == null ? null : DeepUnwrap.unwrap(model);
     Map<String, String> options = new LinkedHashMap<>();
     if (list instanceof Map<?, ?> map) {
       map.forEach((k, v) -> options.put(String.valueOf(k), v == null ? "" : String.valueOf(v)));
