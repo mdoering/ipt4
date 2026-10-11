@@ -310,6 +310,18 @@ public class MetadataPage extends ManagerBasePage implements UploadedFilesAware 
     return TemporalCoverageType.HTML_SELECT_MAP;
   }
 
+  /** The resource fields as they were before a POST; put back unless the section is saved. */
+  private ResourceFormFields formFieldsBefore;
+  private boolean sectionSaved;
+
+  /** A section that was not saved leaves the resource fields its form posted as they were. */
+  @Override
+  public void afterAction() {
+    if (formFieldsBefore != null && !sectionSaved) {
+      formFieldsBefore.restore(resource, req, resourceManager);
+    }
+  }
+
   @Override
   public void prepare() {
     super.prepare();
@@ -322,6 +334,7 @@ public class MetadataPage extends ManagerBasePage implements UploadedFilesAware 
     }
     if (isHttpPost()) {
       workingEml = SerializationUtils.clone(resource.getEml());
+      formFieldsBefore = ResourceFormFields.of(resource);
     }
 
     // take the section parameter from the requested url
@@ -550,6 +563,7 @@ public class MetadataPage extends ManagerBasePage implements UploadedFilesAware 
       resourceManager.save(resource);
       return true;
     });
+    sectionSaved = saved;
     if (saved) {
       // Alert user of successful save
       addActionMessage(getText("manage.success", new String[]{getText("submenu." + section.getName())}));

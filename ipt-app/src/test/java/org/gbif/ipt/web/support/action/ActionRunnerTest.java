@@ -32,8 +32,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ActionRunnerTest {
 
@@ -281,5 +283,24 @@ class ActionRunnerTest {
     });
     assertThat(seen).hasSize(1);
     assertThat(seen.get(0)).doesNotExist();
+  }
+
+  /** Each index a request names makes the binder create every element up to it: requests are held to a budget. */
+  @Test
+  void listGrowthIsBounded() throws Exception {
+    MockHttpServletRequest legit = new MockHttpServletRequest("POST", "/x");
+    for (int i = 0; i < 600; i++) {
+      legit.addParameter("mappings[" + i + "].name", "m" + i);
+    }
+    ProbePage page = page(legit);
+    runner().run(page, legit, "save", () -> ActionPage.SUCCESS);
+    assertThat(page.getMappings()).hasSize(600);
+
+    MockHttpServletRequest huge = new MockHttpServletRequest("POST", "/x");
+    huge.addParameter("mappings[50000].name", "far");
+    ProbePage refused = page(huge);
+    assertThatThrownBy(() -> runner().run(refused, huge, "save", () -> ActionPage.SUCCESS))
+        .isInstanceOf(ResponseStatusException.class);
+    assertThat(refused.getMappings()).hasSize(1);
   }
 }

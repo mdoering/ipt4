@@ -49,10 +49,10 @@ class SanitizeHtmlFilterTest {
   @Test
   void richTextKeepsTheAllowedTags() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest("POST", "/manage/metadata-basic.do");
-    request.addParameter("eml.description", "<p>A <b>bold</b> <a href=\"https://gbif.org\">link</a></p>");
+    request.addParameter("eml.additionalInfo", "<p>A <b>bold</b> <a href=\"https://gbif.org\">link</a></p>");
     request.addParameter("eml.abstract", "<p>ok</p><script>x()</script><img src=x onerror=y>");
     HttpServletRequest out = filtered(request);
-    assertThat(out.getParameter("eml.description"))
+    assertThat(out.getParameter("eml.additionalInfo"))
         .isEqualTo("<p>A <b>bold</b> <a href=\"https://gbif.org\">link</a></p>");
     assertThat(out.getParameter("eml.abstract")).isEqualTo("<p>ok</p>");
     @SuppressWarnings("unchecked")
@@ -74,5 +74,48 @@ class SanitizeHtmlFilterTest {
     @SuppressWarnings("unchecked")
     Map<String, String> flagged = (Map<String, String>) out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR);
     assertThat(flagged).containsOnlyKeys("eml.purpose");
+  }
+
+  /** Only DocBook elements, only the url attribute, only web or mail links, whatever section posts the field. */
+  @Test
+  void docBookFieldsWithOtherMarkupAreFlagged() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/manage/metadata-keywords.do");
+    request.addParameter("eml.description", "<img src=x onerror=alert(1)>");
+    request.addParameter("eml.purpose", "<ulink url=\"http://x&quot; onmouseover=&quot;alert(1)&quot; x=&quot;\">"
+        + "<citetitle>a</citetitle></ulink>");
+    request.addParameter("eml.introduction", "<para onclick=\"alert(1)\">x</para>");
+    request.addParameter("eml.gettingStarted", "<para>Plain text with A & B and 1 < 2</para>");
+    request.addParameter("eml.acknowledgements", "Plain text, no markup & no tags");
+    HttpServletRequest out = filtered(request);
+    @SuppressWarnings("unchecked")
+    Map<String, String> flagged = (Map<String, String>) out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR);
+    assertThat(flagged).containsOnlyKeys("eml.description", "eml.purpose", "eml.introduction");
+  }
+
+  /** Entity-encoded markup in a plain-text field decodes to markup: flagged, so it is not saved. */
+  @Test
+  void encodedMarkupInPlainTextIsFlagged() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/manage/metadata-geocoverage.do");
+    request.addParameter("eml.geospatialCoverages[0].description", "&lt;img src=x onerror=alert(1)&gt;");
+    request.addParameter("eml.title", "Fish &amp; chips, 1 &lt; 2");
+    HttpServletRequest out = filtered(request);
+    @SuppressWarnings("unchecked")
+    Map<String, String> flagged = (Map<String, String>) out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR);
+    assertThat(flagged).containsOnlyKeys("eml.geospatialCoverages[0].description");
+    assertThat(out.getParameter("eml.title")).isEqualTo("Fish & chips, 1 < 2");
+  }
+
+  /** Passwords are what the user typed: never changed (IPT 3 altered and logged them). */
+  @Test
+  void passwordsAreLeftAlone() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/login");
+    request.addParameter("password", "a<b>c&amp;d");
+    request.addParameter("sqlSourcePassword", "<x>");
+    request.addParameter("user.password", "p<q");
+    HttpServletRequest out = filtered(request);
+    assertThat(out.getParameter("password")).isEqualTo("a<b>c&amp;d");
+    assertThat(out.getParameter("sqlSourcePassword")).isEqualTo("<x>");
+    assertThat(out.getParameter("user.password")).isEqualTo("p<q");
+    assertThat(out.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR)).isNull();
   }
 }

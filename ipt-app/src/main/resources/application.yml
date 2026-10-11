@@ -27,7 +27,7 @@ server:
     # the multipart forms (create, uploads) have a handful of parts
     max-parameter-count: 100000
     max-part-count: 100
-    max-http-form-post-size: 50MB
+    max-http-form-post-size: 10MB
   servlet:
     encoding:
       charset: UTF-8

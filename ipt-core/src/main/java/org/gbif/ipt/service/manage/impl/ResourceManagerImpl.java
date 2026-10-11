@@ -651,8 +651,12 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
     return locks;
   }
 
+  /*
+   * The save methods take the resource's write lock (reentrant), never a manager-wide monitor: pages hold the
+   * resource lock while they persist, and a monitor taken inside it, and outside it elsewhere, deadlocks.
+   */
   @Override
-  public synchronized void save(Resource resource) throws InvalidConfigException {
+  public void save(Resource resource) throws InvalidConfigException {
     locks.withWrite(resource.getShortname(), () -> {
       saveUnlocked(resource);
       return null;
@@ -680,7 +684,14 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Override
-  public synchronized void saveInferredMetadata(Resource resource) throws InvalidConfigException {
+  public void saveInferredMetadata(Resource resource) throws InvalidConfigException {
+    locks.withWrite(resource.getShortname(), () -> {
+      saveInferredMetadataUnlocked(resource);
+      return null;
+    });
+  }
+
+  private void saveInferredMetadataUnlocked(Resource resource) throws InvalidConfigException {
     File cfgFile = dataDir.resourceInferredMetadataFile(resource.getShortname());
     try {
       AtomicFiles.write(cfgFile.toPath(), out -> {
@@ -698,11 +709,18 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
    * {@inheritDoc}
    */
   @Override
-  public synchronized void saveEml(Resource resource) throws InvalidConfigException {
+  public void saveEml(Resource resource) throws InvalidConfigException {
     saveEml(resource, false);
   }
 
-  private synchronized void saveEml(Resource resource, boolean preserveKeywords) throws InvalidConfigException {
+  private void saveEml(Resource resource, boolean preserveKeywords) throws InvalidConfigException {
+    locks.withWrite(resource.getShortname(), () -> {
+      saveEmlUnlocked(resource, preserveKeywords);
+      return null;
+    });
+  }
+
+  private void saveEmlUnlocked(Resource resource, boolean preserveKeywords) throws InvalidConfigException {
     // update EML with the latest resource basics (version and GUID)
     syncEmlWithResource(resource, preserveKeywords);
     // set modified date
@@ -715,7 +733,14 @@ public class ResourceManagerImpl extends BaseManager implements ResourceManager 
   }
 
   @Override
-  public synchronized void saveDatapackageMetadata(Resource resource) {
+  public void saveDatapackageMetadata(Resource resource) {
+    locks.withWrite(resource.getShortname(), () -> {
+      saveDatapackageMetadataUnlocked(resource);
+      return null;
+    });
+  }
+
+  private void saveDatapackageMetadataUnlocked(Resource resource) {
     // set modified date
     resource.setModified(new Date());
     // save into data dir

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -105,8 +106,41 @@ public class SanitizeHtmlFilter implements Filter {
   private static final Set<String> DOCBOOK_PARAMETERS = Set.of(
       "eml.description", "eml.acknowledgements", "eml.purpose", "eml.introduction", "eml.gettingStarted");
 
-  private static final java.util.regex.Pattern UNSAFE_LINK = java.util.regex.Pattern.compile(
-      "\\burl\\s*=\\s*[\"']\\s*(?!(?:https?|mailto|ftp):)", java.util.regex.Pattern.CASE_INSENSITIVE);
+  /** The elements of EML's DocBook text type. */
+  private static final Set<String> DOCBOOK_ELEMENTS = Set.of("section", "title", "para", "itemizedlist",
+      "orderedlist", "listitem", "emphasis", "subscript", "superscript", "literallayout", "ulink", "citetitle",
+      "markdown");
+
+  /** A web or mail link without characters that could leave an attribute. */
+  private static final java.util.regex.Pattern SAFE_LINK =
+      java.util.regex.Pattern.compile("(?i)(https?|mailto|ftp):[^\\s\"'<>`]*");
+
+  private static final java.util.regex.Pattern TAG_START = java.util.regex.Pattern.compile("<[A-Za-z/!?]");
+
+  /**
+   * Whether a DocBook value has only DocBook elements, no attribute but a ulink's url, and only web or mail links
+   * (the editors' JavaScript turns these into HTML; anything else could become live markup there).
+   */
+  static boolean isSafeDocBook(String value) {
+    org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(value, "", org.jsoup.parser.Parser.xmlParser());
+    for (org.jsoup.nodes.Element el : doc.getAllElements()) {
+      if (el == doc) {
+        continue;
+      }
+      String name = el.tagName().toLowerCase(Locale.ROOT);
+      if (!DOCBOOK_ELEMENTS.contains(name)) {
+        return false;
+      }
+      for (org.jsoup.nodes.Attribute attribute : el.attributes()) {
+        if (!"ulink".equals(name) || !"url".equals(attribute.getKey())
+            || !SAFE_LINK.matcher(attribute.getValue()).matches()) {
+          return false;
+        }
+      }
+    }
+    // comments, processing instructions or a doctype are not DocBook text either
+    return !value.contains("<!") && !value.contains("<?");
+  }
 
   /**
    * Tags allowed in rich-text parameters, matching the "Allowed HTML tags" list shown to users
@@ -212,8 +246,12 @@ public class SanitizeHtmlFilter implements Filter {
         return null;
       }
 
+      // what the user typed as a password is the password (IPT 3 altered and logged it)
+      if (parameter.toLowerCase(Locale.ROOT).contains("password")) {
+        return value;
+      }
       if (DOCBOOK_PARAMETERS.contains(parameter)) {
-        if (UNSAFE_LINK.matcher(value).find()) {
+        if (!isSafeDocBook(value)) {
           flaggedFields.put(parameter, RICH_TEXT_FLAG_MESSAGE);
         }
         return value;
@@ -228,7 +266,12 @@ public class SanitizeHtmlFilter implements Filter {
         flaggedFields.put(parameter, PLAIN_TEXT_FLAG_MESSAGE);
       }
 
-      return sanitizePlainText(parameter, value);
+      String cleaned = sanitizePlainText(parameter, value);
+      // entity-encoded markup (&lt;img ...&gt;) passes the checks above and decodes to markup
+      if (TAG_START.matcher(cleaned).find()) {
+        flaggedFields.put(parameter, PLAIN_TEXT_FLAG_MESSAGE);
+      }
+      return cleaned;
     }
 
     /**
@@ -268,7 +311,8 @@ public class SanitizeHtmlFilter implements Filter {
 
       String cleaned = sb.toString();
       if (!cleaned.equals(value)) {
-        LOG.warn("Parameter sanitization. {} modified: {}  ==>  {}", parameter, value, cleaned);
+        // the parameter only: values can be large or confidential
+        LOG.warn("Parameter sanitization: {} modified", parameter);
       }
 
       return cleaned;
@@ -286,8 +330,7 @@ public class SanitizeHtmlFilter implements Filter {
       String normalizedOutput = StringEscapeUtils.unescapeHtml4(cleanedForOutput);
 
       if (!normalizedOutput.equals(normalizedValue)) {
-        LOG.warn("Parameter sanitization (rich text). {} modified: {}  ==>  {}",
-            parameter, value, cleanedForOutput);
+        LOG.warn("Parameter sanitization (rich text): {} modified", parameter);
         flaggedFields.put(parameter, RICH_TEXT_FLAG_MESSAGE);
       }
 

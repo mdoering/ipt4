@@ -33,6 +33,7 @@ import java.util.Locale;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.servlet.autoconfigure.MultipartProperties;
+import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -110,12 +111,15 @@ public class WebConfig implements WebMvcConfigurer {
     return properties.createMultipartConfig();
   }
 
-  /** IPT 3's SanitizeHtmlFilter on every request: tags leave all parameters but the EML rich-text fields. */
+  /**
+   * IPT 3's SanitizeHtmlFilter on every request: tags leave all parameters but the EML rich-text fields. After the
+   * security chain, so requests it refuses are not sanitised.
+   */
   @Bean
   public FilterRegistrationBean<SanitizeHtmlFilter> sanitizeHtmlFilter() {
     FilterRegistrationBean<SanitizeHtmlFilter> registration = new FilterRegistrationBean<>(new SanitizeHtmlFilter());
     registration.addUrlPatterns("/*");
-    registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 30);
+    registration.setOrder(SecurityFilterProperties.DEFAULT_FILTER_ORDER + 10);
     return registration;
   }
 

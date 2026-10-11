@@ -201,14 +201,31 @@ function convertToDocBook(html) {
 }
 
 
+// IPT4: decodes the common entities once; &amp; last, so "&amp;quot;" stays "&quot;" (decoding it first decoded
+// attribute values twice)
+function decodeEntities(text) {
+    return text.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+        .replace(/&amp;/g, "&");
+}
+
+// IPT4: what is not DocBook is shown as text (IPT 3 returned it as HTML)
+function docBookFallbackHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// IPT4: only web and mail links become links
+function safeHref(url) {
+    if (typeof url !== "string") return null;
+    return /^(https?|mailto|ftp):/i.test(url) ? url : null;
+}
+
 // Function to convert EML DocBook to HTML
 function convertToHtml(docBook) {
     // If DocBook looks HTML-escaped, decode minimal common entities (optional)
     if (typeof docBook !== "string") return "";
     if (docBook.includes("&lt;")) {
         // minimal safe decode for common entities (don't decode arbitrary input)
-        docBook = docBook.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-            .replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
+        docBook = decodeEntities(docBook);
     }
 
     // Wrap fragment in a single root so XML parser accepts it
@@ -218,8 +235,8 @@ function convertToHtml(docBook) {
     // Check for parser errors
     if (xml.getElementsByTagName("parsererror").length > 0) {
         // Fallback: return original string (or you could return empty string or throw)
-        console.warn("convertToHtml: XML parse error — returning original input.");
-        return docBook;
+        console.warn("convertToHtml: XML parse error — returning the input as text.");
+        return docBookFallbackHtml(docBook);
     }
 
     const serializer = new XMLSerializer();
@@ -258,7 +275,7 @@ function convertToHtml(docBook) {
         // Handle <ulink>
         if (tag === "ulink") {
             const a = htmlDoc.createElement("a");
-            const href = node.getAttribute("url");
+            const href = safeHref(node.getAttribute("url"));
             if (href) a.setAttribute("href", href);
 
             // Prefer <citetitle> content if present, otherwise fallback to children
@@ -347,4 +364,8 @@ function validateHTML(html) {
     }
 
     return { isValid: true }; // No forbidden tags found
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { decodeEntities, docBookFallbackHtml, safeHref };
 }

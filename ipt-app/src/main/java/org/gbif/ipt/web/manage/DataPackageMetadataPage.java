@@ -247,6 +247,18 @@ public class DataPackageMetadataPage extends ManagerBasePage {
     return resource;
   }
 
+  /** The resource fields as they were before a POST; put back unless the section is saved. */
+  private ResourceFormFields formFieldsBefore;
+  private boolean sectionSaved;
+
+  /** A section that was not saved leaves the resource fields its form posted as they were. */
+  @Override
+  public void afterAction() {
+    if (formFieldsBefore != null && !sectionSaved) {
+      formFieldsBefore.restore(resource, req, resourceManager);
+    }
+  }
+
   @Override
   public void prepare() {
     super.prepare();
@@ -255,6 +267,7 @@ public class DataPackageMetadataPage extends ManagerBasePage {
     }
     if (resource != null && isHttpPost() && resource.getDataPackageMetadata() != null) {
       workingMetadata = (DataPackageMetadata) SerializationUtils.clone((Serializable) resource.getDataPackageMetadata());
+      formFieldsBefore = ResourceFormFields.of(resource);
     }
 
     if (resource != null && CAMTRAP_DP.equals(resource.getCoreType())) {
@@ -418,6 +431,7 @@ public class DataPackageMetadataPage extends ManagerBasePage {
       resource.setMetadataModified(new Date());
       return true;
     });
+    sectionSaved = saved;
     if (saved) {
       // Alert user of successful save
       addActionMessage(getText("manage.success", new String[]{getText("submenu.datapackagemetadata." + (isCamtrap ? "camtrap." : "") + section.getName())}));

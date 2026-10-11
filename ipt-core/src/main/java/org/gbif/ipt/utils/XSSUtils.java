@@ -55,7 +55,7 @@ public final class XSSUtils {
     }
     boolean isSafe = Jsoup.isValid(value, IPT_SAFELIST);
     if (!isSafe) {
-      LOG.warn("Potentially malicious content found: {}", value);
+      LOG.warn("Potentially malicious content found ({} characters)", value.length());
     }
     return !isSafe;
   }

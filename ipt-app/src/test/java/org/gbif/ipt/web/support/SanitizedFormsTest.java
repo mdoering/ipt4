@@ -20,6 +20,8 @@ import org.gbif.ipt.service.admin.UserAccountManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +38,14 @@ class SanitizedFormsTest {
 
   @Autowired MockMvc mvc;
   @Autowired UserAccountManager users;
+  @Autowired FilterRegistrationBean<SanitizeHtmlFilter> sanitizer;
+  @Autowired DelegatingFilterProxyRegistrationBean securityFilterChain;
+
+  /** Requests that security refuses (anonymous posts) are not parsed and sanitised for nothing. */
+  @Test
+  void sanitisingRunsAfterTheSecurityChain() {
+    assertThat(sanitizer.getOrder()).isGreaterThan(securityFilterChain.getOrder());
+  }
 
   @Test
   void htmlInAPlainFieldIsAFormError() throws Exception {

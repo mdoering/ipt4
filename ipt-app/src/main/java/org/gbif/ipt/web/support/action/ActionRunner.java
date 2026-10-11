@@ -50,12 +50,14 @@ import javax.annotation.Nullable;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.ResolvableType;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.WebUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,6 +89,7 @@ public class ActionRunner {
       ExtensionProperty.class, Vocabulary.class, VocabularyConcept.class, DataPackageSchema.class,
       DataPackageTableSchema.class, DataPackageField.class, Resource.class, Ipt.class, Network.class, Source.class);
   private static final Pattern INDEX = Pattern.compile("\\[[^]]*]");
+  private static final Pattern LIST_INDEX = Pattern.compile("\\[(\\d+)]");
 
   private final Map<Class<?>, Rules> rules = new ConcurrentHashMap<>();
   private static final Set<String> SAFE_METHODS = Set.of("GET", "HEAD", "OPTIONS");
@@ -126,6 +129,7 @@ public class ActionRunner {
       }
       return method.call();
     } finally {
+      page.afterAction();
       // Struts removed uploads after the action; pages copy what they keep
       files.forEach(UploadedFile::delete);
     }
@@ -150,7 +154,31 @@ public class ActionRunner {
     return files;
   }
 
+  /**
+   * A request names list indexes, and the binder creates every element up to each (auto-grow): the elements a request
+   * can create are limited to 10 per parameter, at least 10,000 (a 600-contact form needs a few thousand).
+   */
+  static void checkListGrowth(Map<String, String[]> parameters) {
+    Map<String, Long> largest = new HashMap<>();
+    for (String name : parameters.keySet()) {
+      Matcher index = LIST_INDEX.matcher(name);
+      while (index.find()) {
+        long size = index.group(1).length() > 9 ? Long.MAX_VALUE / 2 : Long.parseLong(index.group(1)) + 1;
+        largest.merge(name.substring(0, index.start()), size, Math::max);
+      }
+    }
+    long budget = Math.max(10_000L, 10L * parameters.size());
+    long total = 0;
+    for (long size : largest.values()) {
+      total += size;
+      if (total > budget) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Too many list elements in the request");
+      }
+    }
+  }
+
   void bind(ActionPage page, HttpServletRequest request, boolean topLevelOnly) {
+    checkListGrowth(request.getParameterMap());
     Rules rules = this.rules.computeIfAbsent(page.getClass(), type -> rules(type, page.extraAllowedFields()));
     ServletRequestDataBinder binder = new ServletRequestDataBinder(page) {
       @Override

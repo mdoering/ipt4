@@ -99,6 +99,10 @@ public class ActionPage extends PageSupport implements Feedback {
     return List.of();
   }
 
+  /** Called after the action method (or the validation that stopped it), also when it failed. */
+  public void afterAction() {
+  }
+
   /** Called before request parameters are bound (Struts' Preparable). */
   public void prepare() {
     id = StringUtils.trimToNull(req.getParameter("id"));
