@@ -244,7 +244,7 @@ Until M7 a runtime shim `s` (`IptTagLibrary`, about 10 Java directives) kept the
   - It returns HTML markup: message texts are not escaped, as with `s.text`.
   - String arguments are escaped and numbers formatted like `${n}`; markup arguments (a captured `<#assign>`, another `t()`) are inserted as they are.
   - `t(k)?markup_string` gives plain text (Struts' `escapeHtml=true`).
-- `s.submit`, `s.hidden`, `s.file`, `s.select` and `s.checkbox` became the HTML that Struts' simple theme wrote.
+- `s.submit`, `s.hidden`, `s.file`, `s.select` and `s.checkbox` became the HTML that Struts' simple theme wrote. Checkboxes are followed by a hidden `false` field instead of Struts' `__checkbox_` marker; the first value wins, so an unticked box binds false.
 - `s.fielderror` became the `fieldError` macro and `s.property` the `propertyText` function, both in `macros/forms.ftl`.
 - Lines that held only a Struts tag got `<#t>`/`<#lt>`/`<#rt>`, so FreeMarker's white-space stripping and the rendered pages stay the same.
 - The crawler's page snapshots (`-Dipt.snapshots=DIR`) compared every page before and after the removal.

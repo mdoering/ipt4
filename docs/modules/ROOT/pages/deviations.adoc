@@ -523,4 +523,10 @@ introduced each. Generated from `docs/deviations.md` by `tools/docs/deviations-t
 |Filled with the node key
 |Bug fix
 |M7
+
+|Mapping: use the resource DOI as datasetID
+|The checkbox's value was not bound, so the choice was never saved
+|Saved when ticked and when unticked
+|Bug fix
+|M7
 |===

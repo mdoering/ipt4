@@ -376,6 +376,8 @@
                 <#assign value = propertyText(name)>
             </#if>
             <input type="checkbox" name="${name}" value="true"<#if value?lower_case == "true"> checked="checked"</#if> id="${idAttr}" class="${classAttr}"/><#t>
+            <#-- an unticked checkbox sends nothing; false is used when true is absent -->
+            <input type="hidden" name="${name}" value="false"/><#t>
             <#include "/macros/form_checkbox_label.ftl">
             <#include "/macros/help_icon.ftl">
             <#include "/macros/form_field_error.ftl">

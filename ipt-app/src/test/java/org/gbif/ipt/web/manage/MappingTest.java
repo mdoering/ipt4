@@ -15,6 +15,7 @@ package org.gbif.ipt.web.manage;
 
 import org.gbif.ipt.app.ManageFixture;
 import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.model.ExtensionMapping;
 import org.gbif.ipt.model.User;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
@@ -90,13 +91,28 @@ class MappingTest {
         .getStatus()).isEqualTo(401);
   }
 
-  /** Struts' s.checkbox took its name from key; without a name the choice was never sent. */
+  /** "Use the resource DOI as datasetID" is saved when ticked and when unticked again. */
   @Test
-  void datasetDoiCheckboxIsSubmitted() throws Exception {
-    String html = as(ManageFixture.OWNER, get(URI.create("/manage/mapping.do?r=res1&id=" + ENCODED + "&mid=0")))
-        .getContentAsString();
-    assertThat(org.jsoup.Jsoup.parse(html).select("input.datasetDoiCheckbox"))
-        .isNotEmpty().allSatisfy(box -> assertThat(box.attr("name")).isEqualTo("doiUsedForDatasetId"));
+  void datasetDoiCheckboxIsSaved() throws Exception {
+    assertThat(saveMappingPage(true).isDoiUsedForDatasetId()).isTrue();
+    assertThat(saveMappingPage(false).isDoiUsedForDatasetId()).isFalse();
+  }
+
+  private ExtensionMapping saveMappingPage(boolean doiUsedForDatasetId) throws Exception {
+    String url = "/manage/mapping.do?r=res1&id=" + ENCODED + "&mid=0";
+    org.jsoup.nodes.Document page = org.jsoup.Jsoup.parse(as(ManageFixture.OWNER, get(URI.create(url)))
+        .getContentAsString(), "http://localhost" + url);
+    org.jsoup.select.Elements box = page.select("input.datasetDoiCheckbox");
+    assertThat(box).hasSize(1);
+    if (doiUsedForDatasetId) {
+      box.attr("checked", "checked");
+    } else {
+      box.removeAttr("checked");
+    }
+    MockHttpServletResponse saved = as(ManageFixture.OWNER,
+        org.gbif.ipt.web.BrowserForms.submit(page, "mapping.do", null, "", java.util.Map.of()));
+    assertThat(saved.getStatus()).as(saved.getContentAsString()).isLessThan(400);
+    return resources.get("res1").getMappings(OCCURRENCE).get(0);
   }
 
   @Test

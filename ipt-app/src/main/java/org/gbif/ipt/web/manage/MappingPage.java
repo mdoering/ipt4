@@ -121,7 +121,6 @@ public class MappingPage extends ManagerBasePage implements ValidationErrorAware
   @Setter
   @Getter
   private PropertyMapping mappingCoreid;
-  @Setter
   @Getter
   private boolean doiUsedForDatasetId;
 
@@ -562,6 +561,12 @@ public class MappingPage extends ManagerBasePage implements ValidationErrorAware
   @Override
   public String actionErrorOccurred(String currentResultName) {
     return defaultResult;
+  }
+
+  /** "Use the resource DOI as datasetID"; the page sends false too, so an unticked box clears it. */
+  @StrutsParameter
+  public void setDoiUsedForDatasetId(boolean doiUsedForDatasetId) {
+    this.doiUsedForDatasetId = doiUsedForDatasetId;
   }
 
   @StrutsParameter(depth = 2)

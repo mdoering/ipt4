@@ -1075,6 +1075,39 @@ a.no-text-decoration, a.no-text-decoration:focus, a.no-text-decoration:hover {
 }
 /* GBIF red colored outline button END */
 
+/* Bootstrap 5.2+ draws the pressed, open and disabled states of buttons from these variables */
+.btn-outline-gbif-primary {
+    --bs-btn-color: rgb(var(--color-gbif-primary));
+    --bs-btn-border-color: rgba(var(--color-gbif-primary), 0.5);
+    --bs-btn-hover-color: rgb(var(--color-gbif-primary));
+    --bs-btn-hover-bg: rgba(var(--color-gbif-primary), 0.04);
+    --bs-btn-hover-border-color: rgb(var(--color-gbif-primary));
+    --bs-btn-active-color: rgb(var(--color-gbif-primary));
+    --bs-btn-active-bg: transparent;
+    --bs-btn-active-border-color: rgba(var(--color-gbif-primary), 0.5);
+    --bs-btn-disabled-color: rgb(var(--color-gbif-primary));
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: rgba(var(--color-gbif-primary), 0.5);
+}
+.btn-outline-gbif-danger {
+    --bs-btn-color: rgb(var(--color-gbif-danger));
+    --bs-btn-border-color: rgba(var(--color-gbif-danger), 0.5);
+    --bs-btn-hover-color: rgb(var(--color-gbif-danger));
+    --bs-btn-hover-bg: rgba(var(--color-gbif-danger), 0.04);
+    --bs-btn-hover-border-color: rgb(var(--color-gbif-danger));
+    --bs-btn-active-color: rgb(var(--color-gbif-danger));
+    --bs-btn-active-bg: transparent;
+    --bs-btn-active-border-color: rgba(var(--color-gbif-danger), 0.5);
+    --bs-btn-disabled-color: rgb(var(--color-gbif-danger));
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: rgba(var(--color-gbif-danger), 0.5);
+}
+
+/* Bootstrap 5.3 made muted text darker; keep 5.0's grey */
+.text-muted {
+    color: #6c757d !important;
+}
+
 
 /* Overview buttons */
 .overview-action-button {
