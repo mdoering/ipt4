@@ -31,6 +31,13 @@ Each IPT 3 feature area, the tests that cover it on IPT4, and what is left. Inte
   `docker.gbif.org/ipt` and `gbif/ipt`. Check the Jenkins credential ids first.
 - **Visual review:** a person compares key pages with IPT 3 (design §8). Not automated.
 
+## Open before 4.0 (inherited from IPT 3)
+
+- **DataCite failing part-way.** Publishing a new major version (the new DOI is registered, then updating the
+  replaced DOI fails) or deleting a registered resource with DOIs (deregistered from GBIF, then deactivating a DOI
+  fails) leaves the IPT, GBIF and DataCite out of step, as in IPT 3. Needs compensating steps and stub tests for both
+  paths.
+
 ## Left for M7 (optional)
 
 Bootstrap 5.3, self-hosted fonts, a layout macro, replacing the `@s.*` tag shim, an `/api/v1` OpenAPI skeleton,

@@ -115,6 +115,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -933,7 +934,47 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
    * If the resource has an existing DOI already, its an indication the resource is being transitioned to a new DOI.
    * In this case, the previous DOI must be replaced by the new DOI.
    */
+  /**
+   * Registry and DOI operations in progress, by resource: a second request for the same resource (a double click)
+   * is refused instead of creating a second registry entry or DOI. IPT 3's {@code synchronized} methods guarded
+   * nothing, as each request has its own action.
+   */
+  private static final Set<String> REMOTE_OPERATIONS = ConcurrentHashMap.newKeySet();
+
+  @FunctionalInterface
+  private interface RemoteOperation {
+    String run() throws Exception;
+  }
+
+  private String guarded(RemoteOperation operation) throws Exception {
+    if (resource == null) {
+      return NOT_FOUND;
+    }
+    String key = resource.getShortname().toLowerCase(java.util.Locale.ROOT);
+    if (!REMOTE_OPERATIONS.add(key)) {
+      addActionError(getText("manage.overview.remote.operation.running"));
+      return execute();
+    }
+    try {
+      return operation.run();
+    } finally {
+      REMOTE_OPERATIONS.remove(key);
+    }
+  }
+
   public String reserveDoi() throws Exception {
+    return guarded(this::reserveDoiUnguarded);
+  }
+
+  public String deleteDoi() throws Exception {
+    return guarded(this::deleteDoiUnguarded);
+  }
+
+  public String registerResource() throws Exception {
+    return guarded(this::registerResourceUnguarded);
+  }
+
+  private String reserveDoiUnguarded() throws Exception {
     if (resource == null) {
       return NOT_FOUND;
     }
@@ -958,7 +999,7 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
           addActionMessage(msg);
         } catch (DoiExistsException e) {
           LOG.error("Failed to reserve {} because it exists already. Trying again...", doi, e);
-          reserveDoi();
+          reserveDoiUnguarded();
         } catch (InvalidMetadataException e) {
           String errorMsg = getText("manage.overview.publishing.doi.reserve.failed.metadata", new String[]{doi.toString(), e.getMessage()});
           LOG.error(errorMsg, e);
@@ -1129,7 +1170,7 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
    * Can only be done to a resource whose DOI is reserved but not public. If the resource previously had been assigned
    * a DOI, that DOI is reassigned.
    */
-  public String deleteDoi() throws Exception {
+  private String deleteDoiUnguarded() throws Exception {
     if (resource == null) {
       return NOT_FOUND;
     }
@@ -1464,7 +1505,7 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
     return ERROR;
   }
 
-  public synchronized String registerResource() throws Exception {
+  private String registerResourceUnguarded() throws Exception {
     if (resource == null) {
       return NOT_FOUND;
     }
@@ -1687,7 +1728,7 @@ public class OverviewPage extends ManagerBasePage implements ReportHandler, Uplo
   /**
    * Changes the GBIF dataset type of a registered DwC-DP resource and updates its registration.
    */
-  public synchronized String updateDwcDpDatasetType() throws Exception {
+  public String updateDwcDpDatasetType() throws Exception {
     if (resource == null) {
       return NOT_FOUND;
     }

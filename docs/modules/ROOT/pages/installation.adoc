@@ -6,8 +6,11 @@ IPT 4 needs Java 25 (or Docker) and a data directory it can write to.
 
 [source,bash]
 ----
-docker run -d --name ipt -p 8080:8080 -v ipt-data:/srv/ipt gbif/ipt:4
+docker run -d --name ipt -p 8080:8080 -v ipt-data:/srv/ipt gbif/ipt:4.0.0-RC1
 ----
+
+Images are tagged with their version (`gbif/ipt:4.0.0-RC1`, later `gbif/ipt:4.0.0`); final releases are also tagged
+`latest`.
 
 The image runs as the non-root user `ipt`, keeps its data in the volume `/srv/ipt` (`IPT_DATA_DIR`) and reports its
 health at `/actuator/health`. Open `http://localhost:8080/` to start the setup: the first administrator, the

@@ -143,8 +143,19 @@ class ResourceRegistrationTest {
   @Order(1)
   void registerTheResource() throws Exception {
     stub.answer("POST", "/registry/ipt/resource", 201, "application/xml",
-        "<resource><key>" + RESOURCE_KEY + "</key></resource>");
-    overview("resource-registerResource");
+        "<resource><key>" + RESOURCE_KEY + "</key></resource>", 500);
+    // a double click: two registrations at once must create one registry entry
+    java.util.concurrent.ExecutorService clicks = java.util.concurrent.Executors.newFixedThreadPool(2);
+    try {
+      var first = clicks.submit(() -> overview("resource-registerResource"));
+      var second = clicks.submit(() -> overview("resource-registerResource"));
+      first.get(30, java.util.concurrent.TimeUnit.SECONDS);
+      second.get(30, java.util.concurrent.TimeUnit.SECONDS);
+    } finally {
+      clicks.shutdownNow();
+    }
+    assertThat(stub.requests().stream().filter(r -> r.method().equals("POST")
+        && r.path().equals("/registry/ipt/resource"))).hasSize(1);
     Resource res1 = resources.get("res1");
     assertThat(res1.getStatus()).isEqualTo(PublicationStatus.REGISTERED);
     assertThat(res1.getKey()).hasToString(RESOURCE_KEY);
@@ -169,8 +180,16 @@ class ResourceRegistrationTest {
   void registryDownDuringPublication() throws Exception {
     stub.answer("POST", "/registry/ipt/resource/" + RESOURCE_KEY, 500, "text/plain", "down");
     BigDecimal before = resources.get("res1").getEmlVersion();
+    // as if the last published archive had other data than this one
+    String checksum = "previous-archive-checksum";
+    java.util.Map<String, Integer> counts = java.util.Map.of("http://rs.tdwg.org/dwc/terms/Occurrence", 1);
+    resources.get("res1").setLastPublishedArchiveChecksum(checksum);
+    resources.get("res1").setRecordsByExtension(new java.util.HashMap<>(counts));
     publish();
     assertThat(resources.get("res1").getEmlVersion()).isEqualTo(before);
+    // the failed archive's checksum would make "skip if not changed" skip its data later
+    assertThat(resources.get("res1").getLastPublishedArchiveChecksum()).isEqualTo(checksum);
+    assertThat(resources.get("res1").getRecordsByExtension()).isEqualTo(counts);
     assertThat(resources.get("res1").getStatus()).isEqualTo(PublicationStatus.REGISTERED);
     assertThat(publications.isLocked("res1")).isFalse();
     stub.answer("POST", "/registry/ipt/resource/" + RESOURCE_KEY, 200, "application/xml", "<resource/>");

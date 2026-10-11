@@ -44,7 +44,11 @@ public final class StubRegistry {
   public record Request(String method, String path, String body, String user) {
   }
 
-  private record Answer(int status, String contentType, String body) {
+  private record Answer(int status, String contentType, String body, long delayMillis) {
+
+    Answer(int status, String contentType, String body) {
+      this(status, contentType, body, 0);
+    }
   }
 
   private final HttpServer server;
@@ -55,6 +59,8 @@ public final class StubRegistry {
   private StubRegistry() throws IOException {
     server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
     server.createContext("/", this::handle);
+    // several requests at once, like the real registry
+    server.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
     server.start();
   }
 
@@ -72,7 +78,12 @@ public final class StubRegistry {
 
   /** Answers {@code method path} (path without query) with this status and body from now on. */
   public void answer(String method, String path, int status, String contentType, String body) {
-    answers.put(method + " " + path, new Answer(status, contentType, body));
+    answer(method, path, status, contentType, body, 0);
+  }
+
+  /** As {@link #answer(String, String, int, String, String)}, after a delay (a slow registry). */
+  public void answer(String method, String path, int status, String contentType, String body, long delayMillis) {
+    answers.put(method + " " + path, new Answer(status, contentType, body, delayMillis));
   }
 
   /** The password the registry's organisation login accepts for this key. */
@@ -100,6 +111,13 @@ public final class StubRegistry {
       }
       if (answer == null) {
         answer = new Answer(404, "text/plain", "not found");
+      }
+      if (answer.delayMillis() > 0) {
+        try {
+          Thread.sleep(answer.delayMillis());
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
       }
       byte[] bytes = answer.body().getBytes(StandardCharsets.UTF_8);
       exchange.getResponseHeaders().add("Content-Type", answer.contentType());

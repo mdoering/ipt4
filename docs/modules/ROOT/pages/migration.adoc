@@ -18,7 +18,7 @@ With Docker:
 +
 [source,bash]
 ----
-docker run --rm -v /var/lib/ipt3:/old:ro -v ipt-data:/srv/ipt gbif/ipt:4 migrate --from /old --to /srv/ipt
+docker run --rm -v /var/lib/ipt3:/old:ro -v ipt-data:/srv/ipt gbif/ipt:4.0.0-RC1 migrate --from /old --to /srv/ipt
 ----
 . Read `migration-report.txt` in the new directory: resources, users and organisations converted, and anything that
 needs attention.

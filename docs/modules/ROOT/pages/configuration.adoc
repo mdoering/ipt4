@@ -45,6 +45,10 @@ start; an IPT 3 data directory is refused (convert it with xref:migration.adoc[t
 |`server.port`
 |`8080`
 |HTTP port.
+
+|`server.servlet.session.cookie.secure`
+|`false`
+|Mark the session cookie `Secure`; set it to `true` for installations served over HTTPS only.
 |===
 
 == Logs
@@ -55,6 +59,9 @@ logs.
 == Security notes
 
 * Administration and management pages need a login; every form is protected against cross-site request forgery.
-* The session cookie is `HttpOnly` and `SameSite=Lax`; serve the IPT over HTTPS so it is also `Secure`.
+* The session cookie is `HttpOnly` and `SameSite=Lax`. Behind a proxy that terminates HTTPS, the IPT itself is
+reached over plain HTTP and does not mark the cookie `Secure` on its own: set
+`SERVER_SERVLET_SESSION_COOKIE_SECURE=true` (or `server.servlet.session.cookie.secure=true`) when the IPT is served
+over HTTPS only.
 * Passwords of GBIF organisations, DOI agency accounts and SQL sources are encrypted in the data directory and never
 shown in pages.

@@ -225,6 +225,11 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
       if (f.isDone()) {
         // remove the process from the locking list immediately! Fixes Issue 1141
         processFutures.remove(shortname);
+        // what a failed publication must leave as it was (IPT 3 kept the failed archive's checksum, so "skip if not
+        // changed" later skipped data that was never published)
+        String previousChecksum = resource.getLastPublishedArchiveChecksum();
+        Map<String, Integer> previousRecordsByExtension = resource.getRecordsByExtension() == null ? null
+            : new HashMap<>(resource.getRecordsByExtension());
         boolean succeeded = false;
         boolean checksumMatches = false;
         boolean metadataChanged = isMetadataModifiedSinceLastPublication(resource);
@@ -404,7 +409,9 @@ public class ResourcePublicationManagerImpl extends BaseManager implements Resou
               updateNextPublishedDate(new Date(), resource);
             }
 
-            // the previous version needs to be rolled back
+            // the previous version needs to be rolled back, with the archive facts of the previous publication
+            resource.setLastPublishedArchiveChecksum(previousChecksum);
+            resource.setRecordsByExtension(previousRecordsByExtension);
             restoreVersion(resource, version, action);
 
             // do not count "data not changed" as an actual failure
