@@ -16,8 +16,12 @@ package org.gbif.ipt.model;
 import org.gbif.ipt.IptBaseTest;
 import org.gbif.ipt.model.RecordFilter.Comparator;
 
+import java.util.EnumMap;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,4 +85,10 @@ public class RecordFilterTest extends IptBaseTest {
     assertFalse(f.matches(new String[] {"1", "a", "3"}));
   }
 
+  /** The mapping page lists the filter times in this order; a HashMap keyed by enum changed it from run to run. */
+  @Test
+  public void filterTimesInEnumOrder() {
+    assertEquals(List.of(RecordFilter.FilterTime.values()), List.copyOf(new RecordFilter().getFilterTimes().keySet()));
+    assertTrue(new RecordFilter().getFilterTimes() instanceof EnumMap);
+  }
 }

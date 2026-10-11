@@ -22,6 +22,7 @@ import org.gbif.ipt.service.manage.ResourcePublicationManager;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -184,6 +185,7 @@ class CrawlerTest {
       if (type == null || !type.startsWith("text/html")) {
         continue;
       }
+      snapshot(admin, url, response.getContentAsString());
       Document doc = Jsoup.parse(response.getContentAsString(), BASE + url);
       doc.select("script").remove();
       String html = doc.html();
@@ -204,6 +206,16 @@ class CrawlerTest {
     }
     assertThat(problems).as("pages visited: " + seen).isEmpty();
     return seen;
+  }
+
+  /** With -Dipt.snapshots=DIR, the page as normalised HTML in DIR (see {@link PageSnapshot}). */
+  private static void snapshot(boolean admin, String url, String html) throws Exception {
+    String dir = System.getProperty("ipt.snapshots");
+    if (dir != null && !dir.isBlank()) {
+      Path file = Path.of(dir, admin ? "admin" : "logged-out", PageSnapshot.fileName(url));
+      Files.createDirectories(file.getParent());
+      Files.writeString(file, PageSnapshot.normalise(html));
+    }
   }
 
   private static void enqueue(Deque<String> queue, Set<String> seen, String url) {

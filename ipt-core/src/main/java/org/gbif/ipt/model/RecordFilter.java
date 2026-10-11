@@ -15,7 +15,7 @@ package org.gbif.ipt.model;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +51,7 @@ public class RecordFilter implements Serializable {
   }
 
   public Map<FilterTime, String> getFilterTimes() {
-    Map<FilterTime, String> filterTimes = new HashMap<>();
+    Map<FilterTime, String> filterTimes = new EnumMap<>(FilterTime.class);
     filterTimes.put(FilterTime.BeforeTranslation, "manage.mapping.filter.beforeTranslation");
     filterTimes.put(FilterTime.AfterTranslation, "manage.mapping.filter.afterTranslation");
     return filterTimes;
