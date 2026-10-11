@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.MappingAction" -->
 <#include "/inc/header.ftl"/>
-<title><@s.text name="manage.mapping.title"/></title>
+<title>${t("manage.mapping.title")}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -85,7 +85,7 @@
             function hideFields() {
                 showAll=false;
                 $("#showAllValue").val("false");
-                $("#toggleFields").text("<@s.text name="manage.mapping.showAll" />");
+                $("#toggleFields").text("${t("manage.mapping.showAll")}");
                 $('div.mappingRow').not('.required').each(function(index) {
                     // always show all mapped and required fields
                     if ($(".fidx", this).val() === "" && $(".fval", this).val() === "" && $("#doiUsedForDatasetId", this).is(":checked") === false){
@@ -100,7 +100,7 @@
             function hideRedundantGroups() {
                 showAllGroups=false;
                 $("#showAllGroupsValue").val("false");
-                $("#toggleGroups").text("<@s.text name="manage.mapping.showAllGroups" />");
+                $("#toggleGroups").text("${t("manage.mapping.showAllGroups")}");
                 // hide redundant sections
                 $('div.redundant').each(function(index) {
                     $(this).hide();
@@ -130,10 +130,10 @@
             }
 
             $('.confirm').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                question: "<@s.text name ="manage.mapping.confirmation.message"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                question: "${t("manage.mapping.confirmation.message")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
@@ -147,7 +147,7 @@
                 }else{
                     showAll=true;
                     $("#showAllValue").val("true");
-                    $("#toggleFields").text("<@s.text name="manage.mapping.hideEmpty"/>");
+                    $("#toggleFields").text("${t("manage.mapping.hideEmpty")}");
                     $('div.mappingRow').show();
                     $(".groupmenu").show();
                 }
@@ -161,7 +161,7 @@
                 } else {
                     showAllGroups=true;
                     $("#showAllGroupsValue").val("true");
-                    $("#toggleGroups").text("<@s.text name="manage.mapping.hideGroups"/>");
+                    $("#toggleGroups").text("${t("manage.mapping.hideGroups")}");
                     // show sidebar links
                     $('li.redundant').each(function(index) {
                         $(this).show();
@@ -344,15 +344,15 @@
 
 <#macro threeButtons>
     <div class="col-12 my-3">
-        <@s.submit cssClass="button btn btn-outline-gbif-primary" name="save" key="button.save"/>
-        <@s.submit cssClass="confirm btn btn-outline-gbif-danger" name="deleteFlag" key="button.delete"/>
-        <@s.submit cssClass="button btn btn-outline-secondary" name="cancel" key="button.back"/>
+        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-outline-gbif-primary"/><#t>
+        <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="confirm btn btn-outline-gbif-danger"/><#t>
+        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-outline-secondary"/><#t>
     </div>
 </#macro>
 
 <#macro sourceSample index fieldsIndex>
     <div id="fSIdx${fieldsIndex}" class="text-collapse sample mappingText mx-lg-4">
-        <@s.text name='manage.mapping.sourceSample' />:
+        ${t('manage.mapping.sourceSample')}:
         <em>
             <#list peek! as row>
                 <#if row??>
@@ -373,9 +373,9 @@
         <div class="checkbox form-check">
             <#-- use name if value was not supplied -->
             <#if value == "-99999">
-                <#assign value><@s.property value="${name}"/></#assign>
+                <#assign value = propertyText(name)>
             </#if>
-            <@s.checkbox key=name id=idAttr value=value cssClass=classAttr/>
+            <input type="checkbox" name="${name}" value="true"<#if value?lower_case == "true"> checked="checked"</#if> id="${idAttr}" class="${classAttr}"/><#t>
             <#include "/macros/form_checkbox_label.ftl">
             <#include "/macros/help_icon.ftl">
             <#include "/macros/form_field_error.ftl">
@@ -398,14 +398,14 @@
                     <#if p.qualifiedName()?has_content><a href="${p.qualifiedName()}">${p.qualifiedName()}</a><#else>${p.name!}</#if><br/><br/>
                     <#if (p.translations[currentLocale].description)?has_content><@processSurroundedWithBackticksAsCode p.translations[currentLocale].description/><br/><br/><#elseif p.description?has_content>${p.description}<br/><br/></#if>
                     <#if (p.translations[currentLocale].comments)?has_content><@processSurroundedWithBackticksAsCode p.translations[currentLocale].comments/><br/><br/><#elseif p.comments?has_content>${p.comments}<br/><br/></#if>
-                    <#if p.vocabulary??><@s.text name="extension.vocabulary"/> <a href="vocabulary.do?id=${p.vocabulary.uriString}" class="no-text-decoration" target="_blank">${p.vocabulary.title!}</a><br/><br/></#if>
-                    <#if datasetId?? && p.qualifiedName()?lower_case == datasetId.qualname?lower_case><@s.text name='manage.mapping.datasetIdColumn.help'/><br/><br/></#if>
-                    <#if p.link?has_content><@s.text name="basic.seealso"/> <a href="${p.link}" target="_blank">${p.link}</a><br/><br/></#if>
+                    <#if p.vocabulary??>${t("extension.vocabulary")} <a href="vocabulary.do?id=${p.vocabulary.uriString}" class="no-text-decoration" target="_blank">${p.vocabulary.title!}</a><br/><br/></#if>
+                    <#if datasetId?? && p.qualifiedName()?lower_case == datasetId.qualname?lower_case>${t('manage.mapping.datasetIdColumn.help')}<br/><br/></#if>
+                    <#if p.link?has_content>${t("basic.seealso")} <a href="${p.link}" target="_blank">${p.link}</a><br/><br/></#if>
                     <#if (p.translations[currentLocale].examples)?has_content>
-                        <em><@s.text name="basic.examples"/></em>:
+                        <em>${t("basic.examples")}</em>:
                         <@processSurroundedWithBackticksAsCode p.translations[currentLocale].examples />
                     <#elseif p.examples?has_content>
-                        <em><@s.text name="basic.examples"/></em>:
+                        <em>${t("basic.examples")}</em>:
                         <@processSurroundedWithBackticksAsCode p.examples />
                     </#if>
                 </#assign>
@@ -468,13 +468,13 @@
         <#if field.index??>
             <small><@sourceSample field.index fieldsIndex/></small>
             <div id="fTIdx${fieldsIndex}" class="sample mappingText">
-                <small class="mx-lg-4"><@s.text name='manage.mapping.translation' />:</small>
+                <small class="mx-lg-4">${t('manage.mapping.translation')}:</small>
                 <small>
                     <a href="translation.do?r=${resource.shortname}&rowtype=${p.extension.rowType?url}&mid=${mid}&term=${p.qualname?url}">
                         <#if (((field.translation?size)!0)>0)>
                             ${(field.translation?size)!0} terms
                         <#else>
-                            <@s.text name="button.add"/>
+                            ${t("button.add")}<#t>
                         </#if>
                     </a>
                 </small>
@@ -500,7 +500,7 @@
                 <i class="bi bi-check2-circle alert-green-2 fs-bigger-2 me-2"></i>
             </div>
             <div class="overflow-x-hidden pt-1">
-                <@s.text name="manage.mapping.redundant.info"><@s.param>${redundants?size}</@s.param></@s.text>
+                ${t("manage.mapping.redundant.info", redundants?size)}
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -516,15 +516,15 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.mapping"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.mapping")}</li>
                         </ol>
                     </nav>
                 </div>
 
                 <h5 property="dc:title" class="rtitle pt-2 text-gbif-header fs-2 fw-400 text-center">
-                    <@s.text name='manage.mapping.title'/>
+                    ${t('manage.mapping.title')}<#t>
                 </h5>
 
                 <div class="text-center fs-smaller">
@@ -532,28 +532,22 @@
                 </div>
 
                 <#if action.isCoreMapping()>
-                    <#assign extensionType><@s.text name='extension.core'/></#assign>
+                    <#assign extensionType>${t('extension.core')}<#t></#assign>
                 <#else>
-                    <#assign extensionType><@s.text name='extension'/></#assign>
+                    <#assign extensionType>${t('extension')}<#t></#assign>
                 </#if>
                 <#assign extensionType = extensionType?markup_string>
 
                 <div class="mt-2">
-                    <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                    <@s.submit cssClass="confirm btn btn-sm btn-outline-gbif-danger top-button" name="deleteFlag" key="button.delete"/>
-                    <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                    <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                    <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="confirm btn btn-sm btn-outline-gbif-danger top-button"/><#t>
+                    <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                 </div>
 
                 <p class="mt-3 mb-0 text-smaller fst-italic">
-                    <@s.text name='manage.mapping.intro1'>
-                        <@s.param>
-                            <a href="source.do?r=${resource.shortname}&id=${mapping.source.name}" title="<@s.text name='manage.overview.source.data'/>">
+                    <#assign textArg1><a href="source.do?r=${resource.shortname}&id=${mapping.source.name}" title="${t('manage.overview.source.data')}">
                                 ${mapping.source.name}
-                            </a>
-                        </@s.param>
-                        <@s.param>${extensionType?lower_case}:</@s.param>
-                        <@s.param><a href="${baseURL}/admin/extension.do?id=${mapping.extension.rowType!}" target="_blank">${mapping.extension.title!}</a></@s.param>
-                    </@s.text>
+                            </a></#assign><#assign textArg2><a href="${baseURL}/admin/extension.do?id=${mapping.extension.rowType!}" target="_blank">${mapping.extension.title!}</a></#assign>${t('manage.mapping.intro1', textArg1, "${extensionType?lower_case}:", textArg2)}<#t>
                 </p>
             </div>
         </div>
@@ -574,7 +568,7 @@
                                         <#if g?has_content>
                                             ${g}
                                         <#else>
-                                            <@s.text name="manage.mapping.noClass"/>
+                                            ${t("manage.mapping.noClass")}<#t>
                                         </#if>
                                     </a>
                                 </li>
@@ -582,34 +576,34 @@
                         </#if>
 
                         <#if (nonMapped?size>0)>
-                            <li><a class="sidebar-navigation-link" href="#anchor-nonmapped"><@s.text name='manage.mapping.no.mapped.title'/></a></li>
+                            <li><a class="sidebar-navigation-link" href="#anchor-nonmapped">${t('manage.mapping.no.mapped.title')}</a></li>
                         </#if>
 
                         <#if (redundants?size>0)>
-                            <li><a class="sidebar-navigation-link" href="#anchor-redundant"><@s.text name='manage.mapping.redundant'/></a></li>
+                            <li><a class="sidebar-navigation-link" href="#anchor-redundant">${t('manage.mapping.redundant')}</a></li>
                         </#if>
                     </ul>
 
                     <ul>
-                        <li><a id="toggleFields" class="sidebar-link"><@s.text name='manage.mapping.hideEmpty'/></a></li>
+                        <li><a id="toggleFields" class="sidebar-link">${t('manage.mapping.hideEmpty')}</a></li>
                         <#if (redundants?size>0)>
-                            <li><a id="toggleGroups" class="sidebar-link"><@s.text name='manage.mapping.hideGroups'/></a></li>
+                            <li><a id="toggleGroups" class="sidebar-link">${t('manage.mapping.hideGroups')}</a></li>
                         </#if>
                     </ul>
 
                     <div class="d-flex align-content-between" style="margin-left: -10px;">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary me-1" name="save" key="button.save"/>
-                        <@s.submit cssClass="confirm btn btn-sm btn-outline-gbif-danger me-1" name="deleteFlag" key="button.delete"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary me-1"/><#t>
+                        <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="confirm btn btn-sm btn-outline-gbif-danger me-1"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary"/><#t>
                     </div>
                 </nav>
 
                 <nav id="sidebar-content">
                     <ul class="dropdown-menu dropdown-menu-light text-light" aria-labelledby="filtersDropdown">
-                        <li><a id="toggleFields" class="dropdown-item menu-link" href="#"><@s.text name='manage.mapping.hideEmpty'/></a></li>
+                        <li><a id="toggleFields" class="dropdown-item menu-link" href="#">${t('manage.mapping.hideEmpty')}</a></li>
 
                         <#if (redundants?size>0)>
-                            <li><a id="toggleGroups" class="dropdown-item menu-link" href="#"><@s.text name='manage.mapping.hideGroups'/></a></li>
+                            <li><a id="toggleGroups" class="dropdown-item menu-link" href="#">${t('manage.mapping.hideGroups')}</a></li>
                         </#if>
                     </ul>
                 </nav>
@@ -635,15 +629,15 @@
                                     <#if coreid.qualifiedName()?has_content><a href="${coreid.qualifiedName()}">${coreid.qualifiedName()}</a><#else>${coreid.name!}</#if><br/><br/>
                                     <#if (coreid.translations[currentLocale].description)?has_content><@processSurroundedWithBackticksAsCode coreid.translations[currentLocale].description/><br/><br/><#elseif coreid.description?has_content>${coreid.description}<br/><br/></#if>
                                     <#if (coreid.translations[currentLocale].comments)?has_content><@processSurroundedWithBackticksAsCode coreid.translations[currentLocale].comments/><br/><br/><#elseif coreid.comments?has_content>${coreid.comments}<br/><br/></#if>
-                                    <#if coreid.link?has_content><@s.text name="basic.seealso"/> <a href="${coreid.link}" target="_blank">${coreid.link}</a><br/><br/></#if>
+                                    <#if coreid.link?has_content>${t("basic.seealso")} <a href="${coreid.link}" target="_blank">${coreid.link}</a><br/><br/></#if>
                                     <span class="idSuffix">
-                                        <@s.text name='manage.mapping.info.linenumbers'/>
+                                        ${t('manage.mapping.info.linenumbers')}<#t>
                                     </span>
                                     <#if (coreid.translations[currentLocale].examples)?has_content>
-                                        <em><@s.text name="basic.examples"/></em>:
+                                        <em>${t("basic.examples")}</em>:
                                         <@processSurroundedWithBackticksAsCode coreid.translations[currentLocale].examples />
                                     <#elseif coreid.examples?has_content>
-                                        <em><@s.text name="basic.examples"/></em>:
+                                        <em>${t("basic.examples")}</em>:
                                         <@processSurroundedWithBackticksAsCode coreid.examples />
                                     </#if>
                                 </#assign>
@@ -655,12 +649,12 @@
                         <div class="col-lg-4">
                             <select name="mapping.idColumn" id="idColumn" class="form-select form-select-sm">
                                 <#if action.isCoreMapping()>
-                                    <option value="" <#if !mapping.idColumn??> selected="selected"<#elseif (mapping.idColumn!-99)==-3> selected="selected"</#if>><@s.text name="manage.mapping.noid"/></option>
+                                    <option value="" <#if !mapping.idColumn??> selected="selected"<#elseif (mapping.idColumn!-99)==-3> selected="selected"</#if>>${t("manage.mapping.noid")}</option>
                                 </#if>
                                 <!-- auto generating identifiers is only available for the Taxon core -->
                                 <#if mapping.isTaxonCore()>
-                                    <option value="-2" <#if (mapping.idColumn!-99)==-2> selected="selected"</#if>><@s.text name="manage.mapping.uuid"/></option>
-                                    <option value="-1" <#if (mapping.idColumn!-99)==-1> selected="selected"</#if>><@s.text name="manage.mapping.lineNumber"/></option>
+                                    <option value="-2" <#if (mapping.idColumn!-99)==-2> selected="selected"</#if>>${t("manage.mapping.uuid")}</option>
+                                    <option value="-1" <#if (mapping.idColumn!-99)==-1> selected="selected"</#if>>${t("manage.mapping.lineNumber")}</option>
                                 </#if>
                                 <#list columns as col>
                                     <option value="${col_index}" <#if (mapping.idColumn!-99)==col_index> selected="selected"</#if>>${col}</option>
@@ -682,7 +676,7 @@
                         <div class="row pt-2 pb-3 g-2 mappingFiler">
                             <div class="col-lg-1 pt-1" id="filter">
                                 <@popoverPropertyInfo "manage.mapping.info" />
-                                <strong class="ps-1"><@s.text name='manage.mapping.filter'/></strong>
+                                <strong class="ps-1">${t('manage.mapping.filter')}</strong>
                             </div>
 
                             <div class="col-lg-3">
@@ -732,7 +726,7 @@
                                             <#if g?has_content>
                                                 ${g}
                                             <#else>
-                                                <@s.text name="manage.mapping.noClass"/>
+                                                ${t("manage.mapping.noClass")}<#t>
                                             </#if>
                                         </h4>
                                         <#list groupsFields as field>
@@ -745,7 +739,7 @@
                     <#else>
                         <div class="mt-5">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                                <@s.text name="manage.mapping.fields"/>
+                                ${t("manage.mapping.fields")}<#t>
                             </h4>
                             <#list fields as field>
                                 <@showField field field_index/>
@@ -765,9 +759,9 @@
                         <span class="anchor anchor-base" id="anchor-nonmapped"></span>
                         <div class="mt-5" <#if (action.getRedundantGroups()?size==0)>style="height: 100vh; min-height: 200px;"</#if> >
                             <h4 id="nonmapped" class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                                <@s.text name="manage.mapping.no.mapped.title"/>
+                                ${t("manage.mapping.no.mapped.title")}<#t>
                             </h4>
-                            <p><@s.text name="manage.mapping.no.mapped.columns"/>:</p>
+                            <p>${t("manage.mapping.no.mapped.columns")}:</p>
 
                             <div class="text-smaller">
                                 <#list nonMapped as col>
@@ -783,9 +777,9 @@
                         <span class="anchor anchor-base" id="anchor-redundant"></span>
                         <div class="mt-5" style="height: 100vh; min-height: 200px;">
                             <h4 id="redundant" class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                                <@s.text name="manage.mapping.redundant.classes.title"/>
+                                ${t("manage.mapping.redundant.classes.title")}<#t>
                             </h4>
-                            <p><@s.text name="manage.mapping.redundant.classes.intro"/>:</p>
+                            <p>${t("manage.mapping.redundant.classes.intro")}:</p>
 
                             <div class="text-smaller">
                                 <#list redundants as gr>

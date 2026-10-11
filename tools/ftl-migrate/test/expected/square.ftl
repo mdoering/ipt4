@@ -3,5 +3,5 @@
     <FORM method='POST'
           action="${baseURL}/login.do">
 [@csrfField/]
-${t("portal.login")}
+${t("portal.login")}[#t]
 </FORM>

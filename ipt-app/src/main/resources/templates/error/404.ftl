@@ -1,6 +1,6 @@
 [#ftl output_format="HTML"]
 [#include "/inc/header.ftl"/]
-<title>[@s.text name="404.title"/]</title>
+<title>${t("404.title")}</title>
 [#include "/inc/menu.ftl"/]
 
 <div class="container px-0">
@@ -12,12 +12,12 @@
     <div class="container bg-body border rounded-2 mb-4">
         <div class="container my-3 p-3">
             <div class="text-center fs-smaller">
-                [@s.text name="basic.error"/]
+                ${t("basic.error")}[#t]
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    [@s.text name="404.title"/]
+                    ${t("404.title")}[#t]
                 </h1>
             </div>
         </div>
@@ -26,7 +26,7 @@
 
 <main class="container main-content-container">
     <div class="my-3 p-3">
-        <p class="text-center">[@s.text name="404.body"/]</p>
+        <p class="text-center">${t("404.body")}</p>
     </div>
 </main>
 

@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageMetadataAction" -->
     <#include "/inc/header.ftl">
-    <title><@s.text name='manage.datapackagemetadata.camtrap.taxonomic.title'/></title>
+    <title>${t('manage.datapackagemetadata.camtrap.taxonomic.title')}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -323,9 +323,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item"><a href="/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -333,7 +333,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.datapackagemetadata.camtrap.taxonomic.title'/>
+                            ${t('manage.datapackagemetadata.camtrap.taxonomic.title')}<#t>
                         </h1>
                     </div>
 
@@ -348,8 +348,8 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                     </div>
                 </div>
             </div>
@@ -366,18 +366,18 @@
 
                     <div class="bd-content">
                         <div class="mb-md-3 ps-3 py-3">
-                            <#assign removeTaxonLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.taxon'/></#assign>
+                            <#assign removeTaxonLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.taxon')}</#assign>
                             <#assign removeTaxonLink = removeTaxonLink?markup_string>
-                            <#assign addTaxonLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.taxon'/></#assign>
+                            <#assign addTaxonLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.taxon')}</#assign>
                             <#assign addTaxonLink = addTaxonLink?markup_string>
-                            <#assign removeVernacularNameLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.taxonomic.vernacularName'/></#assign>
+                            <#assign removeVernacularNameLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.taxonomic.vernacularName')}</#assign>
                             <#assign removeVernacularNameLink = removeVernacularNameLink?markup_string>
-                            <#assign addVernacularNameLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.taxonomic.vernacularName'/></#assign>
+                            <#assign addVernacularNameLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.taxonomic.vernacularName')}</#assign>
                             <#assign addVernacularNameLink = addVernacularNameLink?markup_string>
 
                             <div class="mt-4">
                                 <#assign inferAutomaticallyPopupInfo>
-                                    <@s.text name='datapackagemetadata.infer.automatically.short.help'/>
+                                    ${t('datapackagemetadata.infer.automatically.short.help')}<#t>
                                 </#assign>
                                 <@checkbox name="resource.inferTaxonomicCoverageAutomatically" value=resource.inferTaxonomicCoverageAutomatically i18nkey="datapackagemetadata.infer.automatically" />
                             </div>
@@ -388,8 +388,8 @@
                                         <div class="table-responsive">
                                             <table class="text-smaller table table-sm table-borderless mb-0">
                                                 <tr>
-                                                    <th class="col-4"><@s.text name='datapackagemetadata.taxonomic.scientificName'/></th>
-                                                    <th><@s.text name='datapackagemetadata.taxonomic.taxonId'/></th>
+                                                    <th class="col-4">${t('datapackagemetadata.taxonomic.scientificName')}</th>
+                                                    <th>${t('datapackagemetadata.taxonomic.taxonId')}</th>
                                                 </tr>
                                                 <#list (metadata.taxonomic)! as tx>
                                                 <tr>
@@ -404,7 +404,7 @@
                                             </table>
                                         </div>
                                     <#else>
-                                        <span class="text-discreet"><@s.text name="datapackagemetadata.noData"/></span>
+                                        <span class="text-discreet">${t("datapackagemetadata.noData")}</span>
                                     </#if>
                                 </div>
                             </div>
@@ -423,7 +423,7 @@
                                                         <path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path>
                                                     </svg>
                                                 </span>
-                                                <span><@s.text name="datapackagemetadata.reinfer"/></span>
+                                                <span>${t("datapackagemetadata.reinfer")}</span>
                                             </a>
                                         </div>
                                     </div>
@@ -434,7 +434,7 @@
                                         <div class="table-responsive">
                                             <table class="text-smaller table table-sm table-borderless mb-0">
                                                 <tr>
-                                                    <th class="col-4"><@s.text name='datapackagemetadata.taxonomic.scientificName'/></th>
+                                                    <th class="col-4">${t('datapackagemetadata.taxonomic.scientificName')}</th>
                                                     <td>
                                                         <#list (inferredMetadata.inferredTaxonomicScope.data)! as tx>
                                                         ${tx.scientificName!}<#sep>;</#sep>
@@ -444,7 +444,7 @@
                                             </table>
                                         </div>
                                     <#else>
-                                        <span class="text-discreet"><@s.text name="datapackagemetadata.noData"/></span>
+                                        <span class="text-discreet">${t("datapackagemetadata.noData")}</span>
                                     </#if>
                                 </div>
                             </div>
@@ -500,10 +500,10 @@
 
         <div class="col-12">
             <span class="form-label">
-                <a tabindex="0" role="button" class="popover-link" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-content="<@s.text name='datapackagemetadata.taxonomic.vernacularNames.help'/>" data-bs-original-title="" title="">
+                <a tabindex="0" role="button" class="popover-link" data-bs-toggle="popover" data-bs-trigger="focus" data-bs-html="true" data-bs-content="${t('datapackagemetadata.taxonomic.vernacularNames.help')}" data-bs-original-title="" title="">
                     <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                 </a>
-                <@s.text name="datapackagemetadata.taxonomic.vernacularNames"/>
+                ${t("datapackagemetadata.taxonomic.vernacularNames")}<#t>
             </span>
         </div>
 

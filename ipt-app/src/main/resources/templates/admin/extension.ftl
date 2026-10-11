@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.admin.ExtensionsAction" -->
 <#include "/inc/header.ftl">
-<title><@s.text name="admin.extension.title"/></title>
+<title>${t("admin.extension.title")}</title>
 <#assign currentMenu = "admin"/>
 <#include "/inc/menu.ftl">
 <#include "/macros/data_bage.ftl">
@@ -50,9 +50,9 @@
                 <div class="fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/extensions.do"><@s.text name="breadcrumb.admin.extensions"/></a></li>
-                            <li class="breadcrumb-item"><@s.text name="admin.extension.title"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/extensions.do">${t("breadcrumb.admin.extensions")}</a></li>
+                            <li class="breadcrumb-item">${t("admin.extension.title")}</li>
                         </ol>
                     </nav>
                 </div>
@@ -71,11 +71,11 @@
                     <div class="text-smaller">
                         <#if extension.isLatest()>
                             <span class="text-gbif-primary">
-                                <@s.text name="extension.version.issued.upToDate"><@s.param>${extension.issued?date?string["d MMMM yyyy"]}</@s.param></@s.text>
+                                ${t("extension.version.issued.upToDate", extension.issued?date?string["d MMMM yyyy"])}
                             </span>
                         <#else>
                             <span class="text-gbif-danger">
-                                <@s.text name="extension.version.issued.outdated"><@s.param>${extension.issued?date?string["d MMMM yyyy"]}</@s.param></@s.text>
+                                ${t("extension.version.issued.outdated", extension.issued?date?string["d MMMM yyyy"])}
                             </span>
                         </#if>
                     </div>
@@ -83,7 +83,7 @@
 
                 <div class="mt-2">
                     <a href="extensions.do" class="btn btn-sm btn-outline-secondary top-button">
-                        <@s.text name="button.back"/>
+                        ${t("button.back")}<#t>
                     </a>
                 </div>
             </div>
@@ -101,7 +101,7 @@
                     <ul>
                         <li>
                             <a class="sidebar-navigation-link" href="#anchor-description">
-                                <@s.text name="basic.description"/>
+                                ${t("basic.description")}<#t>
                             </a>
                         </li>
                         <#if (groups?size>0)>
@@ -111,7 +111,7 @@
                                         <#if g?has_content>
                                             <span class="text-capitalize">${g}</span>
                                         <#else>
-                                            <@s.text name="manage.mapping.noClass"/>
+                                            ${t("manage.mapping.noClass")}<#t>
                                         </#if>
                                     </a>
                                 </li>
@@ -125,12 +125,12 @@
                 <span class="anchor anchor-extension-page" id="anchor-description"></span>
                 <div class="mt-5 section">
                     <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                        <@s.text name="basic.description"/>
+                        ${t("basic.description")}<#t>
                     </h5>
 
                     <#if !extension.isLatest()>
                         <div class="callout callout-danger mb-2">
-                            <@s.text name="admin.extension.version.warning"/>
+                            ${t("admin.extension.version.warning")}<#t>
                         </div>
                     </#if>
 
@@ -140,35 +140,35 @@
 
                     <div class="row text-smaller">
                         <div class="col-lg-3">
-                            <strong><@s.text name="extension.properties"/></strong>
+                            <strong>${t("extension.properties")}</strong>
                         </div>
                         <div class="col-lg-9">${extension.properties?size}</div>
                     </div>
 
                     <div class="row text-smaller">
                         <div class="col-lg-3">
-                            <strong><@s.text name="basic.name"/></strong>
+                            <strong>${t("basic.name")}</strong>
                         </div>
                         <div class="col-lg-9">${extension.name}</div>
                     </div>
 
                     <div class="row text-smaller">
                         <div class="col-lg-3">
-                            <strong><@s.text name="basic.namespace"/></strong>
+                            <strong>${t("basic.namespace")}</strong>
                         </div>
                         <div class="col-lg-9 overflow-x-auto">${extension.namespace}</div>
                     </div>
 
                     <div class="row text-smaller">
                         <div class="col-lg-3">
-                            <strong><@s.text name="extension.rowtype"/></strong>
+                            <strong>${t("extension.rowtype")}</strong>
                         </div>
                         <div class="col-lg-9 overflow-x-auto">${extension.rowType}</div>
                     </div>
 
                     <div class="row text-smaller">
                         <div class="col-lg-3">
-                            <strong><@s.text name="basic.lastModified"/></strong>
+                            <strong>${t("basic.lastModified")}</strong>
                         </div>
                         <div class="col-lg-9">${extension.modified?datetime?string.long_short}</div>
                     </div>
@@ -176,7 +176,7 @@
 
                 <div class="mt-5">
                     <h5 class="pb-2 pt-2 text-gbif-header-2 fw-400">
-                        <@s.text name="admin.extension.properties"/>
+                        ${t("admin.extension.properties")}<#t>
                     </h5>
                 </div>
 
@@ -213,26 +213,26 @@
                                                 </#if>
                                                 <#if p.link?has_content>
                                                     <p class="overflow-x-auto">
-                                                        <@s.text name="basic.seealso"/> <a href="${p.link}">${p.link}</a>
+                                                        ${t("basic.seealso")} <a href="${p.link}">${p.link}</a>
                                                     </p>
                                                 </#if>
                                                 <#if p.examples?has_content>
                                                     <p class="overflow-x-auto">
-                                                        <em><@s.text name="basic.examples"/></em>: <@processSurroundedWithBackticksAsCode p.examples />
+                                                        <em>${t("basic.examples")}</em>: <@processSurroundedWithBackticksAsCode p.examples />
                                                     </p>
                                                 </#if>
                                                 <#if p.vocabulary??>
                                                     <p class="overflow-x-auto">
-                                                        <em><@s.text name="extension.vocabulary"/></em>:
+                                                        <em>${t("extension.vocabulary")}</em>:
                                                         <a href="vocabulary.do?id=${p.vocabulary.uriString}">${p.vocabulary.title}</a>
                                                     </p>
                                                 </#if>
                                                 <div class="details table-responsive">
                                                     <table>
-                                                        <tr><th class="pe-md-4 pe-2"><@s.text name="extension.prop.qname"/></th><td>${p.qualname}</td></tr>
-                                                        <tr><th class="pe-md-4 pe-2"><@s.text name="basic.namespace"/></th><td>${p.namespace()}</td></tr>
-                                                        <tr><th class="pe-md-4 pe-2"><@s.text name="extension.prop.type"/></th><td>${p.type!}</td></tr>
-                                                        <tr><th class="pe-md-4 pe-2"><@s.text name="extension.prop.required"/></th><td><#if p.required><@s.text name="basic.yes"/><#else><@s.text name="basic.no"/></#if></td></tr>
+                                                        <tr><th class="pe-md-4 pe-2">${t("extension.prop.qname")}</th><td>${p.qualname}</td></tr>
+                                                        <tr><th class="pe-md-4 pe-2">${t("basic.namespace")}</th><td>${p.namespace()}</td></tr>
+                                                        <tr><th class="pe-md-4 pe-2">${t("extension.prop.type")}</th><td>${p.type!}</td></tr>
+                                                        <tr><th class="pe-md-4 pe-2">${t("extension.prop.required")}</th><td><#if p.required>${t("basic.yes")}<#else>${t("basic.no")}</#if></td></tr>
                                                     </table>
                                                 </div>
                                             </div>

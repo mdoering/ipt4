@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.PublicationSettingsAction" -->
 <#include "/inc/header.ftl">
-<title><@s.text name='manage.publication.title'/></title>
+<title>${t('manage.publication.title')}</title>
 
 <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
@@ -45,16 +45,16 @@
             <div class="text-center fs-smaller">
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                        <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.publicationSettings"/></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                        <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.publicationSettings")}</li>
                     </ol>
                 </nav>
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name="manage.publicationSettings.title"/>
+                    ${t("manage.publicationSettings.title")}<#t>
                 </h1>
 
                 <div class="text-smaller">
@@ -74,7 +74,7 @@
     <div class="my-3 p-3">
         <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
             <@popoverPropertyInfo "eml.publishingOrganisation.help"/>
-            <@s.text name="eml.publishingOrganisation"/>
+            ${t("eml.publishingOrganisation")}<#t>
         </h5>
 
         <div class="row g-3 mt-0">
@@ -86,9 +86,7 @@
                 </form>
                 <br>
                 <div id="warning-helpdesk-assistance-required" class="simple-alert text-smaller" style="display:none;">
-                        <span><@s.text name="manage.overview.publishing.organisation.registeredResource">
-                            <@s.param><a href="mailto:helpdesk@gbif.org" class="custom-link text-gbif-danger fw-bold">Help Desk</a></@s.param>
-                        </@s.text></span>
+                        <span><#assign textArg1><a href="mailto:helpdesk@gbif.org" class="custom-link text-gbif-danger fw-bold">Help Desk</a></#assign>${t("manage.overview.publishing.organisation.registeredResource", textArg1)}</span>
                 </div>
             </div>
         </div>
@@ -99,7 +97,7 @@
             <div class="d-flex">
                 <h5 class="my-auto text-gbif-header-2 fw-400">
                     <@popoverPropertyInfo "manage.overview.autopublish.description"/>
-                    <@s.text name="manage.overview.autopublish.title"/>
+                    ${t("manage.overview.autopublish.title")}<#t>
                 </h5>
             </div>
 
@@ -108,7 +106,7 @@
                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                     </svg>
-                    <@s.text name="button.edit"/>
+                    ${t("button.edit")}<#t>
                 </a>
             </div>
         </div>
@@ -117,20 +115,20 @@
             <p class="mb-0">
                 <#if resource.usesAutoPublishing()>
                     <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill autopublish-enabled">
-                        <@s.text name="manage.overview.autopublish.enabled"/>: ${autoPublishFrequencies.get(resource.updateFrequency.identifier)}
+                        ${t("manage.overview.autopublish.enabled")}: ${autoPublishFrequencies.get(resource.updateFrequency.identifier)}
                     </span>
-                    <@s.text name="manage.overview.autopublish.intro.activated"/>
+                    ${t("manage.overview.autopublish.intro.activated")}<#t>
                 <#else>
                     <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill autopublish-disabled">
-                        <@s.text name="manage.overview.autopublish.disabled"/>
+                        ${t("manage.overview.autopublish.disabled")}<#t>
                     </span>
-                    <@s.text name="manage.overview.autopublish.intro.deactivated"/>
+                    ${t("manage.overview.autopublish.intro.deactivated")}<#t>
                 </#if>
             </p>
 
             <#if resource.isDeprecatedAutoPublishingConfiguration()>
                 <div class="callout callout-warning text-smaller">
-                    <@s.text name="manage.overview.autopublish.deprecated.warning.button" escapeHtml=true/>
+                    ${t("manage.overview.autopublish.deprecated.warning.button")?markup_string}<#t>
                 </div>
             </#if>
         </div>

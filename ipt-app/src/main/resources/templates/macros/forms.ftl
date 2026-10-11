@@ -1,5 +1,24 @@
 <#ftl output_format="HTML">
 
+    <#-- The validation errors of a field, as a list. -->
+    <#macro fieldError fieldName id="" cssClass="errorMessage" cssStyle="">
+        <#if (fieldErrors[fieldName])?has_content>
+            <ul<#if id?has_content> id="${id}"</#if> class="${cssClass}"<#if cssStyle?has_content> style="${cssStyle}"</#if>><#list fieldErrors[fieldName] as message><li><span>${message}</span></li></#list></ul><#t>
+        </#if>
+    </#macro>
+
+    <#-- The value at a property path such as eml.title, as text. -->
+    <#function propertyText path>
+        <#if !path?matches(r"[A-Za-z_][\w.\[\]]*")>
+            <#return "">
+        </#if>
+        <#local value = ("(" + path + ")!''")?eval>
+        <#if value?is_number || value?is_boolean>
+            <#return value?c>
+        </#if>
+        <#return value>
+    </#function>
+
     <#macro input name value="" i18nkey="" errorfield="" type="text" size=-1 disabled=false help="" helpOptions=[] date=false requiredField=false maxlength=-1 withLabel=true tabindex=-1 placeholder="">
         <div>
             <#if withLabel>
@@ -37,7 +56,7 @@
                       <#if requiredField> required</#if><#t>
                       <#if disabled> disabled</#if>><#t>
                       <#if value=="-99999"><#t>
-                          <@s.property value="${name}"/><#t>
+                          ${propertyText(name)}<#t>
                       <#else><#t>
                           ${value}<#t>
                       </#if><#t>
@@ -54,7 +73,7 @@
                       <#if (maxlength>0)> maxlength="${maxlength}"</#if><#t>
                       <#if requiredField> required</#if><#t>
                       <#if disabled> readonly="readonly"</#if>><#t>
-                      <#if value=="-99999"><@s.property value="${name}"/><#else>${value}</#if><#t>
+                      <#if value=="-99999">${propertyText(name)}<#else>${value}</#if><#t>
             </textarea><#lt>
             <#include "/macros/form_field_error.ftl">
         </div>
@@ -64,7 +83,7 @@
         <div class="textinline">
             <h5 class="py-2 mb-0 text-gbif-header fw-400">
                 <#include "/macros/help_icon.ftl">
-                <span><@s.text name="${name}"/><#if requiredField> <span class="text-gbif-danger">&#42;</span></#if></span>
+                <span>${t(name)}<#if requiredField> <span class="text-gbif-danger">&#42;</span></#if></span>
             </h5>
         </div>
     </#macro>
@@ -72,7 +91,7 @@
     <#macro link name value="" href="" class="" i18nkey="" help="" errorfield="">
         <div>
             <#include "/macros/help_icon.ftl">
-            <a id="${name}" name="${name}" class="${class}" href="${href}"><@s.text name="${value}"/></a>
+            <a id="${name}" name="${name}" class="${class}" href="${href}">${t(value)}</a>
         </div>
     </#macro>
 
@@ -90,7 +109,7 @@
                 </#if>
                 <#list options?keys as val>
                     <option value="${val}" <#if !compareValues && (value!"") == "" + val> selected="selected"</#if> <#if compareValues && (value!"") == "" + options[val]>selected</#if> >
-                        <#if javaGetter><@s.text name="${options.get(val)}"/><#else><@s.text name="${options[val]}"/></#if>
+                        <#if javaGetter>${t(options.get(val))}<#t><#else>${t(options[val])}</#if>
                     </option>
                 </#list>
             </select>
@@ -106,15 +125,25 @@
                     <#include "/macros/form_field_label.ftl">
                 </div>
             </#if>
-            <@s.select id=name class="form-select" name=name list=options listKey=objValue listValue=objTitle value=value size=size disabled=disabled emptyOption=includeEmpty/>
+            <select name="${name}" size="${size}"<#if disabled> disabled="disabled"</#if> id="${name}" class="form-select">
+                <#if includeEmpty>
+                    <option value=""></option>
+                </#if>
+                <#if options?is_enumerable>
+                    <#list options as option>
+                        <#assign optionValue = (option[objValue])!"">
+                        <option value="${optionValue}"<#if optionValue == value> selected="selected"</#if>>${(option[objTitle])!}</option>
+                    </#list>
+                </#if>
+            </select>
             <#include "/macros/form_field_error.ftl">
         </div>
     </#macro>
 
     <#macro checkbox name i18nkey="" errorfield="" disabled=false value=false help="" requiredField=false>
         <div class="form-check">
-            <@s.checkbox name="${name}" id="${name}" cssClass="form-check-input" fieldValue="true" value="${value?c}" disabled=disabled />
-            <#-- Struts sends only true value (when checkbox is checked).Send false additionaly because it only sends true. -->
+            <input type="checkbox" name="${name}" value="true"<#if value?is_boolean && value || value?is_string && value == "true"> checked="checked"</#if><#if disabled> disabled="disabled"</#if> id="${name}" class="form-check-input"/>
+            <#-- A checkbox sends only true (when checked). -->
             <#-- Send false additionaly. It is picked when the first value is absent otherwise ignored. -->
             <input type="hidden" name="${name}" value="false">
             <div class="d-flex">
@@ -138,7 +167,7 @@
         <div>
             <#include "/macros/help_icon.ftl">
             <label class="form-label">
-                <@s.text name="${i18nkey}"/> <#if requiredField><span class="text-gbif-danger">&#42;</span></#if>
+                ${t(i18nkey)} <#if requiredField><span class="text-gbif-danger">&#42;</span></#if>
             </label>
             <#nested>
         </div>
@@ -166,11 +195,11 @@
     <#macro showMore text maxLength>
         <#if (text?length>maxLength)>
             <div id="visibleContent">
-                <@textWithFormattedLink (text)?substring(0,maxLength)/>... <a id="showMore" href=""><@s.text name='basic.showMore'/></a>
+                <@textWithFormattedLink (text)?substring(0,maxLength)/>... <a id="showMore" href="">${t('basic.showMore')}</a>
             </div>
             <div id="hiddenContent" style="display: none">
                 <@textWithFormattedLink text/>
-                <a id="showLess" href=""><@s.text name='basic.showLess'/></a>
+                <a id="showLess" href="">${t('basic.showLess')}</a>
             </div>
         <#else>
             <@textWithFormattedLink text/>

@@ -90,6 +90,15 @@ class MappingTest {
         .getStatus()).isEqualTo(401);
   }
 
+  /** Struts' s.checkbox took its name from key; without a name the choice was never sent. */
+  @Test
+  void datasetDoiCheckboxIsSubmitted() throws Exception {
+    String html = as(ManageFixture.OWNER, get(URI.create("/manage/mapping.do?r=res1&id=" + ENCODED + "&mid=0")))
+        .getContentAsString();
+    assertThat(org.jsoup.Jsoup.parse(html).select("input.datasetDoiCheckbox"))
+        .isNotEmpty().allSatisfy(box -> assertThat(box.attr("name")).isEqualTo("doiUsedForDatasetId"));
+  }
+
   @Test
   void mapANewSourceAndDeleteTheMapping() throws Exception {
     as(ManageFixture.OWNER, multipart("/manage/addsource.do")

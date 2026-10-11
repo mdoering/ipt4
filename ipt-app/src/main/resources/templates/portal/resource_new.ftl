@@ -134,7 +134,7 @@
 <#macro extensionLink ext isCore=false>
     <#if ext?? && ext.name?has_content>
         <#if ext.description?has_content>
-            <#assign coreText><@s.text name='manage.overview.DwC.Mappings.cores.select'/></#assign>
+            <#assign coreText>${t('manage.overview.DwC.Mappings.cores.select')}<#t></#assign>
             <#assign coreText = coreText?markup_string>
             <div class="col-lg-3 ps-0 ext-tooltip" title="${ext.description}">${ext.name}&nbsp;<#if isCore>&#40;${coreText?lower_case}&#41;</#if></div>
         <#else>
@@ -146,10 +146,10 @@
 <#assign anchor_versions>#anchor-versions</#assign>
 <#assign anchor_rights>#anchor-rights</#assign>
 <#assign anchor_citation>#anchor-citation</#assign>
-<#assign no_description><@s.text name='portal.resource.no.description'/></#assign>
-<#assign updateFrequencyTitle><@s.text name='eml.updateFrequency'/></#assign>
+<#assign no_description>${t('portal.resource.no.description')}<#t></#assign>
+<#assign updateFrequencyTitle>${t('eml.updateFrequency')}<#t></#assign>
 <#assign updateFrequencyTitle = updateFrequencyTitle?markup_string>
-<#assign publishedOnText><@s.text name='manage.overview.published.released'/></#assign>
+<#assign publishedOnText>${t('manage.overview.published.released')}<#t></#assign>
 <#assign publishedOnText = publishedOnText?markup_string>
 <#assign download_dwca_url>${baseURL}/archive.do?r=${resource.shortname}<#if version??>&v=${version.toPlainString()}</#if></#assign>
 <#assign download_eml_url>${baseURL}/eml.do?r=${resource.shortname}&v=<#if version??>${version.toPlainString()}<#else>${resource.emlVersion.toPlainString()}</#if></#assign>
@@ -206,7 +206,7 @@
     <#-- display watermark for preview pages -->
     <#if isPreviewPage>
         <div id="watermark" class="text-center text-uppercase fs-1 mb-2">
-            <@s.text name='manage.overview.metadata.preview'><@s.param>${resource.emlVersion.toPlainString()}</@s.param></@s.text>
+            ${t('manage.overview.metadata.preview', resource.emlVersion.toPlainString())}
         </div>
     </#if>
 
@@ -215,8 +215,8 @@
             <div class="text-center fs-smaller">
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}"><@s.text name="breadcrumb.home"/></a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.resource"/></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}">${t("breadcrumb.home")}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.resource")}</li>
                     </ol>
                 </nav>
             </div>
@@ -227,9 +227,9 @@
                 </h1>
 
                 <div class="text-center">
-                    <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1"><@s.text name="portal.resource.type.${resourceTypeLowerCase}"/></span>
+                    <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1">${t("portal.resource.type.${resourceTypeLowerCase}")}</span>
                     <#if resourceSubtypeLowerCase?has_content>
-                        <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceSubtypeLowerCase} me-1"><@s.text name="portal.resource.subtype.${resourceSubtypeLowerCase}"/></span>
+                        <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceSubtypeLowerCase} me-1">${t("portal.resource.subtype.${resourceSubtypeLowerCase}")}</span>
                     </#if>
                 </div>
 
@@ -238,22 +238,22 @@
                         <span>
                             <#-- the existence of parameter version means the version is not equal to the latest published version -->
                             <#if version?? && version.toPlainString() != resource.emlVersion.toPlainString()>
-                                <em><@s.text name='portal.resource.version'/>&nbsp;${version.toPlainString()}</em>
+                                <em>${t('portal.resource.version')}&nbsp;${version.toPlainString()}</em>
                             <#else>
-                                <@s.text name='portal.resource.latest.version'/>
+                                ${t('portal.resource.latest.version')}<#t>
                             </#if>
 
                             <#if action.getDefaultOrganisation()?? && resource.organisation.key.toString() == action.getDefaultOrganisation().key.toString()>
                                 ${publishedOnText?lower_case}&nbsp;<span property="dc:issued">${eml.pubDate?date?string.long}</span>
                             <#else>
-                                <@s.text name='portal.resource.publishedOn'><@s.param>${resource.organisation.name}</@s.param></@s.text> <span property="dc:issued">${eml.pubDate?date?string("MMM d, yyyy")}</span>
+                                ${t('portal.resource.publishedOn', resource.organisation.name)} <span property="dc:issued">${eml.pubDate?date?string("MMM d, yyyy")}</span>
                                 <span property="dc:publisher" style="display: none">${resource.organisation.name}</span>
                             </#if>
                         </span>
                     </div>
                 <#else>
                     <div class="text-gbif-danger text-smaller">
-                        <@s.text name='portal.resource.published.never.long'/>
+                        ${t('portal.resource.published.never.long')}<#t>
                     </div>
                 </#if>
 
@@ -262,11 +262,11 @@
 
                         <#if managerRights>
                             <a href="${baseURL}/manage/resource.do?r=${resource.shortname}" class="btn btn-sm btn-outline-gbif-primary mt-1 me-xl-1 top-button">
-                                <@s.text name='button.edit'/>
+                                ${t('button.edit')}<#t>
                             </a>
                             <#if version?? && version.toPlainString() != resource.emlVersion.toPlainString()>
                                 <a class="confirmDeleteVersion btn btn-sm btn-outline-gbif-danger mt-1 me-xl-1 top-button" data-method="post" href="${baseURL}/admin/deleteVersion.do?r=${resource.shortname}&v=${version.toPlainString()}">
-                                    <@s.text name='button.delete.version'/>
+                                    ${t('button.delete.version')}<#t>
                                 </a>
                             </#if>
                         </#if>
@@ -289,7 +289,7 @@
                         <dl class="inline mb-0">
                             <#if eml.distributionUrl?has_content>
                                 <div class="text-truncate">
-                                    <dt><@s.text name='eml.distributionUrl.short'/>:</dt>
+                                    <dt>${t('eml.distributionUrl.short')}:</dt>
                                     <dd><a href="${eml.distributionUrl}">${eml.distributionUrl}</a></dd>
                                 </div>
                             </#if>
@@ -303,14 +303,14 @@
 
                             <#if eml.pubDate??>
                                 <div>
-                                    <dt><@s.text name='portal.resource.publicationDate'/>:</dt>
+                                    <dt>${t('portal.resource.publicationDate')}:</dt>
                                     <dd>${eml.pubDate?date?string.long}</dd>
                                 </div>
                             </#if>
 
                             <#if resource.organisation??>
                                 <div>
-                                    <dt><@s.text name='portal.resource.publishedBy'/>:</dt>
+                                    <dt>${t('portal.resource.publishedBy')}:</dt>
                                     <dd>
                                         <a href="${cfg.portalUrl}/publisher/${resource.organisation.key}" target="_blank">${resource.organisation.name!"Organisation"}</a>
                                     </dd>
@@ -319,7 +319,7 @@
 
                             <#if eml.intellectualRights?has_content>
                                 <div>
-                                    <dt><@s.text name='portal.resource.license'/>:</dt>
+                                    <dt>${t('portal.resource.license')}:</dt>
                                     <dd>
                                         <#if eml.intellectualRights.contains("CC-BY-NC")>
                                             <a href="http://creativecommons.org/licenses/by-nc/4.0/legalcode" target="_blank">CC-BY-NC 4.0</a>
@@ -336,7 +336,7 @@
                                 <#if eml.citation?? && (eml.citation.citation?has_content || eml.citation.identifier?has_content)>
                                     <a href="#anchor-citation" class="doi" dir="ltr">
                                         <span class="gb-icon gb-icon-quote"></span>
-                                        <span dir="auto"><@s.text name='portal.resource.cite.howTo'/></span>
+                                        <span dir="auto">${t('portal.resource.cite.howTo')}</span>
                                     </a>
                                 </#if>
 
@@ -367,9 +367,9 @@
 
                     <div class="<#if isLogoPresent>col-lg-7<#else>col-lg-8</#if> text-smaller px-0 pt-lg-max-3 border-lg-max-top order-lg-1">
                         <#if metadataOnly == true>
-                            <p class="mb-1"><@s.text name='portal.resource.downloads.metadataOnly.verbose'/></p>
+                            <p class="mb-1">${t('portal.resource.downloads.metadataOnly.verbose')}</p>
                         <#else>
-                            <p class="mb-1"><@s.text name='portal.resource.downloads.verbose'/></p>
+                            <p class="mb-1">${t('portal.resource.downloads.verbose')}</p>
                         </#if>
 
                         <div class="table-responsive">
@@ -380,46 +380,46 @@
                                 <#if metadataOnly == false>
                                     <tr>
                                         <th class="col-4 p-0">
-                                            <@s.text name='portal.resource.dwca.verbose'/>
+                                            ${t('portal.resource.dwca.verbose')}<#t>
                                         </th>
                                         <#if version?? && version.toPlainString() != resource.emlVersion.toPlainString() && recordsPublishedForVersion??>
                                             <td class="p-0">
                                                 <a href="${download_dwca_url}" onClick="_gaq.push(['_trackEvent', 'Archive', 'Download', '${resource.shortname}', ${recordsPublishedForVersion!0?c} ]);">
                                                     <svg class="link-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DownloadIcon"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path></svg>
-                                                    <@s.text name='portal.resource.download'/>
+                                                    ${t('portal.resource.download')}<#t>
                                                 </a>
-                                                ${recordsPublishedForVersion!0?c} <@s.text name='portal.resource.records'/>&nbsp;<#if eml.language?has_content && languages[eml.language]?has_content><@s.text name='eml.language.available'><@s.param>${languages[eml.language]?cap_first!}</@s.param></@s.text></#if> (${archiveSizeForVersion!}) <#if eml.updateFrequency?has_content && eml.updateFrequency.identifier?has_content && frequencies[eml.updateFrequency.identifier]?has_content>&nbsp;-&nbsp;${updateFrequencyTitle?lower_case?cap_first}:&nbsp;${frequencies[eml.updateFrequency.identifier]?lower_case}</#if>
+                                                ${recordsPublishedForVersion!0?c} ${t('portal.resource.records')}&nbsp;<#if eml.language?has_content && languages[eml.language]?has_content>${t('eml.language.available', languages[eml.language]?cap_first!)}</#if> (${archiveSizeForVersion!}) <#if eml.updateFrequency?has_content && eml.updateFrequency.identifier?has_content && frequencies[eml.updateFrequency.identifier]?has_content>&nbsp;-&nbsp;${updateFrequencyTitle?lower_case?cap_first}:&nbsp;${frequencies[eml.updateFrequency.identifier]?lower_case}</#if>
                                             </td>
                                         <#else>
                                             <td class="p-0">
                                                 <a href="${download_dwca_url}" onClick="_gaq.push(['_trackEvent', 'Archive', 'Download', '${resource.shortname}', ${resource.recordsPublished!0?c} ]);">
                                                     <svg class="link-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DownloadIcon"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path></svg>
-                                                    <@s.text name='portal.resource.download'/>
+                                                    ${t('portal.resource.download')}<#t>
                                                 </a>
-                                                ${resource.recordsPublished!0?c} <@s.text name='portal.resource.records'/>&nbsp;<#if eml.language?has_content && languages[eml.language]?has_content><@s.text name='eml.language.available'><@s.param>${languages[eml.language]?cap_first!}</@s.param></@s.text></#if> (${archiveSizeForVersion!})<#if eml.updateFrequency?has_content && eml.updateFrequency.identifier?has_content && frequencies[eml.updateFrequency.identifier]?has_content>&nbsp;-&nbsp;${updateFrequencyTitle?lower_case?cap_first}:&nbsp;${frequencies[eml.updateFrequency.identifier]?lower_case}</#if>
+                                                ${resource.recordsPublished!0?c} ${t('portal.resource.records')}&nbsp;<#if eml.language?has_content && languages[eml.language]?has_content>${t('eml.language.available', languages[eml.language]?cap_first!)}</#if> (${archiveSizeForVersion!})<#if eml.updateFrequency?has_content && eml.updateFrequency.identifier?has_content && frequencies[eml.updateFrequency.identifier]?has_content>&nbsp;-&nbsp;${updateFrequencyTitle?lower_case?cap_first}:&nbsp;${frequencies[eml.updateFrequency.identifier]?lower_case}</#if>
                                             </td>
                                         </#if>
                                     </tr>
                                 </#if>
                                 <tr>
-                                    <th class="p-0"><@s.text name='portal.resource.metadata.verbose'/></th>
+                                    <th class="p-0">${t('portal.resource.metadata.verbose')}</th>
                                     <td class="p-0">
                                         <a href="${download_eml_url}" onClick="_gaq.push(['_trackEvent', 'EML', 'Download', '${resource.shortname}']);" download>
                                             <svg class="link-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DownloadIcon"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path></svg>
-                                            <@s.text name='portal.resource.download'/>
+                                            ${t('portal.resource.download')}<#t>
                                         </a>
-                                        <#if eml.metadataLanguage?has_content && languages[eml.metadataLanguage]?has_content><@s.text name='eml.language.available'><@s.param>${languages[eml.metadataLanguage]!?cap_first}</@s.param></@s.text></#if> (${emlSizeForVersion})
+                                        <#if eml.metadataLanguage?has_content && languages[eml.metadataLanguage]?has_content>${t('eml.language.available', languages[eml.metadataLanguage]!?cap_first)}</#if> (${emlSizeForVersion})
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <th class="p-0"><@s.text name='portal.resource.rtf.verbose'/></th>
+                                    <th class="p-0">${t('portal.resource.rtf.verbose')}</th>
                                     <td class="p-0">
                                         <a href="${download_rtf_url}" onClick="_gaq.push(['_trackEvent', 'RTF', 'Download', '${resource.shortname}']);">
                                             <svg class="link-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="DownloadIcon"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path></svg>
-                                            <@s.text name='portal.resource.download'/>
+                                            ${t('portal.resource.download')}<#t>
                                         </a>
-                                        <#if eml.metadataLanguage?has_content && languages[eml.metadataLanguage]?has_content><@s.text name='eml.language.available'><@s.param>${languages[eml.metadataLanguage]!?cap_first}</@s.param></@s.text></#if> (${rtfSizeForVersion})
+                                        <#if eml.metadataLanguage?has_content && languages[eml.metadataLanguage]?has_content>${t('eml.language.available', languages[eml.metadataLanguage]!?cap_first)}</#if> (${rtfSizeForVersion})
                                     </td>
                                 </tr>
                             </table>
@@ -438,53 +438,53 @@
             <div class="bd-toc mt-4 pt-3 ps-3 mb-lg-5 text-muted">
                 <nav id="sidebar-content">
                     <ul>
-                        <li><a href="#anchor-description" class="sidebar-navigation-link"><@s.text name='portal.resource.description'/></a></li>
+                        <li><a href="#anchor-description" class="sidebar-navigation-link">${t('portal.resource.description')}</a></li>
                         <#if resource.lastPublished??>
                             <#if metadataOnly != true>
-                                <li><a href="#anchor-dataRecords" class="sidebar-navigation-link"><@s.text name='portal.resource.dataRecords'/></a></li>
+                                <li><a href="#anchor-dataRecords" class="sidebar-navigation-link">${t('portal.resource.dataRecords')}</a></li>
                             </#if>
                             <#if resource.versionHistory??>
-                                <li><a href="#anchor-versions" class="sidebar-navigation-link"><@s.text name='portal.resource.versions'/></a></li>
+                                <li><a href="#anchor-versions" class="sidebar-navigation-link">${t('portal.resource.versions')}</a></li>
                             </#if>
                             <#if eml.citation?? && (eml.citation.citation?has_content || eml.citation.identifier?has_content)>
-                                <li><a href="#anchor-citation" class="sidebar-navigation-link"><@s.text name='portal.resource.cite.howTo'/></a></li>
+                                <li><a href="#anchor-citation" class="sidebar-navigation-link">${t('portal.resource.cite.howTo')}</a></li>
                             </#if>
                             <#if eml.intellectualRights?has_content>
-                                <li><a href="#anchor-rights" class="sidebar-navigation-link"><@s.text name='eml.intellectualRights.simple'/></a></li>
+                                <li><a href="#anchor-rights" class="sidebar-navigation-link">${t('eml.intellectualRights.simple')}</a></li>
                             </#if>
-                            <li><a href="#anchor-gbif" class="sidebar-navigation-link"><@s.text name='portal.resource.organisation.key'/></a></li>
+                            <li><a href="#anchor-gbif" class="sidebar-navigation-link">${t('portal.resource.organisation.key')}</a></li>
                             <#if eml.subject?has_content>
-                                <li><a href="#anchor-keywords" class="sidebar-navigation-link"><@s.text name='portal.resource.summary.keywords'/></a></li>
+                                <li><a href="#anchor-keywords" class="sidebar-navigation-link">${t('portal.resource.summary.keywords')}</a></li>
                             </#if>
                             <#if (eml.physicalData?size > 0 )>
-                                <li><a href="#anchor-external" class="sidebar-navigation-link"><@s.text name='manage.metadata.physical.alternativeTitle'/></a></li>
+                                <li><a href="#anchor-external" class="sidebar-navigation-link">${t('manage.metadata.physical.alternativeTitle')}</a></li>
                             </#if>
                             <#if (eml.contacts?size>0) || (eml.creators?size>0) || (eml.metadataProviders?size>0) || (eml.associatedParties?size>0)>
-                                <li><a href="#anchor-contacts" class="sidebar-navigation-link"><@s.text name='portal.resource.contacts'/></a></li>
+                                <li><a href="#anchor-contacts" class="sidebar-navigation-link">${t('portal.resource.contacts')}</a></li>
                             </#if>
                             <#if eml.geospatialCoverages[0]??>
-                                <li><a href="#anchor-geospatial" class="sidebar-navigation-link"><@s.text name='portal.resource.summary.geocoverage'/></a></li>
+                                <li><a href="#anchor-geospatial" class="sidebar-navigation-link">${t('portal.resource.summary.geocoverage')}</a></li>
                             </#if>
                             <#if ((organizedCoverages?size > 0))>
-                                <li><a href="#anchor-taxanomic" class="sidebar-navigation-link"><@s.text name='manage.metadata.taxcoverage.title'/></a></li>
+                                <li><a href="#anchor-taxanomic" class="sidebar-navigation-link">${t('manage.metadata.taxcoverage.title')}</a></li>
                             </#if>
                             <#if ((eml.temporalCoverages?size > 0))>
-                                <li><a href="#anchor-temporal" class="sidebar-navigation-link"><@s.text name='manage.metadata.tempcoverage.title'/></a></li>
+                                <li><a href="#anchor-temporal" class="sidebar-navigation-link">${t('manage.metadata.tempcoverage.title')}</a></li>
                             </#if>
                             <#if eml.project?? && eml.project.title?has_content>
-                                <li><a href="#anchor-project" class="sidebar-navigation-link"><@s.text name='manage.metadata.project.title'/></a></li>
+                                <li><a href="#anchor-project" class="sidebar-navigation-link">${t('manage.metadata.project.title')}</a></li>
                             </#if>
                             <#if eml.studyExtent?has_content || eml.sampleDescription?has_content || eml.qualityControl?has_content || (eml.methodSteps?? && (eml.methodSteps?size>=1) && eml.methodSteps[0]?has_content) >
-                                <li><a href="#anchor-methods" class="sidebar-navigation-link"><@s.text name='manage.metadata.methods.title'/></a></li>
+                                <li><a href="#anchor-methods" class="sidebar-navigation-link">${t('manage.metadata.methods.title')}</a></li>
                             </#if>
                             <#if eml.collections?? && (eml.collections?size > 0) && eml.collections[0].collectionName?has_content >
-                                <li><a href="#anchor-collection" class="sidebar-navigation-link"><@s.text name='manage.metadata.collections.title'/></a></li>
+                                <li><a href="#anchor-collection" class="sidebar-navigation-link">${t('manage.metadata.collections.title')}</a></li>
                             </#if>
                             <#if eml.bibliographicCitationSet?? && (eml.bibliographicCitationSet.bibliographicCitations?has_content)>
-                                <li><a href="#anchor-reference" class="sidebar-navigation-link"><@s.text name='manage.metadata.citations.bibliography'/></a></li>
+                                <li><a href="#anchor-reference" class="sidebar-navigation-link">${t('manage.metadata.citations.bibliography')}</a></li>
                             </#if>
                         </#if>
-                        <li><a href="#anchor-additional" class="sidebar-navigation-link"><@s.text name='manage.metadata.additional.title'/></a></li>
+                        <li><a href="#anchor-additional" class="sidebar-navigation-link">${t('manage.metadata.additional.title')}</a></li>
                     </ul>
                 </nav>
             </div>
@@ -493,13 +493,13 @@
                 <span class="anchor anchor-home-resource-page" id="anchor-description"></span>
                 <div id="description" class="pb-5 section">
                     <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                        <@s.text name='portal.resource.description'/>
+                        ${t('portal.resource.description')}<#t>
                     </h4>
                     <div id="description-container" property="dc:abstract" class="mt-3 overflow-x-auto">
                         <#if (eml.description??)>
                             ${eml.description}
                         <#else>
-                            <p><@s.text name='portal.resource.no.description'/></p>
+                            <p>${t('portal.resource.no.description')}</p>
                         </#if>
                     </div>
                 </div>
@@ -519,19 +519,19 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-dataRecords"></span>
                         <div id="dataRecords" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.dataRecords'/>
+                                ${t('portal.resource.dataRecords')}<#t>
                             </h4>
 
                             <p>
-                                <@s.text name='portal.resource.dataRecords.intro'><@s.param>${action.getCoreType()?lower_case}</@s.param></@s.text>
+                                ${t('portal.resource.dataRecords.intro', action.getCoreType()?lower_case)}
                                 <#if coreExt?? && coreExt.name?has_content && coreCount?has_content>
-                                    <@s.text name='portal.resource.dataRecords.core'><@s.param>${coreCount}</@s.param></@s.text>
+                                    ${t('portal.resource.dataRecords.core', coreCount)}
                                 </#if>
                             </p>
 
                             <#if recordsByExtensionOrderedNumber gt 0>
                                 <p>
-                                    <@s.text name='portal.resource.dataRecords.extensions'><@s.param>${recordsByExtensionOrderedNumber}</@s.param></@s.text>&nbsp;<@s.text name='portal.resource.dataRecords.extensions.coverage'/>
+                                    ${t('portal.resource.dataRecords.extensions', recordsByExtensionOrderedNumber)}&nbsp;${t('portal.resource.dataRecords.extensions.coverage')}
                                 </p>
 
                                 <div id="record_graph" class="mb-3 ps-sm-5 ps-3">
@@ -564,7 +564,7 @@
                             </#if>
 
                             <p>
-                                <@s.text name='portal.resource.dataRecords.repository'/>
+                                ${t('portal.resource.dataRecords.repository')}<#t>
                             </p>
                         </div>
                     </#if>
@@ -574,13 +574,13 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-versions"></span>
                         <div id ="versions" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.versions'/>
+                                ${t('portal.resource.versions')}<#t>
                             </h4>
 
                             <#if managerRights>
-                                <p><@s.text name='portal.resource.versions.verbose.manager'/></p>
+                                <p>${t('portal.resource.versions.verbose.manager')}</p>
                             <#else>
-                                <p><@s.text name='portal.resource.versions.verbose'/></p>
+                                <p>${t('portal.resource.versions.verbose')}</p>
                             </#if>
                             <@versionsTable numVersionsShown=3 sEmptyTable="dataTables.sEmptyTable.versions" baseURL=baseURL shortname=resource.shortname />
                             <div id="vtableContainer" class="table-responsive text-smaller"></div>
@@ -592,14 +592,14 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-citation"></span>
                         <div id="citation" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.cite.howTo'/>
+                                ${t('portal.resource.cite.howTo')}<#t>
                             </h4>
 
                             <p>
                                 <#if version?? && version.toPlainString() != resource.emlVersion.toPlainString()>
-                                    <em class="warn"><@s.text name='portal.resource.latest.version.warning'/>&nbsp;</em>
+                                    <em class="warn">${t('portal.resource.latest.version.warning')}&nbsp;</em>
                                 </#if>
-                                <@s.text name='portal.resource.cite.help'/>:
+                                ${t('portal.resource.cite.help')}:
                             </p>
                             <p property="dc:bibliographicCitation" class="howtocite mt-3 p-3 overflow-x-auto">
                                 <@textWithFormattedLink eml.citation.citation/>
@@ -612,21 +612,21 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-rights"></span>
                         <div id="rights" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='eml.intellectualRights.simple'/>
+                                ${t('eml.intellectualRights.simple')}<#t>
                             </h4>
 
-                            <p><@s.text name='portal.resource.rights.help'/>:</p>
+                            <p>${t('portal.resource.rights.help')}:</p>
                             <@licenseLogoClass eml.intellectualRights!/>
                             <p property="dc:license">
                                 <#if resource.organisation?? && action.getDefaultOrganisation()?? && resource.organisation.key.toString() != action.getDefaultOrganisation().key.toString()>
-                                    <@s.text name='portal.resource.rights.organisation'><@s.param>${resource.organisation.name}</@s.param></@s.text>
+                                    ${t('portal.resource.rights.organisation', resource.organisation.name)}
                                 </#if>
                                 <#if eml.intellectualRights.contains("CC-BY-NC")>
-                                    <@s.text name='eml.intellectualRights.licence.ccbync'/>
+                                    ${t('eml.intellectualRights.licence.ccbync')}<#t>
                                 <#elseif eml.intellectualRights.contains("CC-BY")>
-                                    <@s.text name='eml.intellectualRights.licence.ccby'/>
+                                    ${t('eml.intellectualRights.licence.ccby')}<#t>
                                 <#elseif eml.intellectualRights.contains("CC0")>
-                                    <@s.text name='eml.intellectualRights.licence.cczero'/>
+                                    ${t('eml.intellectualRights.licence.cczero')}<#t>
                                 <#else>
                                     ${eml.intellectualRights!}
                                 </#if>
@@ -638,17 +638,17 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-gbif"></span>
                     <div id="gbif" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.organisation.key'/>
+                            ${t('portal.resource.organisation.key')}<#t>
                         </h4>
 
                         <#if resource.status=="REGISTERED" && resource.organisation??>
                             <p>
-                                <@s.text name='manage.home.registered.verbose'><@s.param>${cfg.portalUrl}/dataset/${resource.key}</@s.param><@s.param>${resource.key}</@s.param></@s.text>
+                                ${t('manage.home.registered.verbose', "${cfg.portalUrl}/dataset/${resource.key}", resource.key)}
                                 <#-- in prod mode link goes to /publisher (GBIF Portal), in dev mode link goes to /publisher (GBIF UAT Portal) -->
-                                &nbsp;<@s.text name='manage.home.published.verbose'><@s.param>${cfg.portalUrl}/publisher/${resource.organisation.key}</@s.param><@s.param>${resource.organisation.name}</@s.param><@s.param>${cfg.portalUrl}/node/${resource.organisation.nodeKey!"#"}</@s.param><@s.param>${resource.organisation.nodeName!}</@s.param></@s.text>
+                                &nbsp;${t('manage.home.published.verbose', "${cfg.portalUrl}/publisher/${resource.organisation.key}", resource.organisation.name, '${cfg.portalUrl}/node/${resource.organisation.nodeKey!"#"}', resource.organisation.nodeName!)}
                             </p>
                         <#else>
-                            <p><@s.text name='manage.home.not.registered.verbose'/></p>
+                            <p>${t('manage.home.not.registered.verbose')}</p>
                         </#if>
                     </div>
 
@@ -657,7 +657,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-keywords"></span>
                         <div id="keywords" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.summary.keywords'/>
+                                ${t('portal.resource.summary.keywords')}<#t>
                             </h4>
 
                             <p property="dc:subject">
@@ -675,10 +675,10 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-external"></span>
                         <div id="external" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.physical.alternativeTitle'/>
+                                ${t('manage.metadata.physical.alternativeTitle')}<#t>
                             </h4>
 
-                            <p><@s.text name='portal.resource.otherFormats'/></p>
+                            <p>${t('portal.resource.otherFormats')}</p>
 
                             <div class="table-responsive">
                                 <table class="text-smaller table table-sm table-borderless">
@@ -704,7 +704,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-contacts"></span>
                         <div id="contacts" class="pb-5 section">
                             <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.contacts'/>
+                                ${t('portal.resource.contacts')}<#t>
                             </h4>
 
                             <div class="row g-3 border">
@@ -722,7 +722,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-geospatial"></span>
                         <div id="geospatial" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.summary.geocoverage'/>
+                                ${t('portal.resource.summary.geocoverage')}<#t>
                             </h4>
 
                             <p property="dc:spatial">
@@ -736,8 +736,8 @@
                             <div class="table-responsive">
                                 <table class="text-smaller table table-sm table-borderless">
                                     <tr>
-                                        <th class="col-4"><@s.text name='eml.geospatialCoverages.boundingCoordinates'/></th>
-                                        <td><@s.text name='eml.geospatialCoverages.boundingCoordinates.min.latitude'/>&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.min.longitude'/>&nbsp;&#91;${eml.geospatialCoverages[0].boundingCoordinates.min.latitude},&nbsp;${eml.geospatialCoverages[0].boundingCoordinates.min.longitude}&#93;&#44;&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.max.latitude'/>&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.max.longitude'/>&nbsp;&#91;${eml.geospatialCoverages[0].boundingCoordinates.max.latitude},&nbsp;${eml.geospatialCoverages[0].boundingCoordinates.max.longitude}&#93;</td>
+                                        <th class="col-4">${t('eml.geospatialCoverages.boundingCoordinates')}</th>
+                                        <td>${t('eml.geospatialCoverages.boundingCoordinates.min.latitude')}&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.min.longitude')}&nbsp;&#91;${eml.geospatialCoverages[0].boundingCoordinates.min.latitude},&nbsp;${eml.geospatialCoverages[0].boundingCoordinates.min.longitude}&#93;&#44;&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.max.latitude')}&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.max.longitude')}&nbsp;&#91;${eml.geospatialCoverages[0].boundingCoordinates.max.latitude},&nbsp;${eml.geospatialCoverages[0].boundingCoordinates.max.longitude}&#93;</td>
                                     </tr>
                                 </table>
                             </div>
@@ -749,7 +749,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-taxanomic"></span>
                         <div id="taxanomic" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.taxcoverage.title'/>
+                                ${t('manage.metadata.taxcoverage.title')}<#t>
                             </h4>
 
                             <#list organizedCoverages as item>
@@ -794,7 +794,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-temporal"></span>
                         <div id="temporal" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.tempcoverage.title'/>
+                                ${t('manage.metadata.tempcoverage.title')}<#t>
                             </h4>
 
                             <#list eml.temporalCoverages as item>
@@ -802,22 +802,22 @@
                                     <table class="text-smaller table table-sm table-borderless">
                                         <#if ("${item.type}" == "DATE_RANGE") && eml.temporalCoverages[item_index].startDate?? && eml.temporalCoverages[item_index].endDate?? >
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.temporalCoverages.startDate'/> / <@s.text name='eml.temporalCoverages.endDate'/></th>
+                                                <th class="col-4">${t('eml.temporalCoverages.startDate')} / ${t('eml.temporalCoverages.endDate')}</th>
                                                 <td property="dc:temporal">${eml.temporalCoverages[item_index].startDate?date} / ${eml.temporalCoverages[item_index].endDate?date}</td>
                                             </tr>
                                         <#elseif "${item.type}" == "SINGLE_DATE" && eml.temporalCoverages[item_index].startDate?? >
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.temporalCoverages.startDate'/></th>
+                                                <th class="col-4">${t('eml.temporalCoverages.startDate')}</th>
                                                 <td property="dc:temporal">${eml.temporalCoverages[item_index].startDate?date}</td>
                                             </tr>
                                         <#elseif "${item.type}" == "FORMATION_PERIOD" && eml.temporalCoverages[item_index].formationPeriod?? >
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.temporalCoverages.formationPeriod'/></th>
+                                                <th class="col-4">${t('eml.temporalCoverages.formationPeriod')}</th>
                                                 <td property="dc:temporal">${eml.temporalCoverages[item_index].formationPeriod}</td>
                                             </tr>
                                         <#elseif eml.temporalCoverages[item_index].livingTimePeriod??> <!-- LIVING_TIME_PERIOD -->
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.temporalCoverages.livingTimePeriod'/></th>
+                                                <th class="col-4">${t('eml.temporalCoverages.livingTimePeriod')}</th>
                                                 <td property="dc:temporal">${eml.temporalCoverages[item_index].livingTimePeriod!}</td>
                                             </tr>
                                         </#if>
@@ -832,7 +832,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-project"></span>
                         <div id="project" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.project.title'/>
+                                ${t('manage.metadata.project.title')}<#t>
                             </h4>
 
                             <p>
@@ -847,37 +847,37 @@
                                 <table class="text-smaller table table-sm table-borderless">
                                     <#if eml.project.title?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.title'/></th>
+                                            <th class="col-4">${t('eml.project.title')}</th>
                                             <td>${eml.project.title}</td>
                                         </tr>
                                     </#if>
                                     <#if eml.project.identifier?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.identifier'/></th>
+                                            <th class="col-4">${t('eml.project.identifier')}</th>
                                             <td>${eml.project.identifier}</td>
                                         </tr>
                                     </#if>
                                     <#if eml.project.funding?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.funding'/></th>
+                                            <th class="col-4">${t('eml.project.funding')}</th>
                                             <td>${eml.project.funding}</td>
                                         </tr>
                                     </#if>
                                     <#if eml.project.studyAreaDescription.descriptorValue?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.studyAreaDescription.descriptorValue'/></th>
+                                            <th class="col-4">${t('eml.project.studyAreaDescription.descriptorValue')}</th>
                                             <td>${eml.project.studyAreaDescription.descriptorValue?no_esc}</td>
                                         </tr>
                                     </#if>
                                     <#if eml.project.designDescription?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.designDescription'/></th>
+                                            <th class="col-4">${t('eml.project.designDescription')}</th>
                                             <td>${eml.project.designDescription?no_esc}</td>
                                         </tr>
                                     </#if>
                                     <#if eml.project.awards?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.award'/></th>
+                                            <th class="col-4">${t('eml.project.award')}</th>
                                             <td>
                                                 <#list eml.project.awards as award>
                                                     <strong>${award.title!}</strong><br>
@@ -892,7 +892,7 @@
                                     </#if>
                                     <#if eml.project.relatedProjects?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.project.relatedProjects'/></th>
+                                            <th class="col-4">${t('eml.project.relatedProjects')}</th>
                                             <td>
                                                 <#list eml.project.relatedProjects as relatedProject>
                                                     <strong>${relatedProject.title}<br></strong>
@@ -908,7 +908,7 @@
 
                             <#if (eml.project.personnel?size >0)>
                                 <br>
-                                <p class="text-smaller fw-bold"><@s.text name='eml.project.personnel.intro'/>:</p>
+                                <p class="text-smaller fw-bold">${t('eml.project.personnel.intro')}:</p>
                                 <div class="row border">
                                     <#list deduplicatedProjectPersonnel as c>
                                         <div class="col-lg-4">
@@ -926,7 +926,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-methods"></span>
                         <div id="methods" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.methods.title'/>
+                                ${t('manage.metadata.methods.title')}<#t>
                             </h4>
 
                             <p class="overflow-x-auto">
@@ -941,14 +941,14 @@
                                 <table class="text-smaller table table-sm table-borderless">
                                     <#if eml.studyExtent?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.studyExtent'/></th>
+                                            <th class="col-4">${t('eml.studyExtent')}</th>
                                             <td>${eml.studyExtent?no_esc}</td>
                                         </tr>
                                     </#if>
 
                                     <#if eml.qualityControl?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.qualityControl'/></th>
+                                            <th class="col-4">${t('eml.qualityControl')}</th>
                                             <td>${eml.qualityControl?no_esc}</td>
                                         </tr>
                                     </#if>
@@ -957,7 +957,7 @@
 
                             <#if (eml.methodSteps?? && (eml.methodSteps?size>=1) && eml.methodSteps[0]?has_content)>
                                 <p class="overflow-x-auto">
-                                    <@s.text name='rtf.methods.description'/>&#58;
+                                    ${t('rtf.methods.description')}&#58;
                                 </p>
                                 <ol class="overflow-x-auto">
                                     <#list eml.methodSteps as item>
@@ -977,7 +977,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-collection"></span>
                         <div id="collection" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.collections.title'/>
+                                ${t('manage.metadata.collections.title')}<#t>
                             </h4>
 
                             <#list eml.collections as item>
@@ -985,19 +985,19 @@
                                     <table class="text-smaller table table-sm table-borderless">
                                         <#if item.collectionName?has_content>
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.collectionName'/></th>
+                                                <th class="col-4">${t('eml.collectionName')}</th>
                                                 <td>${item.collectionName!}</td>
                                             </tr>
                                         </#if>
                                         <#if item.collectionId?has_content>
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.collectionId'/></th>
+                                                <th class="col-4">${t('eml.collectionId')}</th>
                                                 <td>${item.collectionId!}</td>
                                             </tr>
                                         </#if>
                                         <#if item.parentCollectionId?has_content>
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.parentCollectionId'/></th>
+                                                <th class="col-4">${t('eml.parentCollectionId')}</th>
                                                 <td>${item.parentCollectionId!}</td>
                                             </tr>
                                         </#if>
@@ -1009,7 +1009,7 @@
                                 <div class="table-responsive">
                                     <table class="text-smaller table table-sm table-borderless">
                                             <tr>
-                                                <th class="col-4"><@s.text name='eml.specimenPreservationMethod.plural'/></th>
+                                                <th class="col-4">${t('eml.specimenPreservationMethod.plural')}</th>
                                                 <td>
                                                     <#list eml.specimenPreservationMethods as item>
                                                         ${(preservationMethods[item])!?cap_first}<#if item_has_next>,&nbsp;</#if>
@@ -1024,16 +1024,16 @@
                                 <div class="table-responsive">
                                     <table class="text-smaller table table-sm table-borderless">
                                             <tr>
-                                                <th class="col-4"><@s.text name='manage.metadata.collections.curatorialUnits.title'/></th>
+                                                <th class="col-4">${t('manage.metadata.collections.curatorialUnits.title')}</th>
                                                 <td>
                                                     <#list eml.jgtiCuratorialUnits as item>
                                                         <#if item.type=="COUNT_RANGE">
-                                                            <@s.text name='eml.jgtiCuratorialUnits.rangeStart'/>&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeStart}
-                                                            <@s.text name='eml.jgtiCuratorialUnits.rangeEnd'/>&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeEnd}
+                                                            ${t('eml.jgtiCuratorialUnits.rangeStart')}&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeStart}
+                                                            ${t('eml.jgtiCuratorialUnits.rangeEnd')}&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeEnd}
                                                             ${eml.jgtiCuratorialUnits[item_index].unitType}
                                                         <#else>
-                                                            <@s.text name='eml.jgtiCuratorialUnits.rangeMean'/>&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeMean}
-                                                            <@s.text name='eml.jgtiCuratorialUnits.uncertaintyMeasure'/>&nbsp;${eml.jgtiCuratorialUnits[item_index].uncertaintyMeasure}
+                                                            ${t('eml.jgtiCuratorialUnits.rangeMean')}&nbsp;${eml.jgtiCuratorialUnits[item_index].rangeMean}
+                                                            ${t('eml.jgtiCuratorialUnits.uncertaintyMeasure')}&nbsp;${eml.jgtiCuratorialUnits[item_index].uncertaintyMeasure}
                                                             ${eml.jgtiCuratorialUnits[item_index].unitType}
                                                         </#if>
                                                         <#if item_has_next>,&nbsp;</#if>
@@ -1051,7 +1051,7 @@
                         <span class="anchor anchor-home-resource-page" id="anchor-reference"></span>
                         <div id="reference" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='manage.metadata.citations.bibliography'/>
+                                ${t('manage.metadata.citations.bibliography')}<#t>
                             </h4>
 
                             <ol class="overflow-x-auto">
@@ -1073,7 +1073,7 @@
                     <div id="additional" class="pb-5 section">
 
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='manage.metadata.additional.title'/>
+                            ${t('manage.metadata.additional.title')}<#t>
                         </h4>
 
                         <div>
@@ -1084,7 +1084,7 @@
                                 <table class="text-smaller table table-sm table-borderless">
                                     <#if eml.acknowledgements?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='manage.metadata.acknowledgements'/></th>
+                                            <th class="col-4">${t('manage.metadata.acknowledgements')}</th>
                                             <td>
                                                 <div id="acknowledgements-container"></div>
                                             </td>
@@ -1092,7 +1092,7 @@
                                     </#if>
                                     <#if eml.introduction?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='manage.metadata.introduction'/></th>
+                                            <th class="col-4">${t('manage.metadata.introduction')}</th>
                                             <td>
                                                 <div id="introduction-container"></div>
                                             </td>
@@ -1100,7 +1100,7 @@
                                     </#if>
                                     <#if eml.gettingStarted?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='manage.metadata.gettingStarted'/></th>
+                                            <th class="col-4">${t('manage.metadata.gettingStarted')}</th>
                                             <td>
                                                 <div id="gettingStarted-container"></div>
                                             </td>
@@ -1108,7 +1108,7 @@
                                     </#if>
                                     <#if eml.purpose?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.purpose'/></th>
+                                            <th class="col-4">${t('eml.purpose')}</th>
                                             <td>
                                                 <div id="purpose-container"></div>
                                             </td>
@@ -1116,14 +1116,14 @@
                                     </#if>
                                     <#if eml.updateFrequencyDescription?has_content>
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.updateFrequencyDescription'/></th>
+                                            <th class="col-4">${t('eml.updateFrequencyDescription')}</th>
                                             <td>${eml.updateFrequencyDescription?no_esc}</td>
                                         </tr>
                                     </#if>
                                     <#if (eml.alternateIdentifiers?size > 0)>
                                         <#list eml.alternateIdentifiers as item>
                                             <tr>
-                                                <th class="col-4"><#if item_index ==0><@s.text name='manage.metadata.alternateIdentifiers.title'/></#if></th>
+                                                <th class="col-4"><#if item_index ==0>${t('manage.metadata.alternateIdentifiers.title')}</#if></th>
                                                 <td><@textWithFormattedLink eml.alternateIdentifiers[item_index]!/></td>
                                             </tr>
                                         </#list>
@@ -1149,10 +1149,10 @@
 
 <script>
     $('.confirmDeleteVersion').jConfirmAction({
-        titleQuestion : "<@s.text name="basic.confirm"/>",
-        question : "<@s.text name='portal.resource.confirm.delete.version'/></br></br><@s.text name='portal.resource.confirm.delete.version.warning.citation'/></br></br><@s.text name='portal.resource.confirm.delete.version.warning.undone'/>",
-        yesAnswer : "<@s.text name='basic.yes'/>",
-        cancelAnswer : "<@s.text name='basic.no'/>",
+        titleQuestion : "${t("basic.confirm")}",
+        question : "${t('portal.resource.confirm.delete.version')}</br></br>${t('portal.resource.confirm.delete.version.warning.citation')}</br></br>${t('portal.resource.confirm.delete.version.warning.undone')}",
+        yesAnswer : "${t('basic.yes')}",
+        cancelAnswer : "${t('basic.no')}",
         buttonType: "danger",
         baseUrl: "${baseURL}"
     });

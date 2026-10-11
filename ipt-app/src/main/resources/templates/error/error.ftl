@@ -1,6 +1,6 @@
 [#ftl output_format="HTML"]
 [#include "/inc/header.ftl"/]
-<title>[@s.text name="error.header.title"/]</title>
+<title>${t("error.header.title")}</title>
 [#include "/inc/menu.ftl"/]
 
 <div class="container px-0">
@@ -12,12 +12,12 @@
     <div class="container bg-body border rounded-2 mb-4">
         <div class="container my-3 p-3">
             <div class="text-center fs-smaller">
-                [@s.text name="basic.error"/]
+                ${t("basic.error")}[#t]
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    [@s.text name="error.title"/]
+                    ${t("error.title")}[#t]
                 </h1>
             </div>
         </div>
@@ -27,35 +27,35 @@
 <main class="container main-content-container">
     <div class="my-3 p-3">
         <p>
-            [@s.text name="error.body"/]
+            ${t("error.body")}[#t]
         </p>
 
         <pre class="mb-0">
-            [@s.property value="%{exception.message}"/]
+            ${(exception.message)!}[#t]
         </pre>
 
         [#if adminRights]
             <p>
-                <a href="${baseURL}/admin/logs.do">[@s.text name="error.view.logs"/]</a>
+                <a href="${baseURL}/admin/logs.do">${t("error.view.logs")}</a>
             </p>
         [/#if]
 
         <p>
-            [@s.text name="error.report"/]
+            ${t("error.report")}[#t]
         </p>
 
         <p>
-            [@s.text name="error.thanks"/]
+            ${t("error.thanks")}[#t]
         </p>
     </div>
 
     <div class="my-3 p-3">
         <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-            [@s.text name="error.details.title"/]
+            ${t("error.details.title")}[#t]
         </h5>
 
         <pre>
-            [@s.property value="%{exceptionStack}"/]
+            ${(exceptionStack)!}[#t]
         </pre>
     </div>
 </main>

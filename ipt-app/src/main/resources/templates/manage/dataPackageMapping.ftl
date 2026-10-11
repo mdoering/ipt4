@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageMappingAction" -->
     <#include "/inc/header.ftl"/>
-    <title><@s.text name="manage.mapping.title"/></title>
+    <title>${t("manage.mapping.title")}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -89,7 +89,7 @@
             function hideFields() {
                 showAll = false;
                 $("#showAllValue").val("false");
-                $("#toggleFields").text("<@s.text name="manage.mapping.showAll" />");
+                $("#toggleFields").text("${t("manage.mapping.showAll")}");
                 $('div.mappingRow').not('.required').each(function(index) {
                     // always show all mapped and required fields
                     if ($(".fidx", this).val() === "" && $(".fval", this).val() === ""){
@@ -109,7 +109,7 @@
                 } else {
                     showAll = true;
                     $("#showAllValue").val("true");
-                    $("#toggleFields").text("<@s.text name="manage.mapping.hideEmpty"/>");
+                    $("#toggleFields").text("${t("manage.mapping.hideEmpty")}");
                     $('div.mappingRow').show();
                     $(".groupmenu").show();
                 }
@@ -134,15 +134,15 @@
             }
 
             $('.confirm').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
 
             $("#idColumn").select2({
-                placeholder: '<@s.text name="manage.mapping.noid"/>',
+                placeholder: '${t("manage.mapping.noid")}',
                 language: {
                     noResults: function () {
                         return '${selectNoResultsFound}';
@@ -238,7 +238,7 @@
 
     <#macro sourceSample index tableSchemaName fieldsIndex>
         <div id="fSIdx_${tableSchemaName}_${fieldsIndex}" class="text-collapse sample mappingText mx-3">
-            <@s.text name='manage.mapping.sourceSample' />:
+            ${t('manage.mapping.sourceSample')}:
             <em>
                 <#list peek as row>
                     <#if row??>
@@ -263,16 +263,16 @@
                     <#if field.field.description?has_content>
                         <@processDescription field.field.description />
                     <#else>
-                        <@s.text name="basic.no.description"/>
+                        ${t("basic.no.description")}<#t>
                     </#if>
                     <#if field.field.type??>
                         <br/><br/>
-                        <em><@s.text name="schema.field.type"/>:</em>
+                        <em>${t("schema.field.type")}:</em>
                         <span>${field.field.type!}</span>
                     </#if>
                     <#if field.field.constraints?? && (field.field.constraints.unique?? || field.field.constraints.maximum?? || field.field.constraints.minimum?? || field.field.constraints.pattern??)>
                         <br/><br/>
-                        <em><@s.text name="schema.field.constraints"/>:</em>
+                        <em>${t("schema.field.constraints")}:</em>
                         <ul>
                             <#if field.field.constraints.unique??>
                                 <li>unique <code>${field.field.constraints.unique?string}</code></li>
@@ -295,7 +295,7 @@
                         <#if !noBrakeForExamples>
                             <br/><br/>
                         </#if>
-                        <em><@s.text name="basic.examples"/></em>:
+                        <em>${t("basic.examples")}</em>:
                         <#if field.field.example?is_collection>
                             <#list field.field.example as ex>
                                 <code>${ex}</code><#sep>, </#sep>
@@ -353,13 +353,13 @@
                 <small><@sourceSample field.index tableSchema.name fieldsIndex/></small>
 
                 <div id="fTIdx${fieldsIndex}" class="sample mappingText">
-                    <small class="mx-lg-3"><@s.text name='manage.mapping.translation' />:</small>
+                    <small class="mx-lg-3">${t('manage.mapping.translation')}:</small>
                     <small>
                         <a href="dataPackageFieldTranslation.do?r=${resource.shortname}&mid=${mid}&field=${field.field.name}">
                             <#if (((field.translation?size)!0)>0)>
-                                <@s.text name="manage.overview.mappings.fields"><@s.param>${(field.translation?size)!0}</@s.param></@s.text>
+                                ${t("manage.overview.mappings.fields", (field.translation?size)!0)}
                             <#else>
-                                <@s.text name="button.add"/>
+                                ${t("button.add")}<#t>
                             </#if>
                         </a>
                     </small>
@@ -380,16 +380,16 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.mapping"/></li>
+                                <li class="breadcrumb-item"><a href="/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.mapping")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <div class="text-center">
                         <h1 class="pt-2 text-gbif-header fs-2 fw-400 text-center">
-                            <@s.text name='manage.mapping.title'/>
+                            ${t('manage.mapping.title')}<#t>
                         </h1>
 
                         <div class="text-center fs-smaller">
@@ -397,45 +397,35 @@
                         </div>
 
                         <div class="my-2">
-                            <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                            <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
 
                             <div class="btn-group btn-group-sm" role="group">
                                 <button id="btnGroup" type="button" class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <@s.text name="button.options"/>
+                                    ${t("button.options")}<#t>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="btnGroup" style="">
                                     <li>
-                                        <a id="toggleFields" class="button btn btn-sm btn-outline-secondary w-100 dropdown-button"><@s.text name='manage.mapping.hideEmpty'/></a>
+                                        <a id="toggleFields" class="button btn btn-sm btn-outline-secondary w-100 dropdown-button">${t('manage.mapping.hideEmpty')}</a>
                                     </li>
                                     <li>
-                                        <@s.submit cssClass="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" name="delete" key="button.delete"/>
+                                        <input type="submit" value="${t("button.delete")?markup_string}" id="delete" name="delete" class="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button"/><#t>
                                     </li>
                                 </ul>
                             </div>
 
-                            <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                            <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                         </div>
 
                         <p class="mt-3 mb-0 text-smaller fst-italic">
-                            <@s.text var="adminSchemaTitle" name="admin.dataPackageSchema.title"/>
-                            <@s.text name='manage.mapping.intro1'>
-                                <@s.param>
-                                    <a href="source.do?r=${resource.shortname}&id=${mapping.source.name}" title="<@s.text name='manage.overview.source.data'/>">
+                            <#assign adminSchemaTitle = t("admin.dataPackageSchema.title")?markup_string>
+                            <#assign textArg1><a href="source.do?r=${resource.shortname}&id=${mapping.source.name}" title="${t('manage.overview.source.data')}">
                                         ${mapping.source.name}
-                                    </a>
-                                </@s.param>
-                                <@s.param><@s.property value="#adminSchemaTitle.toLowerCase()"/></@s.param>
-                                <@s.param><a href="${baseURL}/admin/dataPackage.do?id=${mapping.dataPackageSchema.identifier!}#anchor-${(mapping.dataPackageTableSchemaName.name)!}" target="_blank">${(mapping.dataPackageSchema.name)!}/${(mapping.dataPackageTableSchemaName.name)!}</a></@s.param>
-                            </@s.text>
+                                    </a></#assign><#assign textArg3><a href="${baseURL}/admin/dataPackage.do?id=${mapping.dataPackageSchema.identifier!}#anchor-${(mapping.dataPackageTableSchemaName.name)!}" target="_blank">${(mapping.dataPackageSchema.name)!}/${(mapping.dataPackageTableSchemaName.name)!}</a></#assign>${t('manage.mapping.intro1', textArg1, adminSchemaTitle?lower_case, textArg3)}<#t>
                         </p>
 
                         <#if dataPackageSchema.version != resource.dataPackageVersion>
                         <p class="text-smaller text-gbif-danger">
-                            <@s.text name='manage.overview.mappings.schemaChanged'>
-                                <@s.param><b>${dataPackageSchema.name}</b></@s.param>
-                                <@s.param><b>v${resource.dataPackageVersion!"unknown"}</b></@s.param>
-                                <@s.param><b>v${dataPackageSchema.version}</b></@s.param>
-                            </@s.text>
+                            <#assign textArg4><b>${dataPackageSchema.name}</b></#assign><#assign textArg5><b>v${resource.dataPackageVersion!"unknown"}</b></#assign><#assign textArg6><b>v${dataPackageSchema.version}</b></#assign>${t('manage.overview.mappings.schemaChanged', textArg4, textArg5, textArg6)}<#t>
                         </p>
                         </#if>
                     </div>
@@ -459,7 +449,7 @@
                             <div class="row py-3 g-2 mappingFiler">
                                 <div class="col-lg-1 pt-1" id="filter">
                                     <@popoverPropertyInfo "manage.mapping.info" />
-                                    <strong><@s.text name='manage.mapping.filter'/></strong>
+                                    <strong>${t('manage.mapping.filter')}</strong>
                                 </div>
 
                                 <div class="col-lg-3">
@@ -514,9 +504,9 @@
                             <span class="anchor anchor-base" id="anchor-nonmapped"></span>
                             <div class="mt-5" style="height: 100vh; min-height: 200px;">
                                 <h4 id="nonmapped" class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                                    <@s.text name="manage.mapping.no.mapped.title"/>
+                                    ${t("manage.mapping.no.mapped.title")}<#t>
                                 </h4>
-                                <p><@s.text name="manage.mapping.schema.no.mapped.columns"/>:</p>
+                                <p>${t("manage.mapping.schema.no.mapped.columns")}:</p>
 
                                 <div class="text-smaller">
                                     <#list nonMapped as col>

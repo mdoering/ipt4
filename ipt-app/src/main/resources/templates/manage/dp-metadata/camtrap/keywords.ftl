@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageMetadataAction" -->
     <#include "/inc/header.ftl">
     <link rel="stylesheet" href="${baseURL}/styles/smaller-inputs.css">
-    <title><@s.text name='manage.datapackagemetadata.camtrap.keywords.title'/></title>
+    <title>${t('manage.datapackagemetadata.camtrap.keywords.title')}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <script>
         $(document).ready(function(){
@@ -97,9 +97,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item"><a href="/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -107,7 +107,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.datapackagemetadata.camtrap.keywords.title'/>
+                            ${t('manage.datapackagemetadata.camtrap.keywords.title')}<#t>
                         </h1>
                     </div>
 
@@ -122,8 +122,8 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                     </div>
                 </div>
             </div>
@@ -141,11 +141,11 @@
                     <div class="bd-content">
 
                         <div class="my-md-3 p-3">
-                            <p class="mb-4"><@s.text name="datapackagemetadata.keywords.intro"/></p>
+                            <p class="mb-4">${t("datapackagemetadata.keywords.intro")}</p>
 
-                            <#assign removeKeywordLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.keyword'/></#assign>
+                            <#assign removeKeywordLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.keyword')}</#assign>
                             <#assign removeKeywordLink = removeKeywordLink?markup_string>
-                            <#assign addKeywordLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.keyword'/></#assign>
+                            <#assign addKeywordLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.keyword')}</#assign>
                             <#assign addKeywordLink = addKeywordLink?markup_string>
 
                             <!-- List of Keywords -->

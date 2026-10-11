@@ -109,7 +109,7 @@
                         if (numberOfIptInstallations > 0) {
                             // do not remove, will be substituted in installationsWarningText
                             var organizationPortalLink = "<a href=\"${cfg.portalUrl!}/publisher/" + organisationKey + "\">" + orgName + "</a>";
-                            var installationsWarningText = `<@s.text name="admin.registration.duplicate.warning"><@s.param>` + organizationPortalLink + `</@s.param></@s.text>`;
+                            var installationsWarningText = `${t("admin.registration.duplicate.warning", "` + organizationPortalLink + `")}`;
                             var installationsCallout = $("#installations-warning");
                             installationsCallout.html(installationsWarningText);
                             installationsCallout.show();
@@ -192,7 +192,7 @@
             $("#network").on("click", displayProcessing);
         });
     </script>
-    <title><@s.text name="title"/></title>
+    <title>${t("title")}</title>
     <#assign currentMenu = "admin"/>
     <#include "/macros/forms.ftl">
     <#include "/inc/menu.ftl">
@@ -208,28 +208,28 @@
                     <div class="fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                                <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.registration"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                                <li class="breadcrumb-item">${t("breadcrumb.admin.registration")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="admin.home.editRegistration"/>
+                        ${t("admin.home.editRegistration")}<#t>
                     </h1>
 
                     <div class="mt-2">
                         <#if hostingOrganisation?has_content>
-                            <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" form="registration" name="update" id="update" key="button.updateRegistration" />
-                            <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" form="changeTokens" name="tokens" id="tokens" key="button.updateTokens" cssStyle="display: none;"/>
-                            <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" form="networkForm" name="network" id="network" key="button.save" cssStyle="display: none;"/>
+                            <input type="submit" value="${t("button.updateRegistration")?markup_string}" id="update" name="update" class="button btn btn-sm btn-outline-gbif-primary top-button" form="registration"/><#t>
+                            <input type="submit" value="${t("button.updateTokens")?markup_string}" id="tokens" name="tokens" class="button btn btn-sm btn-outline-gbif-primary top-button" style="display: none;" form="changeTokens"/><#t>
+                            <input type="submit" value="${t("button.save")?markup_string}" id="network" name="network" class="button btn btn-sm btn-outline-gbif-primary top-button" style="display: none;" form="networkForm"/><#t>
                             <a href="${baseURL}/admin/" class="button btn btn-sm btn-outline-secondary top-button">
-                                <@s.text name="button.back"/>
+                                ${t("button.back")}<#t>
                             </a>
                         <#else>
-                            <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" cssStyle="display: none;" form="registrationForm" name="save" id="save" key="button.save"/>
+                            <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" style="display: none;" form="registrationForm"/><#t>
                             <a href="${baseURL}/admin/" class="button btn btn-sm btn-outline-secondary top-button">
-                                <@s.text name="button.back"/>
+                                ${t("button.back")}<#t>
                             </a>
                         </#if>
                     </div>
@@ -243,9 +243,9 @@
             <#-- If the hosting institution already exists, this IP has been registered. Don't present the register form -->
             <#if hostingOrganisation?has_content>
                 <p>
-                    <@s.text name="admin.registration.registered1"><@s.param><a href="${cfg.portalUrl}/installation/${registeredIpt.key}" target="_blank">IPT</a></@s.param></@s.text>
+                    <#assign textArg1><a href="${cfg.portalUrl}/installation/${registeredIpt.key}" target="_blank">IPT</a></#assign>${t("admin.registration.registered1", textArg1)}
                     <#-- in prod mode link goes to /publisher (GBIF Portal), in dev mode link goes to /publisher (GBIF UAT Portal) -->
-                    <@s.text name="admin.registration.registered2"><@s.param><a href="${cfg.portalUrl}/publisher/${hostingOrganisation.key}" target="_blank">${hostingOrganisation.name!"Organisation"}</a></@s.param></@s.text>
+                    <#assign textArg2><a href="${cfg.portalUrl}/publisher/${hostingOrganisation.key}" target="_blank">${hostingOrganisation.name!"Organisation"}</a></#assign>${t("admin.registration.registered2", textArg2)}
                 </p>
 
                 <div class="py-3">
@@ -253,15 +253,15 @@
                         <div class="tabs-scroller tabs-fixed" style="overflow:hidden;margin-bottom:0">
                             <div class="tabs-flexContainer justify-content-start" role="tablist">
                                 <button id="tab-registration" class="registration-tab-root tab-selected" type="button" role="tab">
-                                    <@s.text name="admin.ipt.registration"/>
+                                    ${t("admin.ipt.registration")}<#t>
                                     <span id="tab-indicator-registration" class="tabs-indicator"></span>
                                 </button>
                                 <button id="tab-network" class="registration-tab-root" type="button" role="tab">
-                                    <@s.text name="admin.ipt.network"/>
+                                    ${t("admin.ipt.network")}<#t>
                                     <span id="tab-indicator-network" class="tabs-indicator" style="display: none;"></span>
                                 </button>
                                 <button id="tab-tokens" class="registration-tab-root" type="button" role="tab">
-                                    <@s.text name="admin.ipt.tokens.title"/>
+                                    ${t("admin.ipt.tokens.title")}<#t>
                                     <span id="tab-indicator-tokens" class="tabs-indicator" style="display: none;"></span>
                                 </button>
                             </div>
@@ -301,12 +301,12 @@
 
                 <div id="network-block" style="display: none;" class="py-3">
                     <p class="mb-3 pb-3">
-                        <@s.text name="admin.ipt.network.intro"/>
+                        ${t("admin.ipt.network.intro")}<#t>
                     </p>
 
                     <form id="networkForm" class="needs-validation" action="associateWithNetwork.do" method="post" novalidate>
 <@csrfField/>
-                        <@s.hidden id="associateNetwork" name="associateNetwork" value="true" />
+                        <input type="hidden" name="associateNetwork" value="true" id="associateNetwork"/><#t>
 
                         <div class="row g-3">
                             <div class="col-lg-6">
@@ -322,12 +322,12 @@
 
                 <div id="tokens-block" style="display: none;" class="py-3">
                     <p class="mb-3 pb-3">
-                        <@s.text name="admin.ipt.tokens.intro"/>
+                        ${t("admin.ipt.tokens.intro")}<#t>
                     </p>
 
                     <form id="changeTokens" class="needs-validation" action="changeTokens" method="post" novalidate>
 <@csrfField/>
-                        <@s.hidden id="tokenChange" name="tokenChange" value="true" />
+                        <input type="hidden" name="tokenChange" value="true" id="tokenChange"/><#t>
 
                         <div class="row g-3">
                             <div class="col-lg-6">
@@ -343,7 +343,7 @@
             <#else>
                 <#-- BASE URL has not been validated, disable the form -->
                 <#if !validatedBaseURL>
-                    <p><@s.text name="admin.registration.test1"/></p>
+                    <p>${t("admin.registration.test1")}</p>
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -351,25 +351,25 @@
                         </div>
 
                         <div class="col-12">
-                            <@s.submit cssClass="button btn btn-outline-gbif-primary" name="validate" id="validate" key="admin.registration.validate"/>
+                            <input type="submit" value="${t("admin.registration.validate")?markup_string}" id="validate" name="validate" class="button btn btn-outline-gbif-primary"/><#t>
 
                             <button id="validation-in-process" name="validate" class="btn btn-outline-gbif-primary" type="submit" style="display: none" disabled>
                                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                <@s.text name="admin.registration.validate"/>
+                                ${t("admin.registration.validate")}<#t>
                             </button>
                         </div>
 
                         <div class="col-12">
                             <div id="validation-success" class="callout callout-info" style="display: none;">
-                                <@s.text name="admin.registration.validate.success"/>
+                                ${t("admin.registration.validate.success")}<#t>
                             </div>
 
                             <div id="validation-failed-development" class="callout callout-danger" style="display: none;">
-                                <@s.text name="admin.registration.validate.failed.development"/>
+                                ${t("admin.registration.validate.failed.development")}<#t>
                             </div>
 
                             <div id="validation-failed" class="callout callout-danger" style="display: none;">
-                                <@s.text name="admin.registration.validate.failed"/>
+                                ${t("admin.registration.validate.failed")}<#t>
                             </div>
                         </div>
                     </div>
@@ -383,7 +383,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <#assign selectOrganisationInfo>
-                                        <@s.text name="admin.registration.intro"/>&nbsp;<@s.text name="admin.registration.intro2"/>
+                                        ${t("admin.registration.intro")}&nbsp;${t("admin.registration.intro2")}
                                     </#assign>
                                     <#assign selectOrganisationInfo = selectOrganisationInfo?markup_string>
                                     <div class="d-flex text-smaller">
@@ -396,11 +396,17 @@
                                             <i class="bi bi-info-circle text-gbif-primary"></i>
                                         </a>&nbsp;
                                         <label for="organisation.key" class="form-label">
-                                            <@s.text name="admin.organisation.key"/> <span class="text-gbif-danger">&#42;</span>
+                                            ${t("admin.organisation.key")} <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                     </div>
-                                    <@s.select cssClass="form-select" id="organisation.key" name="organisation.key" list="organisations" listKey="key" listValue="name" value="organisation.key" size="15" disabled="false"/>
-                                    <@s.fielderror id="field-error-organisation.key" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="organisation.key"/>
+                                    <select name="organisation.key" size="15" id="organisation.key" class="form-select">
+                                        <#assign selectedKey = ((organisation.key)!"")?string>
+                                        <#list (organisations)![] as o>
+                                            <#assign optionKey = ((o.key)!"")?string>
+                                            <option value="${optionKey}"<#if optionKey == selectedKey> selected="selected"</#if>>${(o.name)!}</option>
+                                        </#list>
+                                    </select>
+                                    <@fieldError id="field-error-organisation.key" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="organisation.key"/>
                                 </div>
                                 <div id="requestDetails" class="mt-0 text-smaller"></div>
                             </div>
@@ -421,11 +427,11 @@
                                 <@checkbox name="organisation.canHost" i18nkey="admin.organisation.canPublish" value="true" help="i18n"/>
                             </div>
 
-                            <@s.hidden id="organisation.primaryContactType" name="organisation.primaryContactType" />
-                            <@s.hidden id="organisation.primaryContactName" name="organisation.primaryContactName" />
-                            <@s.hidden id="organisation.primaryContactEmail" name="organisation.primaryContactEmail" />
-                            <@s.hidden id="organisation.nodeKey" name="organisation.nodeKey" />
-                            <@s.hidden id="organisation.nodeName" name="organisation.nodeName" />
+                            <input type="hidden" name="organisation.primaryContactType" value="${(organisation.primaryContactType)!}" id="organisation.primaryContactType"/><#t>
+                            <input type="hidden" name="organisation.primaryContactName" value="${(organisation.primaryContactName)!}" id="organisation.primaryContactName"/><#t>
+                            <input type="hidden" name="organisation.primaryContactEmail" value="${(organisation.primaryContactEmail)!}" id="organisation.primaryContactEmail"/><#t>
+                            <input type="hidden" name="organisation.nodeKey" value="${(organisation.nodeKey)!}" id="organisation.nodeKey"/><#t>
+                            <input type="hidden" name="organisation.nodeName" value="${(organisation.nodeName)!}" id="organisation.nodeName"/><#t>
 
                             <div class="col-lg-6">
                                 <@input name="ipt.name" i18nkey="admin.ipt.name" type="text" maxlength=255 size=150 requiredField=true />
@@ -451,9 +457,9 @@
                                 <@input name="ipt.primaryContactEmail" i18nkey="admin.ipt.primaryContactEmail" type="text" maxlength=254 requiredField=true />
                             </div>
 
-                            <@s.hidden id="admin.ipt.primaryContactType" name="ipt.primaryContactType" value="technical"/>
-                            <@s.hidden id="organisation.name" name="organisation.name" />
-                            <@s.hidden id="ipt.organisationKey" name="ipt.organisationKey" />
+                            <input type="hidden" name="ipt.primaryContactType" value="technical" id="admin.ipt.primaryContactType"/><#t>
+                            <input type="hidden" name="organisation.name" value="${(organisation.name)!}" id="organisation.name"/><#t>
+                            <input type="hidden" name="ipt.organisationKey" value="${(ipt.organisationKey)!}" id="ipt.organisationKey"/><#t>
                         </div>
                     </form>
                 </div>

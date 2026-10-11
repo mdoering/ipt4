@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name="title"/></title>
+<title>${t("title")}</title>
 
 <#assign currentMenu = "admin"/>
 <#include "/inc/menu.ftl">
@@ -15,12 +15,12 @@
 	<div class="container bg-body mb-4 px-3">
 		<div class="container border rounded-2 p-4">
 			<div class="text-center fs-smaller">
-				<@s.text name="breadcrumb.admin"/>
+				${t("breadcrumb.admin")}<#t>
 			</div>
 
 			<div class="text-center">
 				<h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-					<@s.text name="admin.home.title"/>
+					${t("admin.home.title")}<#t>
 				</h1>
 			</div>
 		</div>
@@ -39,18 +39,18 @@
 									<i class="bi bi-gear-fill admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.editConfig"/>
+									${t("admin.home.editConfig")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.editConfig.description"/>
+							${t("admin.home.editConfig.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/config.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -66,18 +66,18 @@
 									<i class="bi bi-stack admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.bulkPublication"/>
+									${t("admin.home.bulkPublication")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.bulkPublication.description"/>
+							${t("admin.home.bulkPublication.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/bulk-publication.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -93,18 +93,18 @@
 									<i class="bi bi-people-fill admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.manageUsers"/>
+									${t("admin.home.manageUsers")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.manageUsers.description"/>
+							${t("admin.home.manageUsers.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/users.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -120,18 +120,18 @@
 									<i class="bi bi-cloud-arrow-up-fill admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.editRegistration"/>
+									${t("admin.home.editRegistration")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.editRegistration.description"/>
+							${t("admin.home.editRegistration.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/registration.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -147,18 +147,18 @@
 									<i class="bi bi-building admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.organisations"/>
+									${t("admin.home.organisations")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.organisations.description"/>
+							${t("admin.home.organisations.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/organisations.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -174,18 +174,18 @@
 									<i class="bi bi-collection-fill admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.manageExtensions"/>
+									${t("admin.home.manageExtensions")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.manageExtensions.description"/>
+							${t("admin.home.manageExtensions.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/extensions.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -201,18 +201,18 @@
 									<i class="bi bi-columns-gap admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.manageDataPackageSchemas"/>
+									${t("admin.home.manageDataPackageSchemas")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.manageDataPackageSchemas.description"/>
+							${t("admin.home.manageDataPackageSchemas.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/dataPackages.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -228,18 +228,18 @@
 									<i class="bi bi-tv admin-icon"></i>
 								</span>
 								<span>
-									<@s.text name="admin.home.manageUI"/>
+									${t("admin.home.manageUI")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.manageUI.description"/>
+							${t("admin.home.manageUI.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/uiManagement.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>
@@ -255,18 +255,18 @@
 									<i class="bi bi-journal-text admin-icon"></i>
 								</span>
 									<span>
-									<@s.text name="admin.home.manageLogs"/>
+									${t("admin.home.manageLogs")}<#t>
 								</span>
 							</h4>
 						</div>
 					</div>
 					<div class="d-flex flex-column flex-auto flex-justify-between">
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-0 px-4 fs-smaller">
-							<@s.text name="admin.home.manageLogs.description"/>
+							${t("admin.home.manageLogs.description")}<#t>
 						</div>
 						<div class="d-flex flex-justify-between flex-items-center pt-2 pb-4 px-4">
 							<a href="${baseURL}/admin/logs.do" title="" class="action-link-button action-link-button-primary">
-								<@s.text name="button.view"/>
+								${t("button.view")}<#t>
 							</a>
 						</div>
 					</div>

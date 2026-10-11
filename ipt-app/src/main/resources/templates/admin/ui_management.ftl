@@ -394,7 +394,7 @@
             }
         });
     </script>
-    <title><@s.text name="title"/></title>
+    <title>${t("title")}</title>
     <#assign currentMenu = "admin"/>
     <#include "/macros/forms.ftl">
     <#include "/inc/menu.ftl">
@@ -410,21 +410,21 @@
                     <div class="fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                                <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.ui"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                                <li class="breadcrumb-item">${t("breadcrumb.admin.ui")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="admin.home.manageUI"/>
+                        ${t("admin.home.manageUI")}<#t>
                     </h1>
 
                     <div class="mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" form="ui-management-form" name="save" id="save" key="button.save" />
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-danger top-button" form="ui-management-form" name="reset" id="reset" key="button.reset" />
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" form="ui-management-form"/><#t>
+                        <input type="submit" value="${t("button.reset")?markup_string}" id="reset" name="reset" class="button btn btn-sm btn-outline-gbif-danger top-button" form="ui-management-form"/><#t>
                         <a href="${baseURL}/admin/" class="button btn btn-sm btn-outline-secondary top-button">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </a>
                     </div>
                 </div>
@@ -437,29 +437,29 @@
             <div id="ui-management-form-wrapper" class="mt-4">
                 <form id="ui-management-form" class="needs-validation" action="uiManagement.do" method="post" novalidate>
 <@csrfField/>
-                    <@s.hidden name="removeLogo" id="removeLogo" value="false" required="true" />
+                    <input type="hidden" name="removeLogo" value="false" id="removeLogo"/><#t>
 
                     <!-- App Logo -->
                     <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                        <@s.text name="admin.uiManagement.logo"/>
+                        ${t("admin.uiManagement.logo")}<#t>
                     </h4>
                     <div id="logofields" class="row g-3 mb-5">
                         <div class="col-lg-6">
                             <label for="file" class="form-label">
-                                <@s.text name="admin.uiManagement.iptLogo"/>
+                                ${t("admin.uiManagement.iptLogo")}<#t>
                             </label>
-                            <@s.file cssClass="form-control my-1" name="file"/>
+                            <input type="file" name="file" id="file" class="form-control my-1"/><#t>
                             <a href="#" class="action-link-button action-link-button-primary" id="buttonUpload">
                                 <svg class="action-link-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                     <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"></path>
                                 </svg>
-                                <@s.text name="button.upload"/>
+                                ${t("button.upload")}<#t>
                             </a>
                             <a href="#" class="action-link-button action-link-button-danger" id="buttonRemove">
                                 <svg class="action-link-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                 </svg>
-                                <@s.text name="button.remove"/>
+                                ${t("button.remove")}<#t>
                             </a>
                         </div>
 
@@ -472,12 +472,12 @@
 
                     <!-- App colors -->
                     <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                        <@s.text name="admin.uiManagement.colors"/>
+                        ${t("admin.uiManagement.colors")}<#t>
                     </h4>
                     <div class="row g-3">
                         <div class="col-lg-6">
                             <label for="primaryColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.primaryColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.primaryColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.primaryColor" id="primaryColor-select" class="form-select">
@@ -499,7 +499,7 @@
                         <!-- Links -->
                         <div class="col-lg-6">
                             <label for="linkColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.linkColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.linkColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.linkColor" id="linkColor-select" class="form-select">
@@ -521,7 +521,7 @@
                         <!-- Navigation bar -->
                         <div class="col-lg-6">
                             <label for="navbarColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.navbarColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.navbarColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.navbarColor" id="navbarColor-select" class="form-select">
@@ -542,7 +542,7 @@
 
                         <div class="col-lg-6">
                             <label for="navbarLinkColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.navbarLinkColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.navbarLinkColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.navbarLinkColor" id="navbarLinkColor-select" class="form-select">
@@ -563,7 +563,7 @@
 
                         <div class="col-lg-6">
                             <label for="navbarGbifLogoColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.navbarGbifLogoColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.navbarGbifLogoColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.navbarGbifLogoColor" id="navbarGbifLogoColor-select" class="form-select">
@@ -585,7 +585,7 @@
 
                         <div class="col-lg-6">
                             <label for="navbarActiveTabColor-select" class="form-label">
-                                <@s.text name="admin.uiManagement.navbarActiveTabColor"/> <span class="text-gbif-danger">&#42;</span>
+                                ${t("admin.uiManagement.navbarActiveTabColor")} <span class="text-gbif-danger">&#42;</span>
                             </label>
                             <div class="input-group">
                                 <select name="colorScheme.navbarActiveTabColor" id="navbarActiveTabColor-select" class="form-select">

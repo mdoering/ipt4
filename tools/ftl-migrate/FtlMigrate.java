@@ -29,6 +29,8 @@ public class FtlMigrate {
   private static final Pattern FIRST_FTL_TAG = Pattern.compile("([<\\[])[#@]");
   private static final Pattern PARAMETERS = Pattern.compile("(?<![\\w.])Parameters\\.");
   private static final List<String> LEFTOVERS = List.of("%{", "#attr", "stack.", "#parameters", "#session");
+  private static final Pattern T_VARIABLE =
+      Pattern.compile("[<\\[]#(list\\s[^>\\]]*\\sas\\s+t\\b|(assign|local|global)\\s+t\\b)");
   private static final Pattern STRUTS_TAG = Pattern.compile("[<\\[]@s\\.(\\w+)");
 
   public static void main(String[] args) throws IOException {
@@ -92,6 +94,9 @@ public class FtlMigrate {
     }
     String[] lines = template.split("\n", -1);
     for (int i = 0; i < lines.length; i++) {
+      if (T_VARIABLE.matcher(lines[i]).find()) {
+        System.err.printf("WARN %s:%d: variable t hides the text function t()%n", file, i + 1);
+      }
       Matcher tag = STRUTS_TAG.matcher(lines[i]);
       while (tag.find()) {
         if (!tag.group(1).equals("param")) {
@@ -127,10 +132,14 @@ public class FtlMigrate {
     }
 
     String convert() {
-      return convert(src);
+      return convert(src, true);
     }
 
     private String convert(String text) {
+      return convert(text, false);
+    }
+
+    private String convert(String text, boolean topLevel) {
       StringBuilder out = new StringBuilder();
       Matcher m = STRUTS_TAG.matcher(text);
       int last = 0;
@@ -142,6 +151,9 @@ public class FtlMigrate {
           out.append(m.group());
           last = m.end();
         } else {
+          if (converted != null && topLevel) {
+            converted += keepWhitespaceStripping(tag, converted);
+          }
           out.append(converted != null ? converted : tag.body == null ? text.substring(tag.start, tag.end)
               // kept, but the tags inside its body are converted (e.g. s.text in s.param)
               : text.substring(tag.start, tag.bodyStart) + convert(tag.body) + text.substring(tag.bodyEnd, tag.end));
@@ -149,6 +161,47 @@ public class FtlMigrate {
         }
       }
       return out.append(text.substring(last)).toString();
+    }
+
+    /**
+     * FreeMarker drops the indentation and line break of lines holding only FTL tags, as lines with a Struts tag often
+     * did; a line with the replacement (an interpolation or HTML) needs {@code <#t>}, {@code <#lt>} or {@code <#rt>}
+     * to render the same.
+     */
+    private String keepWhitespaceStripping(Tag tag, String converted) {
+      if (ftlOnly(converted).isEmpty()) {
+        return "";
+      }
+      int firstLine = lineNumber(tag.start);
+      int lastLine = lineNumber(tag.end - 1);
+      boolean leading = ftlOnlyLine(firstLine) && !trimmed.contains(firstLine);
+      boolean trailing = ftlOnlyLine(lastLine) && !trimmed.contains(lastLine);
+      trimmed.add(firstLine);
+      trimmed.add(lastLine);
+      String directive = leading && trailing ? "#t" : leading ? "#lt" : trailing ? "#rt" : null;
+      return directive == null ? "" : tag.directive(directive);
+    }
+
+    private final java.util.Set<Integer> trimmed = new java.util.HashSet<>();
+
+    private int lineNumber(int index) {
+      int line = 0;
+      for (int i = 0; i < index; i++) {
+        if (src.charAt(i) == '\n') {
+          line++;
+        }
+      }
+      return line;
+    }
+
+    private boolean ftlOnlyLine(int line) {
+      String[] lines = src.split("\n", -1);
+      return ftlOnly(lines[line]).isEmpty() && !lines[line].isBlank();
+    }
+
+    /** What remains of a line without its FTL tags and comments, stripped. */
+    private static String ftlOnly(String line) {
+      return line.replaceAll("<#--.*?-->|\\[#--.*?--]|</?[#@][^>]*>|\\[/?[#@][^\\]]*]", "").strip();
     }
 
     private String convert(Tag tag) {

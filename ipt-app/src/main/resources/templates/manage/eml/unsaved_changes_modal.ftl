@@ -7,20 +7,20 @@
 
             <div class="modal-body">
                 <h5 class="modal-title w-100" id="unsavedChangesModal-title">
-                    <@s.text name="manage.metadata.unsavedChanges.title"/>
+                    ${t("manage.metadata.unsavedChanges.title")}<#t>
                 </h5>
 
                 <p>
-                    <@s.text name="manage.metadata.unsavedChanges.message"/>
+                    ${t("manage.metadata.unsavedChanges.message")}<#t>
                 </p>
             </div>
 
             <div class="modal-footer justify-content-center">
                 <button id="stayButton" type="button" class="btn btn-sm btn-outline-gbif-primary" data-bs-dismiss="modal">
-                    <@s.text name="manage.metadata.unsavedChanges.button.stay"/>
+                    ${t("manage.metadata.unsavedChanges.button.stay")}<#t>
                 </button>
                 <button id="leaveButton" type="button" class="btn btn-sm btn-outline-gbif-danger" data-bs-dismiss="modal">
-                    <@s.text name="manage.metadata.unsavedChanges.button.leave"/>
+                    ${t("manage.metadata.unsavedChanges.button.leave")}<#t>
                 </button>
             </div>
         </div>

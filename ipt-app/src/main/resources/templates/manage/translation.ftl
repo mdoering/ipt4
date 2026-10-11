@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.TranslationAction" -->
 <#include "/inc/header.ftl">
-<title><@s.text name="manage.translation.title"/></title>
+<title>${t("manage.translation.title")}</title>
 <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
 <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
 <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -9,9 +9,9 @@
 <script>
     $(document).ready(function(){
         $('.confirm').jConfirmAction({
-            titleQuestion: "<@s.text name="basic.confirm"/>",
-            yesAnswer: "<@s.text name="basic.yes"/>",
-            cancelAnswer: "<@s.text name="basic.no"/>",
+            titleQuestion: "${t("basic.confirm")}",
+            yesAnswer: "${t("basic.yes")}",
+            cancelAnswer: "${t("basic.no")}",
             buttonType: "danger",
             baseUrl: "${baseURL}"
         });
@@ -167,17 +167,17 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                            <li class="breadcrumb-item"><a href="mapping.do?r=${resource.shortname}&id=${property.extension.rowType?url}&mid=${mid}"><@s.text name="breadcrumb.manage.overview.mapping"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.mapping.translation"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                            <li class="breadcrumb-item"><a href="mapping.do?r=${resource.shortname}&id=${property.extension.rowType?url}&mid=${mid}">${t("breadcrumb.manage.overview.mapping")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.mapping.translation")}</li>
                         </ol>
                     </nav>
                 </div>
 
                 <div class="text-center">
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="manage.translation.title"/>
+                        ${t("manage.translation.title")}<#t>
                     </h1>
                 </div>
 
@@ -187,33 +187,33 @@
 
                 <div class="mt-2 text-center">
                     <div>
-                        <@s.submit form="translation" cssClass="button btn btn-sm btn-outline-gbif-primary top-button mt-1" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button mt-1" form="translation"/><#t>
 
                         <div class="btn-group btn-group-sm" role="group">
                             <button id="btnGroup" type="button" class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <@s.text name="button.options"/>
+                                ${t("button.options")}<#t>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnGroup" style="">
                                 <li>
                                     <a class="button btn btn-sm btn-outline-secondary w-100 dropdown-button" href='translationReload.do?r=${resource.shortname}&mapping=${property.extension.rowType?url}&term=${property.qualname?url}&mid=${mid}&rowtype=${property.extension.rowType?url}'>
-                                        <@s.text name="button.reload"/>
+                                        ${t("button.reload")}<#t>
                                     </a>
                                 </li>
                                 <#if property.vocabulary?has_content>
                                     <li>
                                         <a class="button btn btn-sm btn-outline-secondary w-100 dropdown-button" role="button" href='translationAutomap.do?r=${resource.shortname}&mapping=${property.extension.rowType?url}&rowtype=${property.extension.rowType?url}&term=${property.qualname?url}&mid=${mid}'>
-                                            <@s.text name="button.automap"/>
+                                            ${t("button.automap")}<#t>
                                         </a>
                                     </li>
                                 </#if>
                                 <li>
-                                    <@s.submit form="translation" cssClass="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" name="deleteFlag" key="button.delete"/>
+                                    <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="translation"/><#t>
                                 </li>
                             </ul>
                         </div>
 
                         <a class="button btn btn-sm btn-outline-secondary top-button mt-1" role="button" href="mapping.do?r=${resource.shortname}&id=${property.extension.rowType?url}&mid=${mid}">
-                            <@s.text name='button.cancel'/>
+                            ${t('button.cancel')}<#t>
                         </a>
                     </div>
                 </div>
@@ -223,19 +223,19 @@
 
     <main class="container main-content-container">
         <div class="my-3 p-3">
-            <p><@s.text name="manage.translation.intro"/></p>
+            <p>${t("manage.translation.intro")}</p>
         </div>
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="manage.translation.property"/> <em>${property.name}</em>
+                ${t("manage.translation.property")} <em>${property.name}</em>
             </h5>
 
             <span class="fst-italic">${property.description!}</span>
 
             <#if property.vocabulary?has_content>
                 <div class="callout callout-info text-smaller">
-                    <strong><@s.text name="manage.translation.vocabulary.required"/></strong>
+                    <strong>${t("manage.translation.vocabulary.required")}</strong>
                 </div>
                 <p>
                     <a href="vocabulary.do?id=${property.vocabulary.uriString}" class="no-text-decoration" target="_blank">
@@ -260,11 +260,11 @@
                 <div id="translation">
                     <div class="row g-2 border-bottom pb-2">
                         <div class="col-6">
-                            <strong><@s.text name="manage.translation.source.value"/></strong>
+                            <strong>${t("manage.translation.source.value")}</strong>
                         </div>
 
                         <div class="col-6" >
-                            <strong><@s.text name="manage.translation.translated.value"/></strong>
+                            <strong>${t("manage.translation.translated.value")}</strong>
                         </div>
                     </div>
 
@@ -278,7 +278,7 @@
                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"></path>
                                                 </svg>
                                             </span>
-                                        <span><@s.text name="manage.translation.remove"/></span>
+                                        <span>${t("manage.translation.remove")}</span>
                                     </a>
                                 </div>
 
@@ -289,7 +289,7 @@
                                 <#if (vocabTermsSize>0)>
                                     <div class="col-6">
                                         <select name="tmap['${k}']" class="form-select">
-                                            <option value="" disabled selected><@s.text name="manage.translation.vocabulary"/></option>
+                                            <option value="" disabled selected>${t("manage.translation.vocabulary")}</option>
                                             <#list vocabTermsKeys as code>
                                                 <option value="${code?replace('"','\"')}" <#if tmap.get(k) == code>selected</#if> >
                                                     ${vocabTerms[code]}
@@ -299,7 +299,7 @@
                                     </div>
                                 <#else>
                                     <div class="col-6">
-                                        <input type="text" placeholder="<@s.text name='manage.translation.empty.value'/>" class="translatedValue form-control" name="tmap['${k}']" value="${tmap.get(k)!}"/>
+                                        <input type="text" placeholder="${t('manage.translation.empty.value')}" class="translatedValue form-control" name="tmap['${k}']" value="${tmap.get(k)!}"/>
                                     </div>
                                 </#if>
                             </div>
@@ -317,7 +317,7 @@
                                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                 </svg>
                             </span>
-                            <span><@s.text name="manage.translation.addNew"/></span>
+                            <span>${t("manage.translation.addNew")}</span>
                         </a>
                     </div>
                 </div>
@@ -333,7 +333,7 @@
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"></path>
                 </svg>
             </span>
-            <span><@s.text name="manage.translation.remove"/></span>
+            <span>${t("manage.translation.remove")}</span>
         </a>
     </div>
     <div class="col-6">
@@ -343,7 +343,7 @@
     <#if (vocabTermsSize>0)>
         <div class="col-6">
             <select name="tmap" class="translated-value form-select">
-                <option value="" disabled selected><@s.text name="manage.translation.vocabulary"/></option>
+                <option value="" disabled selected>${t("manage.translation.vocabulary")}</option>
                 <#list vocabTermsKeys as code>
                     <option value="${code?replace('"','\"')}">
                         ${vocabTerms[code]}
@@ -353,7 +353,7 @@
         </div>
     <#else>
         <div class="col-6" >
-            <input type="text" placeholder="<@s.text name='manage.translation.empty.value'/>" class="translated-value form-control" name="tmap" value=""/>
+            <input type="text" placeholder="${t('manage.translation.empty.value')}" class="translated-value form-control" name="tmap" value=""/>
         </div>
     </#if>
 </div>
@@ -365,10 +365,10 @@
                 <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
             </div>
             <div class="modal-body">
-                <h5 class="modal-title w-100" id="staticBackdropLabel"><@s.text name="manage.translation.title"/></h5>
+                <h5 class="modal-title w-100" id="staticBackdropLabel">${t("manage.translation.title")}</h5>
                 <div>
                     <select name="addNewTranslation" id="addNewTranslation" class="form-select">
-                        <option value="" disabled selected><@s.text name="manage.translation.select"/></option>
+                        <option value="" disabled selected>${t("manage.translation.select")}</option>
                         <#list sourceValuesMap as key, val>
                             <#if tmap?? && tmap[key]??>
                             <#else>
@@ -381,8 +381,8 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
-                <button id="add-button" type="button" class="btn btn-sm btn-outline-gbif-primary"><@s.text name="button.add"/></button>
-                <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
+                <button id="add-button" type="button" class="btn btn-sm btn-outline-gbif-primary">${t("button.add")}</button>
+                <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
             </div>
         </div>
     </div>

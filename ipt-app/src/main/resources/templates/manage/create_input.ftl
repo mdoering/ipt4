@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-	<title><@s.text name="manage.resource.create.title"/></title>
+	<title>${t("manage.resource.create.title")}</title>
  <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
 <#include "/macros/forms.ftl"/>
@@ -289,26 +289,26 @@
         <div class="container bg-body border rounded-2 mb-4">
             <div class="container my-3 p-3">
                 <div class="text-center fs-smaller">
-                    <@s.text name="menu.manage.short"/>
+                    ${t("menu.manage.short")}<#t>
                 </div>
 
                 <div class="text-center">
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="manage.resource.create.title"/>
+                        ${t("manage.resource.create.title")}<#t>
                     </h1>
 
                     <#if (organisations?size==0)>
                         <div class="text-smaller text-gbif-danger">
-                            <@s.text name="manage.resource.create.forbidden"/>
+                            ${t("manage.resource.create.forbidden")}<#t>
                         </div>
                     </#if>
 
                     <div class="mt-2">
                         <#if (organisations?size>0) >
-                            <@s.submit form="create-form" cssClass="btn btn-sm btn-outline-gbif-primary top-button" name="create" key="button.create"/>
+                            <input type="submit" value="${t("button.create")?markup_string}" id="create" name="create" class="btn btn-sm btn-outline-gbif-primary top-button" form="create-form"/><#t>
                         </#if>
                         <a href="${baseURL}/manage/" class="btn btn-sm btn-outline-secondary top-button">
-                            <@s.text name="button.cancel"/>
+                            ${t("button.cancel")}<#t>
                         </a>
                     </div>
                 </div>
@@ -318,32 +318,32 @@
 
     <main class="container main-content-container">
         <div class="my-3 p-3">
-            <p class="pt-2"><@s.text name="manage.resource.create.intro"/></p>
+            <p class="pt-2">${t("manage.resource.create.intro")}</p>
 
             <div class="body-pad">
                 <div class="path-select" role="radiogroup" aria-label="Resource start method">
                     <label class="path-option selected" data-path="blank">
                         <input type="radio" class="form-check-input flex-shrink-0" name="startMethod" value="blank" checked>
                         <div>
-                            <div class="path-label"><@s.text name="manage.resource.create.option.blank"/></div>
-                            <div class="path-desc text-muted"><@s.text name="manage.resource.create.option.blank.help"/></div>
+                            <div class="path-label">${t("manage.resource.create.option.blank")}</div>
+                            <div class="path-desc text-muted">${t("manage.resource.create.option.blank.help")}</div>
                         </div>
                     </label>
 
                     <label class="path-option" data-path="archive">
                         <input type="radio" class="form-check-input flex-shrink-0" name="startMethod" value="archive">
                         <div>
-                            <div class="path-label"><@s.text name="manage.resource.create.option.archive"/></div>
-                            <div class="path-desc text-muted"><@s.text name="manage.resource.create.option.archive.help"/></div>
+                            <div class="path-label">${t("manage.resource.create.option.archive")}</div>
+                            <div class="path-desc text-muted">${t("manage.resource.create.option.archive.help")}</div>
                         </div>
                     </label>
                 </div>
 
                 <div class="import-block" id="importBlock">
                     <div class="file-row">
-                        <@s.fielderror cssClass="fielderror" fieldName="file"/>
-                        <label for="file" class="form-label"><@s.text name="manage.resource.create.file"/> <span class="text-gbif-danger">*</span> </label>
-                        <@s.file name="file" cssClass="form-control" key="manage.resource.create.file" />
+                        <@fieldError cssClass="fielderror" fieldName="file"/>
+                        <label for="file" class="form-label">${t("manage.resource.create.file")} <span class="text-gbif-danger">*</span> </label>
+                        <input type="file" name="file" id="file" class="form-control"/><#t>
                     </div>
 
                     <div id="precheckPanel"></div>
@@ -358,7 +358,7 @@
                                 </div>
                                 <div class="simpleCalloutMeta">
                                     <div class="simpleCalloutMessage">
-                                        <@s.text name="manage.resource.create.import.note"/>
+                                        ${t("manage.resource.create.import.note")}<#t>
                                     </div>
                                 </div>
                             </div>
@@ -378,25 +378,25 @@
                         <div class="d-flex text-smaller">
                             <@popoverPropertyInfo "manage.resource.create.coreType.help" />
                             <label for="resourceType" class="form-label px-1">
-                                <@s.text name='resource.coreType'/> <span class="text-gbif-danger">*</span>
+                                ${t('resource.coreType')} <span class="text-gbif-danger">*</span>
                             </label>
                         </div>
                         <select name="resourceType" id="resourceType" size="1" class="form-select" required>
-                            <option value="" selected="selected"><@s.text name="manage.resource.create.coreType.selection"/></option>
-                            <optgroup label="<@s.text name='manage.resource.create.coreType.dwca'/>">
+                            <option value="" selected="selected">${t("manage.resource.create.coreType.selection")}</option>
+                            <optgroup label="${t('manage.resource.create.coreType.dwca')}">
                                 <#list types! as typeValue, typeDisplayValue>
                                     <option value="${typeValue}">${typeDisplayValue}</option>
                                 </#list>
                             </optgroup>
                             <#if dataPackageTypes?has_content>
-                                <optgroup label="<@s.text name='manage.resource.create.coreType.dp'/>">
+                                <optgroup label="${t('manage.resource.create.coreType.dp')}">
                                     <#list dataPackageTypes! as typeValue, typeDisplayValue>
                                         <option value="${typeValue}">${typeDisplayValue}</option>
                                     </#list>
                                 </optgroup>
                             </#if>
                         </select>
-                        <@s.fielderror id="field-error-resourceType" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="resourceType"/>
+                        <@fieldError id="field-error-resourceType" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="resourceType"/>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name='manage.mapping.title'/></title>
+<title>${t('manage.mapping.title')}</title>
 <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
 <#include "/macros/forms.ftl"/>
@@ -34,16 +34,16 @@
             <div class="text-center fs-smaller">
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                        <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.mapping"/></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                        <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.mapping")}</li>
                     </ol>
                 </nav>
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name="manage.mapping.title"/>
+                    ${t("manage.mapping.title")}<#t>
                 </h1>
 
                 <div class="text-center fs-smaller">
@@ -51,8 +51,8 @@
                 </div>
 
                 <div class="my-2">
-                    <@s.submit form="mapping" cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                    <@s.submit form="mapping" cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.cancel"/>
+                    <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" form="mapping"/><#t>
+                    <input type="submit" value="${t("button.cancel")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button" form="mapping"/><#t>
                 </div>
             </div>
         </div>
@@ -71,10 +71,10 @@
             <p class="fst-italic text-center">${mapping.extension.description}</p>
 
             <#if mapping.extension.link?has_content>
-                <p class="text-center"><@s.text name="basic.link"/>: <a href="${mapping.extension.link}">${mapping.extension.link}</a></p>
+                <p class="text-center">${t("basic.link")}: <a href="${mapping.extension.link}">${mapping.extension.link}</a></p>
             </#if>
 
-            <p class="text-center"><@s.text name='manage.mapping.source.help'/></p>
+            <p class="text-center">${t('manage.mapping.source.help')}</p>
 
             <div class="container" style="max-width: 600px;">
                 <div class="row">

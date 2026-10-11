@@ -89,3 +89,4 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Session cookie | `HttpOnly` | `HttpOnly` and `SameSite=Lax` (`Secure` on request for HTTPS installations) | Not sent with other sites' cross-site posts | M6 |
 | Registration and DOI double clicks | Two simultaneous requests could both register the resource (two GBIF datasets) or reserve two DOIs | The second request is refused while the first runs | One registry entry and one DOI per resource | M6 |
 | Failed publication | Kept the failed archive's checksum, so "skip if not changed" later skipped data that was never published | The previous publication's checksum and record counts are kept | Auto-publishing publishes changed data after an outage | M6 |
+| Organisation form, node key | The hidden node key field was filled with the contact phone number | Filled with the node key | Bug fix | M7 |

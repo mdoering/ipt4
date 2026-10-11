@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#include "/inc/header.ftl">
-<title><@s.text name="account.title"/></title>
+<title>${t("account.title")}</title>
 <#include "/inc/menu.ftl">
 <#include "/macros/forms.ftl">
 
@@ -59,18 +59,18 @@
     <div class="container bg-body border rounded-2 mb-4">
         <div class="container my-3 p-3">
             <div class="text-center fs-smaller">
-                <@s.text name="menu.account"/>
+                ${t("menu.account")}<#t>
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name="account.title"/>
+                    ${t("account.title")}<#t>
                 </h1>
 
                 <div class="mt-2">
-                    <@s.submit form="profileData" cssClass="btn btn-sm btn-outline-gbif-primary top-button mt-1" name="save" key="button.save"/>
-                    <@s.submit form="changePassword" cssClass="btn btn-sm btn-outline-gbif-primary top-button mt-1" cssStyle="display: none;" name="change-password" key="button.save"/>
-                    <@s.submit form="profileData" cssClass="btn btn-sm btn-outline-secondary top-button mt-1" name="cancel" key="button.cancel"/>
+                    <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="btn btn-sm btn-outline-gbif-primary top-button mt-1" form="profileData"/><#t>
+                    <input type="submit" value="${t("button.save")?markup_string}" id="change_password" name="change-password" class="btn btn-sm btn-outline-gbif-primary top-button mt-1" style="display: none;" form="changePassword"/><#t>
+                    <input type="submit" value="${t("button.cancel")?markup_string}" id="cancel" name="cancel" class="btn btn-sm btn-outline-secondary top-button mt-1" form="profileData"/><#t>
                 </div>
             </div>
         </div>
@@ -80,11 +80,11 @@
 <main class="container main-content-container">
     <div class="mt-3 p-3">
         <p>
-            <@s.text name="account.intro"/>
+            ${t("account.intro")}<#t>
         </p>
 
         <p class="mb-0">
-            <@s.text name="account.email.cantChange"/>
+            ${t("account.email.cantChange")}<#t>
         </p>
     </div>
 
@@ -93,11 +93,11 @@
             <div class="tabs-scroller tabs-fixed" style="overflow:hidden;margin-bottom:0">
                 <div class="tabs-flexContainer justify-content-start" role="tablist">
                     <button id="tab-profile" class="default-button-tab-root tab-selected" type="button" role="tab">
-                        <@s.text name="account.profile.title"/>
+                        ${t("account.profile.title")}<#t>
                         <span id="tab-indicator-profile" class="tabs-indicator"></span>
                     </button>
                     <button id="tab-password" class="default-button-tab-root" type="button" role="tab">
-                        <@s.text name="account.passwordChange.title"/>
+                        ${t("account.passwordChange.title")}<#t>
                         <span id="tab-indicator-password" class="tabs-indicator" style="display: none;"></span>
                     </button>
                 </div>
@@ -107,7 +107,7 @@
 
     <div id="edit-profile-block" class="p-3">
         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-            <@s.text name="account.profile.title"/>
+            ${t("account.profile.title")}<#t>
         </h4>
         <form id="profileData" class="needs-validation" action="account.do" method="post" novalidate>
 <@csrfField/>
@@ -118,7 +118,7 @@
                     <@input name="user.email" value=user.email! disabled=true requiredField=true />
                 </div>
 
-                <#assign val><@s.text name="user.roles.${user.role?lower_case}"/></#assign>
+                <#assign val>${t("user.roles.${user.role?lower_case}")}<#t></#assign>
 
                 <div class="col-sm-6">
                     <@readonly name="role" i18nkey="user.role" value=val requiredField=true />
@@ -137,7 +137,7 @@
 
     <div id="change-password-block" class="p-3" style="display: none;">
         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-            <@s.text name="account.passwordChange.title"/>
+            ${t("account.passwordChange.title")}<#t>
         </h4>
         <form id="changePassword" class="needs-validation" action="change-password.do" method="post" novalidate>
 <@csrfField/>

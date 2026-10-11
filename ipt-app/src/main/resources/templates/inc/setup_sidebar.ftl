@@ -32,7 +32,7 @@
                     </svg>
                 </span>
                 <span class="setup-step-label-label-container">
-                    <span class="setup-step-label-label ${stepStatus}">[@s.text name="${step}"/]</span>
+                    <span class="setup-step-label-label ${stepStatus}">${t(step)}</span>
                 </span>
             </span>
         </div>

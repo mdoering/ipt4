@@ -1,14 +1,14 @@
     <#include "/inc/header.ftl">
-    <title><@s.text name="admin.home.manageExtensions"/></title>
+    <title>${t("admin.home.manageExtensions")}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
 
     <script>
         $(document).ready(function () {
             $('.confirm').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                question: "<@s.text name='admin.extension.update.confirm'/>",
-                yesAnswer: "<@s.text name='basic.yes'/>",
-                cancelAnswer: "<@s.text name='basic.no'/>",
+                titleQuestion: "${t("basic.confirm")}",
+                question: "${t('admin.extension.update.confirm')}",
+                yesAnswer: "${t('basic.yes')}",
+                cancelAnswer: "${t('basic.no')}",
                 buttonType: "primary",
                 baseUrl: "${baseURL}",
                 logo: "success"
@@ -44,14 +44,14 @@
                     <div class="d-flex flex-justify-between flex-items-center text-break pt-2 pb-0 px-4 fs-smaller">
                         <div>
                             <#if !ext.isLatest()>
-                                <span class="text-gbif-danger"><@s.text name="admin.extension.version.warning.short"/></span><br>
+                                <span class="text-gbif-danger">${t("admin.extension.version.warning.short")}</span><br>
                             </#if>
                             ${ext.description!?truncate(300)}
                         </div>
                     </div>
                     <div class="d-flex pt-2 pb-4 px-4">
                         <a href="extension.do?id=${ext.rowType?url}" title="" class="action-link-button action-link-button-primary">
-                            <@s.text name="button.view"/>
+                            ${t("button.view")}<#t>
                         </a>
 
                         <#if !ext.isLatest()>
@@ -60,7 +60,7 @@
                                 <input type='hidden' name='id' value='${ext.rowType}' />
 
                                 <button type="submit" value="Update" id="update" name="update" class="confirm action-link-button action-link-button-primary">
-                                    <@s.text name="button.update"/>
+                                    ${t("button.update")}<#t>
                                 </button>
                             </form>
                         </#if>
@@ -70,7 +70,7 @@
                             <input type='hidden' name='id' value='${ext.rowType}' />
 
                             <button type="submit" value="Delete" id="delete" name="deleteFlag" class="action-link-button action-link-button-danger">
-                                <@s.text name="button.remove"/>
+                                ${t("button.remove")}<#t>
                             </button>
                         </form>
                     </div>
@@ -105,14 +105,14 @@
                     <div class="d-flex flex-justify-between flex-items-center text-break pt-2 pb-0 px-4 fs-smaller">
                         <div>
                             <#if !vocab.isLatest()>
-                                <span class="text-gbif-danger"><@s.text name="admin.extension.version.warning.short"/></span><br>
+                                <span class="text-gbif-danger">${t("admin.extension.version.warning.short")}</span><br>
                             </#if>
                             ${vocab.description!?truncate(300)}
                         </div>
                     </div>
                     <div class="d-flex pt-2 pb-4 px-4">
                         <a href="vocabulary.do?id=${vocab.uriString?url}" title="" class="action-link-button action-link-button-primary">
-                            <@s.text name="button.view"/>
+                            ${t("button.view")}<#t>
                         </a>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
                             <input type='hidden' name='url' value='${ext.url}' />
 
                             <button type="submit" value="Install" id="install" name="install" class="action-link-button action-link-button-primary">
-                                <@s.text name="button.install"/>
+                                ${t("button.install")}<#t>
                             </button>
                         </form>
                     </div>
@@ -180,29 +180,29 @@
                     <div class="fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                                <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.extensions"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                                <li class="breadcrumb-item">${t("breadcrumb.admin.extensions")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="admin.home.manageExtensions"/>
+                        ${t("admin.home.manageExtensions")}<#t>
                     </h1>
 
                     <div class="text-smaller">
                         <#if numberOfCoreExtensions == 0 && numberOfNonCoreExtensions == 0>
-                            <span class="text-gbif-danger"><@s.text name="admin.extensions.noneInstalled"/></span>
+                            <span class="text-gbif-danger">${t("admin.extensions.noneInstalled")}</span>
                         <#elseif upToDate>
-                            <span class="text-gbif-primary"><@s.text name="admin.extensions.upToDate"/></span>
+                            <span class="text-gbif-primary">${t("admin.extensions.upToDate")}</span>
                         <#else>
-                            <span class="text-gbif-danger"><@s.text name="admin.extensions.not.upToDate"/></span>
+                            <span class="text-gbif-danger">${t("admin.extensions.not.upToDate")}</span>
                         </#if>
                     </div>
 
                     <div class="mt-2">
                         <a href="${baseURL}/admin/" class="btn btn-sm btn-outline-secondary top-button">
-                            <@s.text name="button.cancel"/>
+                            ${t("button.cancel")}<#t>
                         </a>
                     </div>
                 </div>
@@ -213,17 +213,17 @@
     <main class="container main-content-container">
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="admin.extension.coreTypes"/>
+                ${t("admin.extension.coreTypes")}<#t>
             </h5>
 
             <p class="mb-0">
-                <@s.text name="admin.extension.no.coreTypes.installed.help"><@s.param>${cfg.registryUrl}</@s.param></@s.text>
+                ${t("admin.extension.no.coreTypes.installed.help", cfg.registryUrl)}
             </p>
 
             <#if numberOfCoreExtensions=0>
                 <div class="callout callout-warning mb-0">
-                    <@s.text name="admin.extension.no.coreTypes.installed"/>
-                    <@s.text name="admin.extension.no.coreTypes.installed.debug"><@s.param>${cfg.registryUrl}</@s.param></@s.text>
+                    ${t("admin.extension.no.coreTypes.installed")}<#t>
+                    ${t("admin.extension.no.coreTypes.installed.debug", cfg.registryUrl)}
                 </div>
             </#if>
         </div>
@@ -242,11 +242,11 @@
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="extension.synchronise.title"/>
+                ${t("extension.synchronise.title")}<#t>
             </h5>
 
             <p>
-                <@s.text name="admin.extensions.synchronise.help"/>
+                ${t("admin.extensions.synchronise.help")}<#t>
             </p>
 
             <form action='extensions.do' method='post'>
@@ -257,11 +257,11 @@
                         <svg class="overview-action-button-icon" viewBox="0 0 24 24">
                             <path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path>
                         </svg>
-                        <@s.text name="button.synchronise"/>
+                        ${t("button.synchronise")}<#t>
                     </button>
                     <#if lastSynchronised??>
                     <span class="fs-smaller">
-                        <@s.text name="extension.last.synchronised"><@s.param>${lastSynchronised?datetime?string["d MMMM yyyy HH:mm"]}</@s.param></@s.text>
+                        ${t("extension.last.synchronised", lastSynchronised?datetime?string["d MMMM yyyy HH:mm"])}
                     </span>
                     </#if>
                 </div>
@@ -270,16 +270,16 @@
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="admin.extension.extensions"/>
+                ${t("admin.extension.extensions")}<#t>
             </h5>
 
             <p class="mb-0">
-                <@s.text name="admin.extension.no.extensions.installed.help"><@s.param>${cfg.registryUrl}</@s.param></@s.text>
+                ${t("admin.extension.no.extensions.installed.help", cfg.registryUrl)}
             </p>
 
             <#if numberOfNonCoreExtensions=0>
                 <div class="callout callout-warning mb-0">
-                    <@s.text name="admin.extension.no.extensions.installed"/>
+                    ${t("admin.extension.no.extensions.installed")}<#t>
                 </div>
             </#if>
         </div>
@@ -297,7 +297,7 @@
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="admin.extension.vocabularies"/>
+                ${t("admin.extension.vocabularies")}<#t>
             </h5>
         </div>
         <div>
@@ -312,12 +312,12 @@
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="extension.further.title"/>
+                ${t("extension.further.title")}<#t>
             </h5>
 
             <#if !newExtensions?has_content>
                 <div class="callout callout-info">
-                    <@s.text name="extension.already.installed"/>
+                    ${t("extension.already.installed")}<#t>
                 </div>
             </#if>
 

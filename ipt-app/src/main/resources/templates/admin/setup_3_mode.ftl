@@ -14,18 +14,18 @@
             <div class="container my-3 p-3">
                 <div class="text-center">
                     <div class="text-center fs-smaller">
-                        <span>[@s.text name="admin.config.setup.common.setup"/]</span>
+                        <span>${t("admin.config.setup.common.setup")}</span>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        [@s.text name="admin.config.setup.common.ipt"/]
+                        ${t("admin.config.setup.common.ipt")}[#t]
                     </h1>
                     <h1 class="pb-2 mb-0 text-gbif-header-light fs-5 fw-normal">
-                        [@s.text name="admin.config.setup.common.tagline"/]
+                        ${t("admin.config.setup.common.tagline")}[#t]
                     </h1>
 
                     <div class="mt-2">
-                        [@s.submit cssClass="btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/]
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="btn btn-sm btn-outline-gbif-primary top-button"/>[#t]
                     </div>
                 </div>
             </div>
@@ -41,23 +41,23 @@
             <div class="bd-content">
                 <div class="my-3 p-3">
                     <h5 class="text-gbif-header-2 pb-2 mt-2 fw-400">
-                        [@s.text name="admin.config.setup2.mode.title"/]
+                        ${t("admin.config.setup2.mode.title")}[#t]
                     </h5>
 
-                    <p>[@s.text name="admin.config.setup2.mode.help"/]</p>
-                    <p>[@s.text name="admin.config.setup2.mode.test"/]</p>
-                    <p>[@s.text name="admin.config.setup2.mode.production"/]</p>
-                    <p>[@s.text name="admin.config.setup2.mode"/] <span class="text-gbif-danger">&#42;</span></p>
+                    <p>${t("admin.config.setup2.mode.help")}</p>
+                    <p>${t("admin.config.setup2.mode.test")}</p>
+                    <p>${t("admin.config.setup2.mode.production")}</p>
+                    <p>${t("admin.config.setup2.mode")} <span class="text-gbif-danger">&#42;</span></p>
 
                     [#list modes as mode]
                         <div class="form-check form-check-inline pb-2">
                             <input class="form-check-input" type="radio" name="modeSelected" id="mode${mode}" aria-describedby="field-error-mode" [#if mode??]value="${mode}"[/#if] [#if modeSelected?? && mode == modeSelected] checked [/#if]>
                             <label class="form-check-label" for="mode${mode}">
-                                [@s.text name="admin.config.setup2.mode.${mode?lower_case}.label"/]
+                                ${t("admin.config.setup2.mode.${mode?lower_case}.label")}[#t]
                             </label>
                         </div>
                     [/#list]
-                    [@s.fielderror cssClass="invalid-feedback list-unstyled radio-error radio-name-modeSelected my-0" fieldName="modeSelected"/]
+                    [@fieldError cssClass="invalid-feedback list-unstyled radio-error radio-name-modeSelected my-0" fieldName="modeSelected"/]
 
                 </div>
             </div>

@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name="title"/></title>
+<title>${t("title")}</title>
 
 <link rel="stylesheet" href="${baseURL}/styles/leaflet/leaflet.css" />
 <link rel="stylesheet" href="${baseURL}/styles/leaflet/locationfilter.css" />
@@ -60,20 +60,20 @@
                     <div class="fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                                <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.settings"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                                <li class="breadcrumb-item">${t("breadcrumb.admin.settings")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="admin.home.editConfig"/>
+                        ${t("admin.home.editConfig")}<#t>
                     </h1>
 
                     <div class="mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <a href="${baseURL}/admin/" class="button btn btn-sm btn-outline-secondary top-button">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </a>
                     </div>
                 </div>
@@ -84,7 +84,7 @@
     <main class="container main-content-container">
         <div class="my-3 p-3 ">
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.urls"/>
+                ${t("admin.config.section.urls")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -101,7 +101,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.serverLocation"/>
+                ${t("admin.config.section.serverLocation")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-sm-6">
@@ -128,7 +128,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.administration"/>
+                ${t("admin.config.section.administration")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -137,7 +137,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.email"/>
+                ${t("admin.config.section.email")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -162,7 +162,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.localization"/>
+                ${t("admin.config.section.localization")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -171,7 +171,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.analytics"/>
+                ${t("admin.config.section.analytics")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -180,7 +180,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.archiving"/>
+                ${t("admin.config.section.archiving")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-12">
@@ -193,7 +193,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.debugging"/>
+                ${t("admin.config.section.debugging")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-12">
@@ -202,7 +202,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.directories"/>
+                ${t("admin.config.section.directories")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">
@@ -215,7 +215,7 @@
             </div>
 
             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fs-5 fw-400">
-                <@s.text name="admin.config.section.registry"/>
+                ${t("admin.config.section.registry")}<#t>
             </h4>
             <div class="row g-3 mb-5">
                 <div class="col-lg-6">

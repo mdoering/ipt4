@@ -5,17 +5,15 @@
         <div class="d-flex">
             <h5 class="my-auto text-gbif-header-2 fw-400">
                 <#assign metadataHeaderInfo>
-                    <@s.text name='manage.metadata.description1'/><br><br><#if resource.dataPackage??><@s.text name='manage.metadata.description2.dp'/><#else><@s.text name='manage.metadata.description2.dwc'/></#if>
+                    ${t('manage.metadata.description1')}<br><br><#if resource.dataPackage??>${t('manage.metadata.description2.dp')}<#else>${t('manage.metadata.description2.dwc')}</#if>
                     <#if resource.coreType?has_content && resource.coreType==metadataType>
                         <br><br>
-                        <@s.text name='manage.overview.source.hidden'>
-                            <@s.param><a href="${baseURL}/manage/metadata-basic.do?r=${resource.shortname}&amp;edit=Edit"><@s.text name="submenu.basic"/></a></@s.param>
-                        </@s.text>
+                        <#assign textArg1><a href="${baseURL}/manage/metadata-basic.do?r=${resource.shortname}&amp;edit=Edit">${t("submenu.basic")}</a></#assign>${t('manage.overview.source.hidden', textArg1)}<#t>
                     </#if>
                 </#assign>
                 <@popoverTextInfo metadataHeaderInfo/>
 
-                <@s.text name='manage.overview.metadata'/>
+                ${t('manage.overview.metadata')}<#t>
             </h5>
         </div>
 
@@ -23,7 +21,7 @@
             <#if resource.coreType?has_content && resource.coreType == "camtrap-dp">
                 <#assign viewOrEditElementId="edit-metadata-button"/>
                 <#assign viewOrEditButtonText>
-                    <@s.text name="button.edit"/>
+                    ${t("button.edit")}<#t>
                 </#assign>
                 <#assign viewOrEditAction="camtrap-metadata-basic.do?r=${resource.shortname}"/>
                 <#assign viewOrEditIcon>
@@ -32,7 +30,7 @@
             <#elseif resource.coreType?has_content && resource.coreType == "coldp">
                 <#assign viewOrEditElementId="view-metadata-button"/>
                 <#assign viewOrEditButtonText>
-                    <@s.text name="button.view"/>
+                    ${t("button.view")}<#t>
                 </#assign>
                 <#assign viewOrEditAction="#"/>
                 <#assign viewOrEditIcon>
@@ -42,7 +40,7 @@
             <#elseif resource.coreType?has_content && resource.coreType == "dwc-dp">
                 <#assign viewOrEditElementId="edit-metadata-button"/>
                 <#assign viewOrEditButtonText>
-                    <@s.text name="button.edit"/>
+                    ${t("button.edit")}<#t>
                 </#assign>
                 <#assign viewOrEditAction="metadata-basic.do?r=${resource.shortname}"/>
                 <#assign viewOrEditIcon>
@@ -52,7 +50,7 @@
         <#else>
             <#assign viewOrEditElementId="edit-metadata-button"/>
             <#assign viewOrEditButtonText>
-                <@s.text name="button.edit"/>
+                ${t("button.edit")}<#t>
             </#assign>
             <#assign viewOrEditAction="metadata-basic.do"/>
             <#assign viewOrEditIcon>
@@ -73,7 +71,7 @@
                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                         <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"></path>
                     </svg>
-                    <@s.text name="button.options"/>
+                    ${t("button.options")}<#t>
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="metadataDropdown">
@@ -82,12 +80,12 @@
                            href="${baseURL}/manage/eml.do?r=${resource.shortname}"
                            onclick="_gaq.push(['_trackEvent', 'EML', 'Download', 'test-empty-organization']);"
                            download>
-                            <@s.text name="button.download"/>
+                            ${t("button.download")}<#t>
                         </a>
                     </li>
                     <li>
                         <a class="btn btn-sm btn-outline-gbif-primary w-100 dropdown-button" id="upload-metadata-button" href="#anchor-metadata">
-                            <@s.text name="button.upload"/>
+                            ${t("button.upload")}<#t>
                         </a>
                     </li>
 
@@ -96,7 +94,7 @@
                     <#if !isDataPackage || isDwcDp>
                         <li>
                             <a class="show-metadata-validation-result btn btn-sm btn-outline-gbif-primary w-100 dropdown-button" href="#">
-                                <@s.text name="manage.overview.metadata.modal.validation.report"/>
+                                ${t("manage.overview.metadata.modal.validation.report")}<#t>
                             </a>
                         </li>
                     </#if>
@@ -109,9 +107,9 @@
         <div class="text-smaller">
             <small>
                 <#if metadataModifiedSinceLastPublication>
-                    <@s.text name='manage.home.last.modified'/> ${resource.getMetadataModified()?datetime?string.medium!}
+                    ${t('manage.home.last.modified')} ${resource.getMetadataModified()?datetime?string.medium!}
                 <#elseif resource.lastPublished??>
-                    <@s.text name="manage.overview.notModified"/>
+                    ${t("manage.overview.notModified")}<#t>
                 </#if>
             </small>
         </div>
@@ -120,14 +118,14 @@
     <div class="row mt-4">
         <p class="mb-0">
             <#if !validMetadata>
-                <span title="<@s.text name='manage.overview.metadata.invalid'/>" class="show-metadata-validation-result fs-smaller-2 text-nowrap dt-content-link dt-content-pill metadata-incomplete"><@s.text name="manage.overview.metadata.invalid.logo"/></span>
+                <span title="${t('manage.overview.metadata.invalid')}" class="show-metadata-validation-result fs-smaller-2 text-nowrap dt-content-link dt-content-pill metadata-incomplete">${t("manage.overview.metadata.invalid.logo")}</span>
             <#else>
-                <span class="show-metadata-validation-result fs-smaller-2 text-nowrap dt-content-link dt-content-pill metadata-complete"><@s.text name="manage.overview.metadata.valid.logo"/></span>
+                <span class="show-metadata-validation-result fs-smaller-2 text-nowrap dt-content-link dt-content-pill metadata-complete">${t("manage.overview.metadata.valid.logo")}</span>
             </#if>
             <#if resource.coreType?has_content && resource.coreType == "coldp">
-                <@s.text name="manage.overview.metadata.coldp.description"/>
+                ${t("manage.overview.metadata.coldp.description")}<#t>
             <#else>
-                <@s.text name="manage.overview.metadata.description"/>
+                ${t("manage.overview.metadata.description")}<#t>
             </#if>
         </p>
     </div>

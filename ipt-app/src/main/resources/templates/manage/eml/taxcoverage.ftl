@@ -182,7 +182,7 @@
             makeSureResourceParameterIsPresentInURL('${resource.shortname}');
         });
     </script>
-    <title><@s.text name='manage.metadata.taxcoverage.title'/></title>
+    <title>${t('manage.metadata.taxcoverage.title')}</title>
     <#assign currentMetadataPage = "taxcoverage"/>
     <#assign currentMenu="manage"/>
     <#include "/inc/menu.ftl">
@@ -197,7 +197,7 @@
                 <i class="bi bi-exclamation-triangle alert-orange-2 fs-bigger-2 me-2"></i>
             </div>
             <div class="overflow-x-hidden pt-1">
-                <span><@s.text name="eml.warning.reinfer"/></span>
+                <span>${t("eml.warning.reinfer")}</span>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -209,7 +209,7 @@
                                 <i class="bi bi-exclamation-circle alert-red-2 fs-bigger-2 me-2"></i>
                             </div>
                             <div class="overflow-x-hidden pt-1">
-                                <span><@s.text name="${error}"/></span>
+                                <span>${t(error)}</span>
                             </div>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
@@ -225,16 +225,16 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.metadata.taxcoverage.title'/>
+                            ${t('manage.metadata.taxcoverage.title')}<#t>
                         </h1>
                     </div>
 
@@ -243,9 +243,9 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </button>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
                                                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                 </svg>
                                             </span>
-                                            <span><@s.text name="eml.previewInferred"/></span>
+                                            <span>${t("eml.previewInferred")}</span>
                                         </a>
                                     </div>
                                     <div id="dateInferred" class="text-smaller mt-0 d-flex justify-content-end" style="display: none !important;">
@@ -289,7 +289,7 @@
                                                     <path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path>
                                                 </svg>
                                             </span>
-                                            <span><@s.text name="eml.reinfer"/></span>
+                                            <span>${t("eml.reinfer")}</span>
                                         </a>
                                     </div>
                                 </div>
@@ -297,7 +297,7 @@
                             </#if>
 
                             <p class="my-3 intro">
-                                <@s.text name='manage.metadata.taxcoverage.intro'/>
+                                ${t('manage.metadata.taxcoverage.intro')}<#t>
                             </p>
 
                             <div id="items">
@@ -312,7 +312,7 @@
                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                     </svg>
                                                 </span>
-                                                <span><@s.text name='manage.metadata.removethis'/> <@s.text name='manage.metadata.taxcoverage.item'/></span>
+                                                <span>${t('manage.metadata.removethis')} ${t('manage.metadata.taxcoverage.item')}</span>
                                             </a>
                                         </div>
 
@@ -330,7 +330,7 @@
                                                         </svg>
                                                     </span>
                                                     <span>
-                                                        <@s.text name="manage.metadata.taxcoverage.addSeveralTaxa"/>
+                                                        ${t("manage.metadata.taxcoverage.addSeveralTaxa")}<#t>
                                                     </span>
                                                 </a>
                                                 <@popoverPropertyInfo "manage.metadata.taxcoverage.addSeveralTaxa.help" />
@@ -347,7 +347,7 @@
                                                         </svg>
                                                     </span>
                                                     <span>
-                                                        <@s.text name='button.add'/>
+                                                        ${t('button.add')}<#t>
                                                     </span>
                                                 </a>
                                             </div>
@@ -405,7 +405,7 @@
                                                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                                     </svg>
                                                 </span>
-                                                <span><@s.text name='manage.metadata.addnew' /> <@s.text name='manage.metadata.taxcoverage.taxon.item' /></span>
+                                                <span>${t('manage.metadata.addnew')} ${t('manage.metadata.taxcoverage.taxon.item')}</span>
                                             </a>
                                         </div>
                                     </div>
@@ -419,7 +419,7 @@
                                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                         </svg>
                                     </span>
-                                    <span><@s.text name='manage.metadata.addnew' /> <@s.text name='manage.metadata.taxcoverage.item' /></span>
+                                    <span>${t('manage.metadata.addnew')} ${t('manage.metadata.taxcoverage.item')}</span>
                                 </a>
                             </div>
 
@@ -445,7 +445,7 @@
                                                             </#if>
 
                                                             <#if rankWarning?has_content>
-                                                                <code><@s.text name="${rankWarning}"/></code>
+                                                                <code>${t(rankWarning)}</code>
                                                             <#else>
                                                                 <#list k.displayNames as name>
                                                                     &nbsp;${name}<#if name_has_next>,</#if>
@@ -461,13 +461,13 @@
                                 <#elseif (inferredMetadata.inferredTaxonomicCoverage)?? && inferredMetadata.inferredTaxonomicCoverage.errors?size != 0>
                                     <#list inferredMetadata.inferredTaxonomicCoverage.errors as error>
                                         <div class="callout callout-danger text-smaller">
-                                            <@s.text name="${error}"/>
+                                            ${t(error)}<#t>
                                         </div>
                                     </#list>
                                 <!-- Other -->
                                 <#else>
                                     <div class="callout callout-warning text-smaller">
-                                        <@s.text name="eml.warning.reinfer"/>
+                                        ${t("eml.warning.reinfer")}<#t>
                                     </div>
                                 </#if>
                             </div>
@@ -485,7 +485,7 @@
                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name='manage.metadata.removethis'/> <@s.text name='manage.metadata.taxcoverage.item'/></span>
+                                        <span>${t('manage.metadata.removethis')} ${t('manage.metadata.taxcoverage.item')}</span>
                                     </a>
                                 </div>
 
@@ -501,7 +501,7 @@
                                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name='manage.metadata.taxcoverage.addSeveralTaxa' /></span>
+                                        <span>${t('manage.metadata.taxcoverage.addSeveralTaxa')}</span>
                                     </a>
                                 </div>
                                 <div id="list" class="mt-2" style="display:none">
@@ -513,7 +513,7 @@
                                                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                                 </svg>
                                             </span>
-                                            <span><@s.text name="button.add"/></span>
+                                            <span>${t("button.add")}</span>
                                         </a>
                                     </div>
                                 </div>
@@ -539,7 +539,7 @@
                                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name='manage.metadata.addnew' /> <@s.text name='manage.metadata.taxcoverage.taxon.item' /></span>
+                                        <span>${t('manage.metadata.addnew')} ${t('manage.metadata.taxcoverage.taxon.item')}</span>
                                     </a>
                                 </div>
                             </div>

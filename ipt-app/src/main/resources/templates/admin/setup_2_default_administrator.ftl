@@ -14,18 +14,18 @@
             <div class="container my-3 p-3">
                 <div class="text-center">
                     <div class="text-center fs-smaller">
-                        <span>[@s.text name="admin.config.setup.common.setup"/]</span>
+                        <span>${t("admin.config.setup.common.setup")}</span>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        [@s.text name="admin.config.setup.common.ipt"/]
+                        ${t("admin.config.setup.common.ipt")}[#t]
                     </h1>
                     <h1 class="pb-2 mb-0 text-gbif-header-light fs-5 fw-normal">
-                        [@s.text name="admin.config.setup.common.tagline"/]
+                        ${t("admin.config.setup.common.tagline")}[#t]
                     </h1>
 
                     <div class="mt-2">
-                        [@s.submit cssClass="btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/]
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="btn btn-sm btn-outline-gbif-primary top-button"/>[#t]
                     </div>
                 </div>
             </div>
@@ -41,15 +41,15 @@
             <div class="bd-content">
                 <div class="my-3 p-3">
                     <h5 class="pb-2 mb-2 mt-2 text-gbif-header-2 fw-400">
-                        [@s.text name="admin.config.setup2.administrator.title"/]
+                        ${t("admin.config.setup2.administrator.title")}[#t]
                     </h5>
 
-                    <p>[@s.text name="admin.config.setup2.welcome"/]</p>
+                    <p>${t("admin.config.setup2.welcome")}</p>
 
                     <input type="hidden" name="setupDefaultAdministrator" value="true" />
 
                     <p>
-                        [@s.text name="admin.config.setup2.administrator"/]. [@s.text name="admin.config.setup2.administrator.help"/]
+                        ${t("admin.config.setup2.administrator")}. ${t("admin.config.setup2.administrator.help")}
                     </p>
                     <div class="row g-3 pb-3 mb-2">
                         <div class="col-md-4">

@@ -67,27 +67,27 @@
                 <!-- Navbar -->
                 <ul class="navbar-nav mx-auto mb-md-0">
                     <li class="nav-item nav-item-border-bottom">
-                        <a class="nav-link custom-nav-link [#if currentMenu=='home']active[/#if]" href="${baseURL}/">[@s.text name="menu.home"/]</a>
+                        <a class="nav-link custom-nav-link [#if currentMenu=='home']active[/#if]" href="${baseURL}/">${t("menu.home")}</a>
                     </li>
                     [#if managerRights]
                         <li class="nav-item nav-item-border-bottom">
-                            <a class="nav-link custom-nav-link [#if currentMenu=='manage']active[/#if]" href="${baseURL}/manage/">[@s.text name="menu.manage"/]</a>
+                            <a class="nav-link custom-nav-link [#if currentMenu=='manage']active[/#if]" href="${baseURL}/manage/">${t("menu.manage")}</a>
                         </li>
                     [/#if]
                     [#if adminRights]
                         <li class="nav-item nav-item-border-bottom">
-                            <a class="nav-link custom-nav-link [#if currentMenu=='admin']active[/#if]" href="${baseURL}/admin/">[@s.text name="menu.admin"/]</a>
+                            <a class="nav-link custom-nav-link [#if currentMenu=='admin']active[/#if]" href="${baseURL}/admin/">${t("menu.admin")}</a>
                         </li>
                     [/#if]
                     <li class="nav-item nav-item-border-bottom">
-                        <a class="nav-link custom-nav-link [#if currentMenu=='about']active[/#if]" href="${baseURL}/about.do">[@s.text name="menu.about"/]</a>
+                        <a class="nav-link custom-nav-link [#if currentMenu=='about']active[/#if]" href="${baseURL}/about.do">${t("menu.about")}</a>
                     </li>
                 </ul>
 
                 <div class="d-xl-flex align-content-between">
                     <!-- Health -->
                     <div class="navbar-nav nav-item-border-bottom">
-                      <a href="${baseURL}/health.do" class="nav-link position-relative health-link" title="[@s.text name="portal.health.title"/]">
+                      <a href="${baseURL}/health.do" class="nav-link position-relative health-link" title="${t("portal.health.title")}">
                           <svg class="gbif-heartbeat-icon [#if currentMenu=='health']active[/#if]" height="20" width="20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-356 246.5 90 77.6"  xml:space="preserve">
                               <path d="M-277.2,286.2h-22.9l-5,11l-10.1-43.8l-10.9,32.8h-18.6c-1.8,0-3.2,1.4-3.2,3.2c0,1.8,1.4,3.2,3.2,3.2h23.3l5.2-15.5l9.2,40l11.1-24.5h18.7c1.8,0,3.2-1.4,3.2-3.2C-274,287.7-275.4,286.2-277.2,286.2z"/>
                           </svg>
@@ -119,7 +119,7 @@
                                             <svg class="account-dropdown-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="AccountCircleIcon">
                                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"></path>
                                             </svg>
-                                            [@s.text name="menu.account"/]
+                                            ${t("menu.account")}[#t]
                                         </a>
                                     </li>
                                     <li>
@@ -129,7 +129,7 @@
                                                 <svg class="account-dropdown-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="LogoutIcon">
                                                     <path d="m17 7-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"></path>
                                                 </svg>
-                                                [@s.text name="menu.logout"/]
+                                                ${t("menu.logout")}[#t]
                                             </button>
                                         </form>
                                     </li>
@@ -140,7 +140,7 @@
                             <form action="${baseURL}/logout" method="post" class="d-inline">
                                 [@csrfField/]
                                 <button type="submit" class="nav-link ps-0 show-xl-smaller btn btn-link">
-                                    [@s.text name="menu.logout"/]
+                                    ${t("menu.logout")}[#t]
                                 </button>
                             </form>
                             <a href="${baseURL}/account.do" class="nav-link show-xl-smaller nav-link-account">
@@ -151,11 +151,11 @@
                         <form action="${baseURL}/login.do" method="post" class="d-xl-flex align-content-xl-center">
 [@csrfField/]
                             <button id="login-button" class="btn btn-sm m-xl-auto navbar-button text-capitalize show-xl-bigger" type="submit" name="login-submit">
-                                [@s.text name="portal.login"/]
+                                ${t("portal.login")}[#t]
                             </button>
                             <div class="navbar-nav show-xl-smaller nav-item-border-top">
                                 <a href="javascript:{}" class="nav-link text-capitalize" onclick="this.closest('form').submit();return false;">
-                                    [@s.text name="portal.login"/]
+                                    ${t("portal.login")}[#t]
                                 </a>
                             </div>
                         </form>
@@ -171,7 +171,7 @@
             <div class="d-flex justify-content-between">
                 <div class="d-flex py-2 fs-smaller">
                     <div class="py-2 me-3">
-                        <span class="fs-smaller-2 text-nowrap me-1 my-1 dt-content-link dt-content-pill type-${resourceTypeLowerCase}">[@s.text name="portal.resource.type.${resourceTypeLowerCase}"/]</span>
+                        <span class="fs-smaller-2 text-nowrap me-1 my-1 dt-content-link dt-content-pill type-${resourceTypeLowerCase}">${t("portal.resource.type.${resourceTypeLowerCase}")}</span>
 
                         [#if resource.status??]
                         <span class="text-nowrap text-discreet fs-smaller-2 status-pill status-${resource.status?lower_case}">
@@ -180,38 +180,38 @@
                             [#else]
                                 <i class="bi bi-circle-fill fs-smaller-2"></i>
                             [/#if]
-                            <span>[@s.text name="manage.home.visible.${resource.status?lower_case}"/]</span>
+                            <span>${t("manage.home.visible.${resource.status?lower_case}")}</span>
                         </span>
                         [/#if]
                     </div>
 
                     <div>
                         <span class="fw-500">${resource.title!resource.shortname}</span><br>
-                        <span class="fs-smaller-2 text-discreet">[@s.text name="basic.createdByOn"][@s.param]${(resource.creator.name)!}[/@s.param][@s.param]${resource.created?date?string("MMM d, yyyy")}[/@s.param][/@s.text]</span>
+                        <span class="fs-smaller-2 text-discreet">${t("basic.createdByOn", (resource.creator.name)!, resource.created?date?string("MMM d, yyyy"))}</span>
                     </div>
                 </div>
                 <div class="d-flex gap-1 my-auto">
-                    <button class="btn btn-sm btn-outline-gbif-primary proxy-button-view-resource" name="view">[@s.text name="button.view"/]</button>
+                    <button class="btn btn-sm btn-outline-gbif-primary proxy-button-view-resource" name="view">${t("button.view")}</button>
 
                     [#if resource.status == "DELETED"]
                         [#if disableRegistrationRights == "false"]
-                            <button class="btn btn-sm btn-outline-gbif-primary proxy-button-undelete-resource" name="undelete">[@s.text name="button.undelete"/]</button>
+                            <button class="btn btn-sm btn-outline-gbif-primary proxy-button-undelete-resource" name="undelete">${t("button.undelete")}</button>
                         [#else]
-                            <button class="btn btn-sm btn-outline-gbif-primary" name="undelete" disabled>[@s.text name="button.undelete"/]</button>
+                            <button class="btn btn-sm btn-outline-gbif-primary" name="undelete" disabled>${t("button.undelete")}</button>
                         [/#if]
                     [#else]
                         [#if disableRegistrationRights == "false"]
                             [#if resource.key?? && resource.status == "REGISTERED"]
-                                <button class="btn btn-sm btn-outline-gbif-danger button-show-delete-resource-modal" name="delete">[@s.text name="button.delete"/]</button>
+                                <button class="btn btn-sm btn-outline-gbif-danger button-show-delete-resource-modal" name="delete">${t("button.delete")}</button>
                             [#else]
-                                <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-ipt" name="delete">[@s.text name="button.delete"/]</button>
+                                <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-ipt" name="delete">${t("button.delete")}</button>
                             [/#if]
                         [#else]
-                            <button class="btn btn-sm btn-outline-gbif-danger" name="delete" disabled>[@s.text name="button.delete"/]</button>
+                            <button class="btn btn-sm btn-outline-gbif-danger" name="delete" disabled>${t("button.delete")}</button>
                         [/#if]
                     [/#if]
 
-                    <button class="btn btn-sm btn-outline-secondary proxy-button-cancel" name="cancel">[@s.text name="button.cancel"/]</button>
+                    <button class="btn btn-sm btn-outline-secondary proxy-button-cancel" name="cancel">${t("button.cancel")}</button>
                 </div>
             </div>
         </div>

@@ -7,9 +7,9 @@
 <script>
     $(document).ready(function(){
         $('.confirmPublishAll').jConfirmAction({
-            titleQuestion : "<@s.text name="basic.confirm"/>",
-            yesAnswer : "<@s.text name='basic.yes'/>",
-            cancelAnswer : "<@s.text name='basic.no'/>",
+            titleQuestion : "${t("basic.confirm")}",
+            yesAnswer : "${t('basic.yes')}",
+            cancelAnswer : "${t('basic.no')}",
             question: "Are you sure you want to start bulk publication?",
             buttonType: "primary",
             processing: false,
@@ -113,7 +113,7 @@
     });
 </script>
 
-<title><@s.text name="title"/></title>
+<title>${t("title")}</title>
 <#assign currentMenu = "admin"/>
 <#include "/macros/forms.ftl">
 <#include "/inc/menu.ftl">
@@ -131,20 +131,20 @@
                     <div class="fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                                <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.bulkPublication"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                                <li class="breadcrumb-item">${t("breadcrumb.admin.bulkPublication")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="admin.home.bulkPublication"/>
+                        ${t("admin.home.bulkPublication")}<#t>
                     </h1>
 
                     <div class="mt-2">
-                        <@s.submit cssClass="btn btn-sm btn-outline-gbif-primary top-button confirmPublishAll" name="publishAll" key="admin.config.publishResources"/>
+                        <input type="submit" value="${t("admin.config.publishResources")?markup_string}" id="publishAll" name="publishAll" class="btn btn-sm btn-outline-gbif-primary top-button confirmPublishAll"/><#t>
                         <a href="${baseURL}/admin/" class="button btn btn-sm btn-outline-secondary top-button">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </a>
                     </div>
                 </div>
@@ -155,29 +155,29 @@
     <main class="container main-content-container">
         <div class="my-3 p-3">
             <p>
-                <@s.text name="admin.config.publishResources.details"/>
+                ${t("admin.config.publishResources.details")}<#t>
             </p>
         </div>
 
         <div class="my-3 p-3">
             <fieldset>
                 <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                    <@s.text name="admin.config.publish.options"/>
+                    ${t("admin.config.publish.options")}<#t>
                 </h5>
 
                 <label class="py-1">
                     <input class="form-check-input" type="radio" name="publishMode" value="ALL" checked>
-                    <@s.text name="admin.config.publish.all"/>
+                    ${t("admin.config.publish.all")}<#t>
                 </label><br>
 
                 <label class="py-1">
                     <input class="form-check-input" type="radio" name="publishMode" value="CHANGED">
-                    <@s.text name="admin.config.publish.changed"/>
+                    ${t("admin.config.publish.changed")}<#t>
                 </label><br>
 
                 <label class="py-1">
                     <input class="form-check-input" type="radio" name="publishMode" value="SELECTED">
-                    <@s.text name="admin.config.publish.selected"/>
+                    ${t("admin.config.publish.selected")}<#t>
                 </label><br>
 
                 <div id="selectedDatasets" class="dataset-dropdown ms-3 mb-2" style="display: none;">
@@ -194,7 +194,7 @@
 
                 <label class="py-1">
                     <input class="form-check-input" type="radio" name="publishMode" value="EXCLUDED">
-                    <@s.text name="admin.config.publish.excluded"/>
+                    ${t("admin.config.publish.excluded")}<#t>
                 </label><br>
 
                 <div id="excludedDatasets" class="dataset-dropdown" style="display: none; margin-left: 20px;">

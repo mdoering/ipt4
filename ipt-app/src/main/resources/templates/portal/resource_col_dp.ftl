@@ -74,8 +74,8 @@
 <#assign anchor_versions>#anchor-versions</#assign>
 <#assign anchor_rights>#anchor-rights</#assign>
 <#assign anchor_citation>#anchor-citation</#assign>
-<#assign no_description><@s.text name='portal.resource.no.description'/></#assign>
-<#assign publishedOnText><@s.text name='manage.overview.published.released'/></#assign>
+<#assign no_description>${t('portal.resource.no.description')}<#t></#assign>
+<#assign publishedOnText>${t('manage.overview.published.released')}<#t></#assign>
 <#assign publishedOnText = publishedOnText?markup_string>
 <#assign download_dp_url>${baseURL}/archive.do?r=${resource.shortname}<#if version??>&v=${version.toPlainString()}</#if></#assign>
 <#assign download_metadata_url>${baseURL}/metadata.do?r=${resource.shortname}&v=<#if version??>${version.toPlainString()}<#else>${resource.metadataVersion.toPlainString()}</#if></#assign>
@@ -113,7 +113,7 @@
     <#-- display watermark for preview pages -->
     <#if isPreviewPage>
         <div id="watermark" class="text-center text-uppercase fs-1 mb-2">
-            <@s.text name='manage.overview.metadata.preview'><@s.param>${resource.metadataVersion.toPlainString()}</@s.param></@s.text>
+            ${t('manage.overview.metadata.preview', resource.metadataVersion.toPlainString())}
         </div>
     </#if>
 
@@ -123,9 +123,9 @@
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);"
                      aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}"><@s.text name="breadcrumb.home"/></a></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}">${t("breadcrumb.home")}</a></li>
                         <li class="breadcrumb-item active"
-                            aria-current="page"><@s.text name="breadcrumb.resource"/></li>
+                            aria-current="page">${t("breadcrumb.resource")}</li>
                     </ol>
                 </nav>
             </div>
@@ -136,7 +136,7 @@
                 </h1>
 
                 <div class="text-center">
-                    <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1"><@s.text name="portal.resource.type.${resourceTypeLowerCase}"/></span>
+                    <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1">${t("portal.resource.type.${resourceTypeLowerCase}")}</span>
                 </div>
 
                 <#if resource.lastPublished??>
@@ -144,9 +144,9 @@
                             <span>
                                 <#-- the existence of parameter version means the version is not equal to the latest published version -->
                                 <#if version?? && version.toPlainString() != resource.metadataVersion.toPlainString()>
-                                    <em><@s.text name='portal.resource.version'/>&nbsp;${version.toPlainString()}</em>
+                                    <em>${t('portal.resource.version')}&nbsp;${version.toPlainString()}</em>
                                 <#else>
-                                    <@s.text name='portal.resource.latest.version'/>
+                                    ${t('portal.resource.latest.version')}<#t>
                                 </#if>
 
                                 ${publishedOnText?lower_case}&nbsp;<span>${resource.lastPublished?date?string.long}</span>
@@ -154,7 +154,7 @@
                     </div>
                 <#else>
                     <div class="text-gbif-danger text-smaller">
-                        <@s.text name='portal.resource.published.never.long'/>
+                        ${t('portal.resource.published.never.long')}<#t>
                     </div>
                 </#if>
 
@@ -163,14 +163,14 @@
                         <#if managerRights>
                             <a href="${baseURL}/manage/resource.do?r=${resource.shortname}"
                                class="btn btn-sm btn-outline-gbif-primary mt-1 me-xl-1 top-button">
-                                <@s.text name='button.edit'/>
+                                ${t('button.edit')}<#t>
                             </a>
                         </#if>
                         <#if version?? && version.toPlainString() != resource.metadataVersion.toPlainString()>
                             <#if adminRights>
                                 <a class="confirmDeleteVersion btn btn-sm btn-outline-gbif-danger mt-1 me-xl-1 top-button" data-method="post"
                                    href="${baseURL}/admin/deleteVersion.do?r=${resource.shortname}&v=${version.toPlainString()}">
-                                    <@s.text name='button.delete.version'/>
+                                    ${t('button.delete.version')}<#t>
                                 </a>
                             </#if>
                         </#if>
@@ -191,7 +191,7 @@
                         <dl class="inline mb-0">
                             <#if (dpMetadata.issued)??>
                                 <div>
-                                    <dt><@s.text name='portal.resource.publicationDate'/>:</dt>
+                                    <dt>${t('portal.resource.publicationDate')}:</dt>
                                     <dd>${dpMetadata.issued?date?string.long}</dd>
                                 </div>
                             </#if>
@@ -199,7 +199,7 @@
                         <dl class="inline mb-0">
                             <#if (dpMetadata.issued)?? && resource.organisation?has_content>
                                 <div>
-                                    <dt><@s.text name='portal.resource.publishedBy'/>:</dt>
+                                    <dt>${t('portal.resource.publishedBy')}:</dt>
                                     <dd>
                                         <a href="${cfg.portalUrl}/publisher/${resource.organisation.key}"
                                            target="_blank">${resource.organisation.name!"Organisation"}</a>
@@ -210,13 +210,13 @@
                     </div>
 
                     <div class="col-lg-8 text-smaller px-0 pt-lg-max-3 border-lg-max-top order-lg-1">
-                        <p class="mb-1"><@s.text name='portal.resource.downloads.datapackage.verbose'/></p>
+                        <p class="mb-1">${t('portal.resource.downloads.datapackage.verbose')}</p>
 
                         <div class="table-responsive">
                             <table class="downloads text-smaller table table-sm table-borderless mb-0">
                                 <tr>
                                     <th class="col-4 p-0">
-                                        <@s.text name='portal.resource.dataPackage.verbose'/>
+                                        ${t('portal.resource.dataPackage.verbose')}<#t>
                                     </th>
                                     <td class="p-0">
                                         <a href="${download_dp_url}"
@@ -225,13 +225,13 @@
                                                  viewBox="0 0 24 24" data-testid="DownloadIcon">
                                                 <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path>
                                             </svg>
-                                            <@s.text name='portal.resource.download'/>
+                                            ${t('portal.resource.download')}<#t>
                                         </a>
                                         (${dataPackageSizeForVersion!"-"})
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th class="p-0"><@s.text name='portal.resource.datapackage.metadata.verbose'/></th>
+                                    <th class="p-0">${t('portal.resource.datapackage.metadata.verbose')}</th>
                                     <td class="p-0">
                                         <a href="${download_metadata_url}"
                                            onClick="_gaq.push(['_trackEvent', 'Metadata', 'Download', '${resource.shortname}']);"
@@ -240,7 +240,7 @@
                                                  viewBox="0 0 24 24" data-testid="DownloadIcon">
                                                 <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path>
                                             </svg>
-                                            <@s.text name='portal.resource.download'/>
+                                            ${t('portal.resource.download')}<#t>
                                         </a>
                                         (${metadataSizeForVersion!"-"})
                                     </td>
@@ -261,67 +261,67 @@
                 <nav id="sidebar-content">
                     <ul>
                         <li><a href="#anchor-description"
-                               class="sidebar-navigation-link"><@s.text name='portal.resource.description'/></a>
+                               class="sidebar-navigation-link">${t('portal.resource.description')}</a>
                         </li>
                         <#if resource.lastPublished??>
                             <#if resource.versionHistory??>
                                 <li><a href="#anchor-versions"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.versions'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.versions')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.identifier)?has_content>
                                 <li><a href="#anchor-identifiers"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.identifiers'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.identifiers')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.keyword)?has_content>
                                 <li><a href="#anchor-keywords"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.keywords'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.keywords')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.contact)?has_content>
                                 <li><a href="#anchor-contact"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.contact'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.contact')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.creator)?has_content>
                                 <li><a href="#anchor-creators"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.creators'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.creators')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.editor)?has_content>
                                 <li><a href="#anchor-editors"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.editors'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.editors')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.publisher)?has_content>
                                 <li><a href="#anchor-publisher"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.publisher'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.publisher')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.contributor)?has_content>
                                 <li><a href="#anchor-contributors"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.contributors'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.contributors')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.geographicScope)?has_content>
                                 <li><a href="#anchor-geographic"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.geographic'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.geographic')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.taxonomicScope)?has_content>
                                 <li><a href="#anchor-taxonomic"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.taxonomic'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.taxonomic')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.temporalScope)?has_content>
                                 <li><a href="#anchor-temporal"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.temporal'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.temporal')}</a>
                                 </li>
                             </#if>
                             <#if (dpMetadata.notes)?has_content>
                                 <li><a href="#anchor-notes"
-                                       class="sidebar-navigation-link"><@s.text name='portal.resource.notes'/></a>
+                                       class="sidebar-navigation-link">${t('portal.resource.notes')}</a>
                                 </li>
                             </#if>
                         </#if>
@@ -333,7 +333,7 @@
                 <span class="anchor anchor-home-resource-page" id="anchor-description"></span>
                 <div id="description" class="pb-5 section">
                     <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                        <@s.text name='portal.resource.description'/>
+                        ${t('portal.resource.description')}<#t>
                     </h4>
                     <div property="dc:abstract" class="mt-3 overflow-x-auto">
                         <#if (dpMetadata.description)?has_content>
@@ -341,7 +341,7 @@
                                 ${dpMetadata.description?no_esc}
                             </p>
                         <#else>
-                            <p><@s.text name='portal.resource.no.description'/></p>
+                            <p>${t('portal.resource.no.description')}</p>
                         </#if>
                     </div>
                 </div>
@@ -353,13 +353,13 @@
                         <span class="anchor anchor-resource-page" id="anchor-versions"></span>
                         <div id="versions" class="pb-5 section">
                             <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                                <@s.text name='portal.resource.versions'/>
+                                ${t('portal.resource.versions')}<#t>
                             </h4>
 
                             <#if managerRights>
-                                <p><@s.text name='portal.resource.versions.verbose.manager'/></p>
+                                <p>${t('portal.resource.versions.verbose.manager')}</p>
                             <#else>
-                                <p><@s.text name='portal.resource.versions.verbose'/></p>
+                                <p>${t('portal.resource.versions.verbose')}</p>
                             </#if>
                             <@versionsTable numVersionsShown=3 sEmptyTable="dataTables.sEmptyTable.versions" baseURL=baseURL shortname=resource.shortname />
                             <div id="vtableContainer" class="table-responsive text-smaller"></div>
@@ -372,7 +372,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-identifiers"></span>
                     <div id="identifiers" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.identifiers'/>
+                            ${t('portal.resource.identifiers')}<#t>
                         </h4>
 
                         <p>
@@ -388,7 +388,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-keywords"></span>
                     <div id="keywords" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.keywords'/>
+                            ${t('portal.resource.keywords')}<#t>
                         </h4>
 
                         <p>
@@ -404,7 +404,7 @@
                     <span class="anchor anchor-resource-page" id="anchor-contact"></span>
                     <div id="contact" class="pb-5 section">
                         <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.contact'/>
+                            ${t('portal.resource.contact')}<#t>
                         </h4>
 
                         <div class="row g-3 border">
@@ -420,7 +420,7 @@
                     <span class="anchor anchor-resource-page" id="anchor-creators"></span>
                     <div id="creators" class="pb-5 section">
                         <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.creators'/>
+                            ${t('portal.resource.creators')}<#t>
                         </h4>
 
                         <div class="row g-3 border">
@@ -440,7 +440,7 @@
                     <span class="anchor anchor-resource-page" id="anchor-editors"></span>
                     <div id="editors" class="pb-5 section">
                         <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.editors'/>
+                            ${t('portal.resource.editors')}<#t>
                         </h4>
 
                         <div class="row g-3 border">
@@ -460,7 +460,7 @@
                     <span class="anchor anchor-resource-page" id="anchor-publisher"></span>
                     <div id="publisher" class="pb-5 section">
                         <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.publisher'/>
+                            ${t('portal.resource.publisher')}<#t>
                         </h4>
 
                         <div class="row g-3 border">
@@ -476,7 +476,7 @@
                     <span class="anchor anchor-resource-page" id="anchor-contributors"></span>
                     <div id="contributors" class="pb-5 section">
                         <h4 class="pb-2 mb-4 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.contributors'/>
+                            ${t('portal.resource.contributors')}<#t>
                         </h4>
 
                         <div class="row g-3 border">
@@ -496,7 +496,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-sources"></span>
                     <div id="sources" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.sources'/>
+                            ${t('portal.resource.sources')}<#t>
                         </h4>
 
                         <#list dpMetadata.sources as source>
@@ -533,7 +533,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-licenses"></span>
                     <div id="licenses" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.licenses'/>
+                            ${t('portal.resource.licenses')}<#t>
                         </h4>
 
                         <#list dpMetadata.licenses as license>
@@ -572,7 +572,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-geographic"></span>
                     <div id="geographic" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.geographic'/>
+                            ${t('portal.resource.geographic')}<#t>
                         </h4>
 
                         <p>
@@ -586,7 +586,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-taxonomic"></span>
                     <div id="taxonomic" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.taxonomic'/>
+                            ${t('portal.resource.taxonomic')}<#t>
                         </h4>
 
                         <p>
@@ -600,7 +600,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-temporal"></span>
                     <div id="temporal" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.temporal'/>
+                            ${t('portal.resource.temporal')}<#t>
                         </h4>
 
                         <p>
@@ -614,7 +614,7 @@
                     <span class="anchor anchor-home-resource-page" id="anchor-notes"></span>
                     <div id="notes" class="pb-5 section">
                         <h4 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                            <@s.text name='portal.resource.notes'/>
+                            ${t('portal.resource.notes')}<#t>
                         </h4>
 
                         <p>
@@ -638,10 +638,10 @@
 
 <script>
     $('.confirmDeleteVersion').jConfirmAction({
-        titleQuestion: "<@s.text name="basic.confirm"/>",
-        question: "<@s.text name='portal.resource.confirm.delete.version'/></br></br><@s.text name='portal.resource.confirm.delete.version.warning.citation'/></br></br><@s.text name='portal.resource.confirm.delete.version.warning.undone'/>",
-        yesAnswer: "<@s.text name='basic.yes'/>",
-        cancelAnswer: "<@s.text name='basic.no'/>",
+        titleQuestion: "${t("basic.confirm")}",
+        question: "${t('portal.resource.confirm.delete.version')}</br></br>${t('portal.resource.confirm.delete.version.warning.citation')}</br></br>${t('portal.resource.confirm.delete.version.warning.undone')}",
+        yesAnswer: "${t('basic.yes')}",
+        cancelAnswer: "${t('basic.no')}",
         buttonType: "danger",
         baseUrl: "${baseURL}"
     });

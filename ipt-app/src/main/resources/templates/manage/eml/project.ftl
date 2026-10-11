@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
     <script src="${baseURL}/js/select2/select2-4.0.13.min.js"></script>
-    <title><@s.text name='manage.metadata.project.title'/></title>
+    <title>${t('manage.metadata.project.title')}</title>
     <script>
         $(document).ready(function () {
             $('#metadata-section').change(function () {
@@ -187,16 +187,16 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.metadata.project.title'/>
+                            ${t('manage.metadata.project.title')}<#t>
                         </h1>
                     </div>
 
@@ -205,9 +205,9 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save" />
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </button>
                     </div>
                 </div>
@@ -226,23 +226,23 @@
                     <div class="bd-content">
                         <div class="my-md-3 p-3">
                             <p class="mb-0">
-                                <@s.text name='manage.metadata.project.intro'/>
+                                ${t('manage.metadata.project.intro')}<#t>
                             </p>
 
                             <!-- retrieve some link names one time -->
-                            <#assign copyLink><@s.text name="eml.metadataAgent.copyLink"/></#assign>
+                            <#assign copyLink>${t("eml.metadataAgent.copyLink")}<#t></#assign>
                             <#assign copyLink = copyLink?markup_string>
-                            <#assign removeLink><@s.text name='manage.metadata.removethis'/> <@s.text name='rtf.project.personnel'/></#assign>
+                            <#assign removeLink>${t('manage.metadata.removethis')}<#t> ${t('rtf.project.personnel')}</#assign>
                             <#assign removeLink = removeLink?markup_string>
-                            <#assign removeRelatedProjectLink><@s.text name='manage.metadata.removethis'/> <@s.text name='rtf.project.relatedProject'/></#assign>
+                            <#assign removeRelatedProjectLink>${t('manage.metadata.removethis')}<#t> ${t('rtf.project.relatedProject')}</#assign>
                             <#assign removeRelatedProjectLink = removeRelatedProjectLink?markup_string>
-                            <#assign removeAwardLink><@s.text name='manage.metadata.removethis'/> <@s.text name='rtf.project.award'/></#assign>
+                            <#assign removeAwardLink>${t('manage.metadata.removethis')}<#t> ${t('rtf.project.award')}</#assign>
                             <#assign removeAwardLink = removeAwardLink?markup_string>
-                            <#assign addLink><@s.text name='manage.metadata.addnew'/> <@s.text name='rtf.project.personnel'/></#assign>
+                            <#assign addLink>${t('manage.metadata.addnew')}<#t> ${t('rtf.project.personnel')}</#assign>
                             <#assign addLink = addLink?markup_string>
-                            <#assign addRelatedProjectLink><@s.text name='manage.metadata.addnew'/> <@s.text name='rtf.project.relatedProject'/></#assign>
+                            <#assign addRelatedProjectLink>${t('manage.metadata.addnew')}<#t> ${t('rtf.project.relatedProject')}</#assign>
                             <#assign addRelatedProjectLink = addRelatedProjectLink?markup_string>
-                            <#assign addAwardLink><@s.text name='manage.metadata.addnew'/> <@s.text name='rtf.project.award'/></#assign>
+                            <#assign addAwardLink>${t('manage.metadata.addnew')}<#t> ${t('rtf.project.award')}</#assign>
                             <#assign addAwardLink = addAwardLink?markup_string>
 
                             <div class="row g-3 mt-1 mb-2">
@@ -341,7 +341,7 @@
                                                 <div id="relatedProject-${item_index}-personnel">
                                                     <div class="d-flex text-smaller">
                                                         <label for="eml.project.relatedProject.personnel" class="form-label mb-0">
-                                                            <@s.text name="eml.project.relatedProject.personnel"/> <span class="text-gbif-danger">&#42;</span>
+                                                            ${t("eml.project.relatedProject.personnel")} <span class="text-gbif-danger">&#42;</span>
                                                         </label>
                                                     </div>
                                                     <#list (eml.project.relatedProjects[item_index].personnel)! as personnel>
@@ -358,8 +358,8 @@
                                                                             <span>${copyLink?lower_case?cap_first}</span>
                                                                         </a>
                                                                         <ul class="dropdown-menu" aria-labelledby="dropdown-relatedProject-${item_index}-personnel-copy-${personnel_index}">
-                                                                            <li><a id="relatedProject-${item_index}-personnel-from-contact-${personnel_index}" class="relatedProject-personnel-copy-from-contact-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                                            <li><a id="relatedProject-${item_index}-personnel-copy-${personnel_index}" class="relatedProject-personnel-copy-personnel-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                                            <li><a id="relatedProject-${item_index}-personnel-from-contact-${personnel_index}" class="relatedProject-personnel-copy-from-contact-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                                            <li><a id="relatedProject-${item_index}-personnel-copy-${personnel_index}" class="relatedProject-personnel-copy-personnel-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                                         </ul>
                                                                     </div>
                                                                 </div>
@@ -445,8 +445,8 @@
                                                             <span>${copyLink?lower_case?cap_first}</span>
                                                         </a>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdown-personnel-copy-${item_index}">
-                                                            <li><a id="personnel-from-contact-${item_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                            <li><a id="personnel-copy-${item_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                            <li><a id="personnel-from-contact-${item_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                            <li><a id="personnel-copy-${item_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -511,8 +511,8 @@
                                                 <span>${copyLink?lower_case?cap_first}</span>
                                             </a>
                                             <ul class="dropdown-menu" aria-labelledby="personnel-creator-copy">
-                                                <li><a id="personnel-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                <li><a id="personnel-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                <li><a id="personnel-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                <li><a id="personnel-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -573,7 +573,7 @@
                                     <div id="relatedProject-personnel">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.project.relatedProject.personnel" class="form-label mb-0">
-                                                <@s.text name="eml.project.relatedProject.personnel"/>  <span class="text-gbif-danger">&#42;</span>
+                                                ${t("eml.project.relatedProject.personnel")}  <span class="text-gbif-danger">&#42;</span>
                                             </label>
                                         </div>
                                     </div>
@@ -635,8 +635,8 @@
                                                 <span>${copyLink?lower_case?cap_first}</span>
                                             </a>
                                             <ul class="dropdown-menu" aria-labelledby="personnel-creator-copy">
-                                                <li><a id="personnel-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                <li><a id="personnel-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                <li><a id="personnel-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                <li><a id="personnel-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -684,8 +684,8 @@
                                                 <span>${copyLink?lower_case?cap_first}</span>
                                             </a>
                                             <ul class="dropdown-menu" aria-labelledby="personnel-creator-copy">
-                                                <li><a id="personnel-from-contact" class="relatedProject-personnel-copy-from-contact-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                <li><a id="personnel-copy" class="relatedProject-personnel-copy-personnel-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                <li><a id="personnel-from-contact" class="relatedProject-personnel-copy-from-contact-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                <li><a id="personnel-copy" class="relatedProject-personnel-copy-personnel-link dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -734,11 +734,11 @@
                     <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
                 </div>
                 <div class="modal-body" style="text-align: left !important;">
-                    <h5 class="modal-title w-100" id="staticBackdropLabel"><@s.text name="eml.metadataAgent.copy"/></h5>
+                    <h5 class="modal-title w-100" id="staticBackdropLabel">${t("eml.metadataAgent.copy")}</h5>
                     <div class="row g-3">
                         <div class="col-12">
                             <label for="resource" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.resource"/>
+                                ${t("eml.metadataAgent.copy.resource")}<#t>
                             </label>
                             <select name="resource" id="resource" size="1" class="form-select">
                                 <option value=""></option>
@@ -746,20 +746,20 @@
                         </div>
                         <div class="col-12">
                             <label for="agentType" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.agentType"/>
+                                ${t("eml.metadataAgent.copy.agentType")}<#t>
                             </label>
                             <select name="agentType" id="agentType" size="1" class="form-select">
                                 <option value=""></option>
-                                <option value="creators"><@s.text name="eml.metadataAgent.copy.agentType.creator"/></option>
-                                <option value="contacts"><@s.text name="eml.metadataAgent.copy.agentType.contact"/></option>
-                                <option value="metadataProviders"><@s.text name="eml.metadataAgent.copy.agentType.metadataProvider"/></option>
-                                <option value="associatedParties"><@s.text name="eml.metadataAgent.copy.agentType.associatedParty"/></option>
-                                <option value="projectPersonnel"><@s.text name="eml.metadataAgent.copy.agentType.projectPersonnel"/></option>
+                                <option value="creators">${t("eml.metadataAgent.copy.agentType.creator")}</option>
+                                <option value="contacts">${t("eml.metadataAgent.copy.agentType.contact")}</option>
+                                <option value="metadataProviders">${t("eml.metadataAgent.copy.agentType.metadataProvider")}</option>
+                                <option value="associatedParties">${t("eml.metadataAgent.copy.agentType.associatedParty")}</option>
+                                <option value="projectPersonnel">${t("eml.metadataAgent.copy.agentType.projectPersonnel")}</option>
                             </select>
                         </div>
                         <div class="col-12">
                             <label for="agent" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.agent"/>
+                                ${t("eml.metadataAgent.copy.agent")}<#t>
                             </label>
                             <select name="agent" id="agent" size="1" class="form-select">
                                 <option value=""></option>
@@ -769,10 +769,10 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button id="copy-agent-button" type="button" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">
-                        <@s.text name="button.copy"/>
+                        ${t("button.copy")}<#t>
                     </button>
                     <button id="copy-agent-cancel" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>

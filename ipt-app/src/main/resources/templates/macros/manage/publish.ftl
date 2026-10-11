@@ -11,7 +11,7 @@
             value="Publish"
             type="submit">
         <@publishIcon/>
-        <@s.text name="button.publish"/>
+        ${t("button.publish")}<#t>
     </button>
 </#macro>
 
@@ -20,7 +20,7 @@
        class="text-gbif-header-2 icon-button icon-material-actions overview-action-button"
        href="#">
         <@publishIcon/>
-        <@s.text name="button.publish"/>
+        ${t("button.publish")}<#t>
     </a>
 </#macro>
 
@@ -30,7 +30,7 @@
                 class="publishDeletedResource text-gbif-header-2 icon-button icon-material-actions overview-action-button"
                 type="button">
             <@publishIcon />
-            <@s.text name="button.publish"/>
+            ${t("button.publish")}<#t>
         </button>
 
     <!-- resources cannot be published if the mandatory metadata is missing -->

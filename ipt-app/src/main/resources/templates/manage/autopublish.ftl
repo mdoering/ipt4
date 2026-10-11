@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.AutoPublishAction" -->
     <#include "/inc/header.ftl">
-    <title><@s.text name='manage.autopublish.title'/></title>
+    <title>${t('manage.autopublish.title')}</title>
 
     <#assign currentMenu = "manage"/>
     <#include "/inc/menu.ftl">
@@ -132,17 +132,17 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                            <li class="breadcrumb-item"><a href="publication-settings.do?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview.publicationSettings"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.autopublishing"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                            <li class="breadcrumb-item"><a href="publication-settings.do?r=${resource.shortname}">${t("breadcrumb.manage.overview.publicationSettings")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.autopublishing")}</li>
                         </ol>
                     </nav>
                 </div>
 
                 <div class="text-center">
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="manage.autopublish.title"/>
+                        ${t("manage.autopublish.title")}<#t>
                     </h1>
 
                     <div class="text-smaller">
@@ -160,19 +160,17 @@
 
     <main class="container main-content-container">
         <div class="my-3 p-3">
-            <p class=""><@s.text name='manage.autopublish.intro'/></p>
+            <p class="">${t('manage.autopublish.intro')}</p>
 
             <p id="timezone" class="">
-                <@s.text name="manage.autopublish.help.timezone">
-                    <@s.param>${serverTimeZone}</@s.param>
-                </@s.text>
+                ${t("manage.autopublish.help.timezone", serverTimeZone)}<#t>
             </p>
 
             <form id="autopublishForm" action="auto-publish.do" method="post">
 <@csrfField/>
                 <#if resource.isDeprecatedAutoPublishingConfiguration()>
                     <div class="callout callout-warning text-smaller">
-                        <@s.text name='manage.overview.autopublish.deprecated.warning.description'/>
+                        ${t('manage.overview.autopublish.deprecated.warning.description')}<#t>
                     </div>
                 </#if>
                 <input type="hidden" name="r" value="${resource.shortname}" />
@@ -216,12 +214,12 @@
                 <div class="row">
                     <div class="form-group col-md-6 col-lg-4">
                         <label for="updateFrequency" class="form-label">
-                            <@s.text name="manage.autopublish.frequency"/>
+                            ${t("manage.autopublish.frequency")}<#t>
                         </label>
                         <select id="updateFrequency" class="form-select" name="updateFrequency" size="1">
                             <#list frequencies?keys as val>
                                 <option value="${val}" <#if (updateFrequency!"")==val> selected="selected"</#if>>
-                                    <@s.text name="${frequencies.get(val)}"/>
+                                    ${t(frequencies.get(val))}<#t>
                                 </option>
                             </#list>
                         </select>
@@ -230,27 +228,27 @@
 
                 <p id="introAnnually" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.annually"/>
+                    ${t("manage.autopublish.intro.annually")}<#t>
                 </p>
                 <p id="introDaily" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.daily"/>
+                    ${t("manage.autopublish.intro.daily")}<#t>
                 </p>
                 <p id="introBiAnnually" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.biannually"/>
+                    ${t("manage.autopublish.intro.biannually")}<#t>
                 </p>
                 <p id="introMonthly" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.monthly"/>
+                    ${t("manage.autopublish.intro.monthly")}<#t>
                 </p>
                 <p id="introWeekly" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.weekly"/>
+                    ${t("manage.autopublish.intro.weekly")}<#t>
                 </p>
                 <p id="introOff" class="">
                     <br/>
-                    <@s.text name="manage.autopublish.intro.off"/>
+                    ${t("manage.autopublish.intro.off")}<#t>
                 </p>
 
                 <div id="frequencyDetails" class="mt-2">
@@ -259,7 +257,7 @@
                             <select id="updateFrequencyDayOfWeek" class="form-select" name="updateFrequencyDayOfWeek" size="1">
                                 <#list daysOfWeek?keys as val>
                                     <option value="${val}" <#if (updateFrequencyDayOfWeek!"")==val> selected="selected"</#if>>
-                                        <@s.text name="${daysOfWeek.get(val)}"/>
+                                        ${t(daysOfWeek.get(val))}<#t>
                                     </option>
                                 </#list>
                             </select>
@@ -270,7 +268,7 @@
                             <select id="updateFrequencyDay" class="form-select" name="updateFrequencyDay" size="1">
                                 <#list days?keys as val>
                                     <option value="${val}" <#if (updateFrequencyDay!"")?string==val?string> selected="selected"</#if>>
-                                        <@s.text name="${days.get(val)}"/>
+                                        ${t(days.get(val))}<#t>
                                     </option>
                                 </#list>
                             </select>
@@ -281,7 +279,7 @@
                             <select id="updateFrequencyMonth" class="form-select" name="updateFrequencyMonth" size="1">
                                 <#list months?keys as val>
                                     <option value="${val}" <#if (updateFrequencyMonth!"")==val> selected="selected"</#if>>
-                                        <@s.text name="${months.get(val)}"/>
+                                        ${t(months.get(val))}<#t>
                                     </option>
                                 </#list>
                             </select>
@@ -292,7 +290,7 @@
                             <select id="updateFrequencyBiMonth" class="form-select" name="updateFrequencyBiMonth" size="1">
                                 <#list biMonths?keys as val>
                                     <option value="${val}" <#if (updateFrequencyBiMonth!"")==val> selected="selected"</#if>>
-                                        <@s.text name="${biMonths.get(val)}"/>
+                                        ${t(biMonths.get(val))}<#t>
                                     </option>
                                 </#list>
                             </select>
@@ -306,7 +304,7 @@
                 </div>
 
                 <div id="options" class="mt-5">
-                    <h5 class="text-gbif-header-2 fw-400 mb-3"><@s.text name="manage.autopublish.options"/></h5>
+                    <h5 class="text-gbif-header-2 fw-400 mb-3">${t("manage.autopublish.options")}</h5>
 
                     <@checkbox name="skipUnchanged" value=skipUnchanged i18nkey="manage.autopublish.options.skipUnchanged"/>
 
@@ -315,7 +313,7 @@
                     <div id="dropThresholdContainer" class="mt-2" style="display: none;">
                         <div class="row">
                             <div class="col-lg-4">
-                                <label for="recordsDropThreshold" class="form-label"><@s.text name="manage.autopublish.options.dropThreshold"/></label>
+                                <label for="recordsDropThreshold" class="form-label">${t("manage.autopublish.options.dropThreshold")}</label>
                                 <input type="number" class="form-control" name="recordsDropThreshold" id="recordsDropThreshold" min="0" max="100" step="1" value="${recordsDropThreshold!}">
                             </div>
                         </div>
@@ -324,14 +322,14 @@
                     <@checkbox name="notifyPublicationFailure" value=notifyFailure i18nkey="manage.autopublish.options.notifyFailure"/>
                     <#if !publicationFailureEmailConfigured>
                         <div class="callout callout-warning text-smaller mt-2">
-                            <@s.text name="manage.autopublish.options.notifyFailure.notConfigured"/>
+                            ${t("manage.autopublish.options.notifyFailure.notConfigured")}<#t>
                         </div>
                     </#if>
 
                     <div id="failureEmailsContainer" class="mt-2" style="display: none;">
                         <div class="row">
                             <div class="col-lg-6">
-                                <label for="failureEmails" class="form-label"><@s.text name="manage.autopublish.options.notifyFailure.emails"/></label>
+                                <label for="failureEmails" class="form-label">${t("manage.autopublish.options.notifyFailure.emails")}</label>
                                 <input type="text" class="form-control" name="failureEmails" id="failureEmails" placeholder="email1@example.org, email2@example.org" value="${failureEmails!}">
                             </div>
                         </div>

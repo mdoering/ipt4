@@ -6,3 +6,4 @@
 </form>
 <form action="search" method="get"></form>
 <a href="%{foo}">x</a>
+<#list xs as t>${t.name}</#list>

@@ -1,6 +1,6 @@
 [#ftl output_format="HTML"]
 [#include "/inc/header.ftl"/]
-<title>[@s.text name="error.header.title"/]</title>
+<title>${t("error.header.title")}</title>
 
 <style>
     body {
@@ -81,12 +81,12 @@
     <div class="container bg-body rounded-2 mb-4">
         <div class="container my-3">
             <div class="text-center fs-smaller">
-                [@s.text name="basic.error"/]
+                ${t("basic.error")}[#t]
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    [@s.text name="error.fallback.title"/]
+                    ${t("error.fallback.title")}[#t]
                 </h1>
             </div>
         </div>
@@ -96,7 +96,7 @@
 <main class="container main-content-container">
     <div class="my-3 p-3">
         <p class="text-center">
-            [@s.text name="error.fallback.description"][@s.param]${baseURL}[/@s.param][@s.param]https://ipt.gbif.org/manual/en/ipt/latest/[/@s.param][/@s.text]
+            ${t("error.fallback.description", baseURL, "https://ipt.gbif.org/manual/en/ipt/latest/")}
         </p>
     </div>
 </main>

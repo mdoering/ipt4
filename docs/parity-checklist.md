@@ -19,7 +19,7 @@ Each IPT 3 feature area, the tests that cover it on IPT4, and what is left. Inte
 | DOIs (DataCite) | overview, publishing | `ResourceDoiTest` (stub DataCite) | Done offline; DataCite test run pending |
 | Access control and CSRF | interceptors | `ApplicationAuthorizationMatrixTest`, `ManageAuthorizationMatrixTest`, `AdminAuthorizationMatrixTest`, `SecurityHeadersTest` | Done |
 | Concurrency | | `ConcurrentUseTest`, `ResourceLockOrderTest` | Done |
-| Templates and assets | Struts tags | `TemplatesParseTest`, `TemplateShimTest`, `CrawlerTest` (all areas), `VendoredAssetsManifestTest` | Done |
+| Templates and assets | Struts tags | `TemplatesParseTest`, `TextFunctionTest`, `PageVariablesTest`, `CrawlerTest` (all areas, page snapshots), `VendoredAssetsManifestTest`, `tools/ftl-migrate/test.sh` | Done; Struts tag shim removed (M7) |
 | Docker image | | `tools/docker-smoke.sh` | Done |
 
 ## Waiting for the user

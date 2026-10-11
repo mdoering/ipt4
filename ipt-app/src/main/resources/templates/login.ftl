@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#include "/inc/header.ftl">
-<title><@s.text name="login.title"/></title>
+<title>${t("login.title")}</title>
 <#assign currentMenu = "account"/>
 <#include "/inc/menu.ftl">
 <#include "/macros/forms.ftl">
@@ -28,24 +28,22 @@
                     Integrated Publishing Toolkit
                 </div>
                 <div class="text-smaller" style="opacity: 0.75;">
-                    <@s.text name="admin.config.setup.common.tagline"/>
+                    ${t("admin.config.setup.common.tagline")}<#t>
                 </div>
             </div>
         </div>
 
         <p class="text-center text-smaller mt-5 mb-4">
-            <@s.text name="login.intro">
-                <@s.param>${adminEmail!}?subject=New IPT account&body=Dear IPT administrator,%0A I would like to have an account at the IPT ${baseURL}. %0ABest regards, ...</@s.param>
-            </@s.text>
+            ${t("login.intro", "${adminEmail!}?subject=New IPT account&body=Dear IPT administrator,%0A I would like to have an account at the IPT ${baseURL}. %0ABest regards, ...")}<#t>
         </p>
 
         <form class="needs-validation" action="${baseURL}/login.do" method="post" novalidate>
 <@csrfField/>
             <#assign userEmail>
-                <@s.text name="user.email"/>
+                ${t("user.email")}<#t>
             </#assign>
             <#assign userPassword>
-                <@s.text name="user.password"/>
+                ${t("user.password")}<#t>
             </#assign>
 
             <div class="row g-3 mt-0 mb-2">
@@ -59,14 +57,12 @@
 
                 <#if email?has_content>
                     <p class="text-center text-smaller pt-3">
-                        <@s.text name="login.forgottenpassword">
-                            <@s.param>${adminEmail!}?subject=IPT password reset&body=Dear IPT administrator,%0AI would like to request a password reset for my IPT account ... at ${baseURL}.%0ABest regards, ...</@s.param>
-                        </@s.text>
+                        ${t("login.forgottenpassword", "${adminEmail!}?subject=IPT password reset&body=Dear IPT administrator,%0AI would like to request a password reset for my IPT account ... at ${baseURL}.%0ABest regards, ...")}<#t>
                     </p>
                 </#if>
 
                 <div class="col-12">
-                    <@s.submit cssClass="btn btn-outline-gbif-primary w-100 text-capitalize" name="login" key="portal.login"/>
+                    <input type="submit" value="${t("portal.login")?markup_string}" id="login" name="login" class="btn btn-outline-gbif-primary w-100 text-capitalize"/><#t>
                 </div>
             </div>
         </form>

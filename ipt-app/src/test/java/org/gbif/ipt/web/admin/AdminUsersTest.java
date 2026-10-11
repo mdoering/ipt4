@@ -101,7 +101,8 @@ class AdminUsersTest {
   @Test
   void passwordsMustMatchAndEmailsBeNew() throws Exception {
     MvcResult mismatch = create("mismatch@example.org", "User", "Secret-pass-2", "Other-pass-2");
-    assertThat(mismatch.getResponse().getContentAsString()).contains("The passwords provided don't match.");
+    assertThat(org.jsoup.Jsoup.parse(mismatch.getResponse().getContentAsString()).text())
+        .contains("The passwords provided don't match.");
     assertThat(users.get("mismatch@example.org")).isNull();
 
     MvcResult existing = create(ManageFixture.OWNER, "User", "Secret-pass-2", "Secret-pass-2");

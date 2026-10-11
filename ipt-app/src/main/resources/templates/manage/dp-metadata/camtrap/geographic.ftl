@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageMetadataAction" -->
     <#include "/inc/header.ftl">
-    <title><@s.text name='manage.datapackagemetadata.camtrap.geographic.title'/></title>
+    <title>${t('manage.datapackagemetadata.camtrap.geographic.title')}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <script>
         $(document).ready(function(){
@@ -98,9 +98,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item"><a href="/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -108,7 +108,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.datapackagemetadata.camtrap.geographic.title'/>
+                            ${t('manage.datapackagemetadata.camtrap.geographic.title')}<#t>
                         </h1>
                     </div>
 
@@ -123,8 +123,8 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                     </div>
                 </div>
             </div>
@@ -149,13 +149,13 @@
                                 <div class="table-responsive border rounded p-3">
                                     <table class="text-smaller table table-sm table-borderless mb-0">
                                         <tr>
-                                            <th class="col-4"><@s.text name='datapackagemetadata.geographic.type'/></th>
+                                            <th class="col-4">${t('datapackagemetadata.geographic.type')}</th>
                                             <td>
                                                 ${(metadata.spatial.type)!"-"}
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th class="col-4"><@s.text name='datapackagemetadata.geographic.boundingCoordinates'/></th>
+                                            <th class="col-4">${t('datapackagemetadata.geographic.boundingCoordinates')}</th>
                                             <td>
                                                 <#if (metadata.spatial.coordinates)??>
                                                     ${metadata.spatial.coordinates}
@@ -166,7 +166,7 @@
                                         </tr>
                                         <#if (metadata.coordinatePrecision)??>
                                         <tr>
-                                            <th class="col-4"><@s.text name='datapackagemetadata.coordinatePrecision'/></th>
+                                            <th class="col-4">${t('datapackagemetadata.coordinatePrecision')}</th>
                                             <td>
                                                 ${metadata.coordinatePrecision}
                                             </td>
@@ -178,16 +178,16 @@
 
                             <div id="custom-data" class="mt-4">
                                 <div class="col-md-6">
-                                    <@s.file id="custom-data-input" cssClass="form-control form-control-sm my-1 d-none" />
+                                    <input type="file" name="" id="custom-data-input" class="form-control form-control-sm my-1 d-none"/><#t>
                                 </div>
 
-                                <textarea id="custom-data-textarea" name="customGeoJson" placeholder="<@s.text name='datapackagemetadata.geographic.custom.input'/>" class="form-control" style="border-bottom: 1px dashed #ced4da;border-bottom-right-radius: 0;border-bottom-left-radius: 0;">${customGeoJson!}</textarea>
+                                <textarea id="custom-data-textarea" name="customGeoJson" placeholder="${t('datapackagemetadata.geographic.custom.input')}" class="form-control" style="border-bottom: 1px dashed #ced4da;border-bottom-right-radius: 0;border-bottom-left-radius: 0;">${customGeoJson!}</textarea>
                                 <div id="file-selector" class="border-bottom border-start border-end rounded py-2 px-3 fs-smaller text-muted" style="cursor: pointer;border-color: #ced4da !important;border-top-right-radius: 0 !important;border-top-left-radius: 0 !important;">
                                     <span id="upload-file">
                                         <svg class="action-link-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                             <path style="fill:#6c757d!important;" d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"></path>
                                         </svg>
-                                        <@s.text name="basic.uploadFile"/>
+                                        ${t("basic.uploadFile")}<#t>
                                     </span>
                                     <span id="error-upload-file" class="text-gbif-danger"></span>
                                 </div>
@@ -209,7 +209,7 @@
                                                         <path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path>
                                                     </svg>
                                                 </span>
-                                                <span><@s.text name="datapackagemetadata.reinfer"/></span>
+                                                <span>${t("datapackagemetadata.reinfer")}</span>
                                             </a>
                                         </div>
                                     </div>
@@ -218,13 +218,13 @@
                                     <#if geographicScopeMetadataIsInferred>
                                         <table class="text-smaller table table-sm table-borderless mb-0">
                                             <tr>
-                                                <th class="col-4"><@s.text name='datapackagemetadata.geographic.type'/></th>
+                                                <th class="col-4">${t('datapackagemetadata.geographic.type')}</th>
                                                 <td>
                                                     Polygon
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th class="col-4"><@s.text name='datapackagemetadata.geographic.boundingCoordinates'/></th>
+                                                <th class="col-4">${t('datapackagemetadata.geographic.boundingCoordinates')}</th>
                                                 <td>
                                                     [[[${inferredMetadata.inferredGeographicScope.minLongitude!}, ${inferredMetadata.inferredGeographicScope.minLatitude!}],
                                                     [${inferredMetadata.inferredGeographicScope.maxLongitude!}, ${inferredMetadata.inferredGeographicScope.minLatitude!}],
@@ -235,7 +235,7 @@
                                             </tr>
                                         </table>
                                     <#else>
-                                        <@s.text name="datapackagemetadata.noData"/>
+                                        ${t("datapackagemetadata.noData")}<#t>
                                     </#if>
                                 </div>
                             </div>

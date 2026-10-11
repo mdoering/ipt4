@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageMetadataAction" -->
     <#include "/inc/header.ftl">
-    <title><@s.text name='manage.datapackagemetadata.camtrap.basic.title'/></title>
+    <title>${t('manage.datapackagemetadata.camtrap.basic.title')}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -521,12 +521,12 @@
                                  aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
                                     <li class="breadcrumb-item">
-                                        <a href="/manage/"><@s.text name="breadcrumb.manage"/></a>
+                                        <a href="/manage/">${t("breadcrumb.manage")}</a>
                                     </li>
                                     <li class="breadcrumb-item">
-                                        <a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a>
+                                        <a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a>
                                     </li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -534,7 +534,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.datapackagemetadata.camtrap.basic.title'/>
+                            ${t('manage.datapackagemetadata.camtrap.basic.title')}<#t>
                         </h1>
                     </div>
 
@@ -549,8 +549,8 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                     </div>
                 </div>
             </div>
@@ -588,9 +588,9 @@
                         </div>
 
                         <div class="my-md-3 p-3">
-                            <#assign removeContributorLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.contributor'/></#assign>
+                            <#assign removeContributorLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.contributor')}</#assign>
                             <#assign removeContributorLink = removeContributorLink?markup_string>
-                            <#assign addContributorLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.contributor'/></#assign>
+                            <#assign addContributorLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.contributor')}</#assign>
                             <#assign addContributorLink = addContributorLink?markup_string>
 
                             <!-- List of Contributors -->
@@ -657,9 +657,9 @@
                         </div>
 
                         <div class="my-md-3 p-3">
-                            <#assign removeLicenseLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.license'/></#assign>
+                            <#assign removeLicenseLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.license')}</#assign>
                             <#assign removeLicenseLink = removeLicenseLink?markup_string>
-                            <#assign addLicenseLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.license'/></#assign>
+                            <#assign addLicenseLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.license')}</#assign>
                             <#assign addLicenseLink = addLicenseLink?markup_string>
 
                             <#assign dataLicenseItemIndex = -1 />
@@ -709,9 +709,9 @@
                         </div>
 
                         <div class="my-md-3 p-3">
-                            <#assign removeSourceLink><@s.text name='manage.metadata.removethis'/> <@s.text name='datapackagemetadata.source'/></#assign>
+                            <#assign removeSourceLink>${t('manage.metadata.removethis')}<#t> ${t('datapackagemetadata.source')}</#assign>
                             <#assign removeSourceLink = removeSourceLink?markup_string>
-                            <#assign addSourceLink><@s.text name='manage.metadata.addnew'/> <@s.text name='datapackagemetadata.source'/></#assign>
+                            <#assign addSourceLink>${t('manage.metadata.addnew')}<#t> ${t('datapackagemetadata.source')}</#assign>
                             <#assign addSourceLink = addSourceLink?markup_string>
 
                             <!-- List of Sources -->

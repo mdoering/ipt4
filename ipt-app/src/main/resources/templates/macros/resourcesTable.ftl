@@ -11,12 +11,12 @@ resourcesTable macro: Generates a data table that has searching, pagination, and
     <script charset="utf-8">
         <#assign emptyString="--">
         <#assign dotDot="..">
-        <#assign visibilityPrivate><@s.text name="manage.home.visible.private"/></#assign>
-        <#assign visibilityPublic><@s.text name="manage.home.visible.public"/></#assign>
-        <#assign visibilityDeleted><@s.text name="manage.home.visible.deleted"/></#assign>
-        <#assign notRegistered><@s.text name="manage.home.not.registered"/></#assign>
-        <#assign unknownOrganisation><@s.text name="manage.home.unknown.organisation"/></#assign>
-        <#assign notPublished><@s.text name="portal.home.not.published"/></#assign>
+        <#assign visibilityPrivate>${t("manage.home.visible.private")}<#t></#assign>
+        <#assign visibilityPublic>${t("manage.home.visible.public")}<#t></#assign>
+        <#assign visibilityDeleted>${t("manage.home.visible.deleted")}<#t></#assign>
+        <#assign notRegistered>${t("manage.home.not.registered")}<#t></#assign>
+        <#assign unknownOrganisation>${t("manage.home.unknown.organisation")}<#t></#assign>
+        <#assign notPublished>${t("portal.home.not.published")}<#t></#assign>
 
         // parse a date in yyyy-mm-dd format
         function parseDate(input) {
@@ -92,31 +92,31 @@ resourcesTable macro: Generates a data table that has searching, pagination, and
                 "iDisplayLength": ${numResourcesShown},
                 "bLengthChange": false,
                 "oLanguage": {
-                    "sEmptyTable": "<@s.text name="${sEmptyTable}"/>",
-                    "sZeroRecords": "<@s.text name="dataTables.sZeroRecords.resources"/>",
-                    "sInfo": "<@s.text name="dataTables.sInfo"/>",
-                    "sInfoEmpty": "<@s.text name="dataTables.sInfoEmpty"/>",
-                    "sInfoFiltered": "<@s.text name="dataTables.sInfoFiltered"/>",
-                    "sSearch": "<@s.text name="manage.mapping.filter"/>:",
+                    "sEmptyTable": "${t(sEmptyTable)}",
+                    "sZeroRecords": "${t("dataTables.sZeroRecords.resources")}",
+                    "sInfo": "${t("dataTables.sInfo")}",
+                    "sInfoEmpty": "${t("dataTables.sInfoEmpty")}",
+                    "sInfoFiltered": "${t("dataTables.sInfoFiltered")}",
+                    "sSearch": "${t("manage.mapping.filter")}:",
                     "oPaginate": {
-                        "sNext": "<@s.text name="pager.next"/>",
-                        "sPrevious": "<@s.text name="pager.previous"/>"
+                        "sNext": "${t("pager.next")}",
+                        "sPrevious": "${t("pager.previous")}"
                     }
                 },
                 "aoColumns": [
-                    {"sTitle": "<@s.text name="portal.home.logo"/>", "bSearchable": false, "bSortable": false, "sClass": "desktop", "bVisible": <#if shownPublicly>true<#else>false</#if>},
-                    {"sTitle": "<@s.text name="manage.home.name"/>", "sClass": "all text-break"},
-                    {"sTitle": "<@s.text name="manage.home.organisation"/>", "sClass": "desktop tablet-l"},
-                    {"sTitle": "<@s.text name="manage.home.type"/>", "sClass": "desktop tablet-l tablet-p"},
-                    {"sTitle": "<@s.text name="manage.home.subtype"/>", "sClass": "desktop"},
-                    {"sTitle": "<@s.text name="portal.home.records"/>", "bSearchable": false, "sType": "number", "sClass": "text-xl-end desktop"},
-                    {"sTitle": "<@s.text name="manage.home.last.modified"/>", "bSearchable": false, "sClass": "text-xl-end desktop"},
-                    {"sTitle": "<@s.text name="manage.home.last.publication" />", "bSearchable": false, orderSequence: ["desc", "asc"], "sClass": "text-xl-end desktop tablet-l tablet-p"},
-                    {"sTitle": "<@s.text name="manage.home.next.publication" />", "bSearchable": false, "sClass": "text-xl-end desktop"},
-                    {"sTitle": "<@s.text name="manage.home.visible"/>", "bSearchable": false, "sClass": "desktop tablet-l", "bVisible": <#if shownPublicly>false<#else>true</#if>},
-                    {"sTitle": "<@s.text name="portal.home.author"/>", "sClass": "desktop tablet-l", "bVisible": <#if shownPublicly>false<#else>true</#if>},
-                    {"sTitle": "<@s.text name="resource.shortname"/>", "bVisible": false},
-                    {"sTitle": "<@s.text name="portal.resource.summary.keywords"/>", "bVisible": false}
+                    {"sTitle": "${t("portal.home.logo")}", "bSearchable": false, "bSortable": false, "sClass": "desktop", "bVisible": <#if shownPublicly>true<#else>false</#if>},
+                    {"sTitle": "${t("manage.home.name")}", "sClass": "all text-break"},
+                    {"sTitle": "${t("manage.home.organisation")}", "sClass": "desktop tablet-l"},
+                    {"sTitle": "${t("manage.home.type")}", "sClass": "desktop tablet-l tablet-p"},
+                    {"sTitle": "${t("manage.home.subtype")}", "sClass": "desktop"},
+                    {"sTitle": "${t("portal.home.records")}", "bSearchable": false, "sType": "number", "sClass": "text-xl-end desktop"},
+                    {"sTitle": "${t("manage.home.last.modified")}", "bSearchable": false, "sClass": "text-xl-end desktop"},
+                    {"sTitle": "${t("manage.home.last.publication")}", "bSearchable": false, orderSequence: ["desc", "asc"], "sClass": "text-xl-end desktop tablet-l tablet-p"},
+                    {"sTitle": "${t("manage.home.next.publication")}", "bSearchable": false, "sClass": "text-xl-end desktop"},
+                    {"sTitle": "${t("manage.home.visible")}", "bSearchable": false, "sClass": "desktop tablet-l", "bVisible": <#if shownPublicly>false<#else>true</#if>},
+                    {"sTitle": "${t("portal.home.author")}", "sClass": "desktop tablet-l", "bVisible": <#if shownPublicly>false<#else>true</#if>},
+                    {"sTitle": "${t("resource.shortname")}", "bVisible": false},
+                    {"sTitle": "${t("portal.resource.summary.keywords")}", "bVisible": false}
                 ],
                 "aaSorting": [[sortParam, orderParam]],
                 "aoColumnDefs": [

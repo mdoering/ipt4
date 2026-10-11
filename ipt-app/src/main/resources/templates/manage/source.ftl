@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name='manage.source.title'/></title>
+<title>${t('manage.source.title')}</title>
 <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
 <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
 <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -7,18 +7,18 @@
 <script>
     $(document).ready(function(){
         $('.confirm').jConfirmAction({
-            titleQuestion: "<@s.text name="basic.confirm"/>",
-            question: "<@s.text name="manage.source.confirmation.message"/>",
-            yesAnswer: "<@s.text name="basic.yes"/>",
-            cancelAnswer: "<@s.text name="basic.no"/>",
+            titleQuestion: "${t("basic.confirm")}",
+            question: "${t("manage.source.confirmation.message")}",
+            yesAnswer: "${t("basic.yes")}",
+            cancelAnswer: "${t("basic.no")}",
             buttonType: "danger",
             baseUrl: "${baseURL}"
         });
         $('#analyze').jConfirmAction({
-            titleQuestion: "<@s.text name="basic.confirm"/>",
-            question: "<@s.text name="manage.source.analyze.confirmation.message"/>",
-            yesAnswer: "<@s.text name="basic.yes"/>",
-            cancelAnswer: "<@s.text name="basic.no"/>",
+            titleQuestion: "${t("basic.confirm")}",
+            question: "${t("manage.source.analyze.confirmation.message")}",
+            yesAnswer: "${t("basic.yes")}",
+            cancelAnswer: "${t("basic.no")}",
             buttonType: "primary",
             processing: true,
             baseUrl: "${baseURL}",
@@ -136,9 +136,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.source"/></li>
+                                    <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.source")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -147,7 +147,7 @@
                             <#if source.name?has_content>
                                 ${source.name}
                             <#else>
-                                <@s.text name='manage.source.title'/>
+                                ${t('manage.source.title')}<#t>
                             </#if>
                         </h5>
 
@@ -157,32 +157,32 @@
 
                         <div class="mt-2">
                             <#if source??>
-                                <@s.submit cssClass="btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                                <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="btn btn-sm btn-outline-gbif-primary top-button"/><#t>
 
                                 <div class="btn-group btn-group-sm" role="group">
                                     <button id="btnGroupDelete" type="button" class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <@s.text name="button.options"/>
+                                        ${t("button.options")}<#t>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="btnGroupDelete" style="">
                                       <li>
-                                          <@s.submit cssClass="btn btn-sm btn-outline-gbif-primary w-100 dropdown-button" name="analyze" key="button.analyze"/>
+                                          <input type="submit" value="${t("button.analyze")?markup_string}" id="analyze" name="analyze" class="btn btn-sm btn-outline-gbif-primary w-100 dropdown-button"/><#t>
                                       </li>
                                       <li>
                                         <a id="peekBtn" href="#" class="btn btn-sm btn-outline-gbif-primary w-100 dropdown-button">
-                                            <@s.text name="button.preview"/>
+                                            ${t("button.preview")}<#t>
                                         </a>
                                       </li>
                                         <#if id?has_content>
                                       <li>
-                                          <@s.submit cssClass="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" name="deleteFlag" key="button.delete"/>
+                                          <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button"/><#t>
                                       </li>
                                         </#if>
                                     </ul>
                                 </div>
 
-                                <@s.submit cssClass="btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.cancel"/>
+                                <input type="submit" value="${t("button.cancel")?markup_string}" id="cancel" name="cancel" class="btn btn-sm btn-outline-secondary top-button"/><#t>
                             <#else>
-                                <@s.submit cssClass="btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                                <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="btn btn-sm btn-outline-secondary top-button"/><#t>
                             </#if>
                         </div>
                     </div>
@@ -202,32 +202,32 @@
                                 <div class="table-responsive">
                                     <table id="source-properties" class="table table-sm text-smaller">
                                         <tr>
-                                            <th class="col-lg-2 col-md-3"><@s.text name="manage.overview.source.sourceType"/></th>
+                                            <th class="col-lg-2 col-md-3">${t("manage.overview.source.sourceType")}</th>
                                             <td>
                                                 <#if source.sourceType == 'EXCEL_FILE'>
-                                                    <@s.text name="manage.overview.source.excel"/>
+                                                    ${t("manage.overview.source.excel")}<#t>
                                                 <#elseif source.sourceType == 'TEXT_FILE'>
-                                                    <@s.text name="manage.overview.source.file"/>
+                                                    ${t("manage.overview.source.file")}<#t>
                                                 <#elseif source.sourceType == 'URL'>
-                                                    <@s.text name="manage.overview.source.url"/>
+                                                    ${t("manage.overview.source.url")}<#t>
                                                 <#elseif source.sourceType == 'SQL'>
-                                                    <@s.text name="manage.overview.source.sql"/>
+                                                    ${t("manage.overview.source.sql")}<#t>
                                                 </#if>
                                           </td>
                                         </tr>
 
                                         <tr>
-                                            <th class="col-lg-2 col-md-3"><@s.text name='manage.source.readable'/></th>
+                                            <th class="col-lg-2 col-md-3">${t('manage.source.readable')}</th>
                                             <td>
                                                 <div>
                                                     <#if source.processing>
-                                                        <span class="text-gbif-primary"><@s.text name="manage.source.processing.info"/></span>
+                                                        <span class="text-gbif-primary">${t("manage.source.processing.info")}</span>
                                                     <#elseif source.readable>
                                                         <i class="bi bi-circle-fill text-gbif-primary"></i>
-                                                        <span class="text-gbif-primary"><@s.text name="basic.yes"/></span>
+                                                        <span class="text-gbif-primary">${t("basic.yes")}</span>
                                                     <#else>
                                                         <i class="bi bi-circle-fill text-gbif-danger"></i>
-                                                        <span class="text-gbif-danger"><@s.text name="basic.no"/></span>
+                                                        <span class="text-gbif-danger">${t("basic.no")}</span>
                                                     </#if>
                                                 </div>
                                             </td>
@@ -235,20 +235,20 @@
 
                                         <#if source.sourceType == 'URL'>
                                             <tr>
-                                                <th><@s.text name='manage.source.url'/></th>
+                                                <th>${t('manage.source.url')}</th>
                                                 <td><a href="${(source.url)!}">${(source.url)!}</a></td>
                                             </tr>
                                             <#if source.readable>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.columns'/></th>
+                                                    <th>${t('manage.source.columns')}</th>
                                                     <td>${source.getColumns()}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.rows'/></th>
+                                                    <th>${t('manage.source.rows')}</th>
                                                     <td>${source.rows!"-"}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.size'/></th>
+                                                    <th>${t('manage.source.size')}</th>
                                                     <td>
                                                         <#attempt>
                                                             <@source.formattedFileSize(currentLocale)?interpret />
@@ -260,31 +260,31 @@
                                             </#if>
                                             <#if source.lastModified?has_content>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.modified'/></th>
+                                                    <th>${t('manage.source.modified')}</th>
                                                     <td>${(source.lastModified?datetime?string.long_medium)!}</td>
                                                 </tr>
                                             </#if>
                                             <#if (logExists)>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.source.log'/></th>
-                                                    <td><a href="${baseURL}/sourcelog.do?r=${resource.shortname}&s=${source.name}"><@s.text name='manage.source.view'/></a></td>
+                                                    <th>${t('manage.source.source.log')}</th>
+                                                    <td><a href="${baseURL}/sourcelog.do?r=${resource.shortname}&s=${source.name}">${t('manage.source.view')}</a></td>
                                                 </tr>
                                             </#if>
                                         <#elseif source.sourceType == 'TEXT_FILE' || source.sourceType == 'EXCEL_FILE'>
                                             <tr>
-                                                <th><@s.text name='manage.source.file'/></th>
+                                                <th>${t('manage.source.file')}</th>
                                                 <td>${(source.file.getAbsolutePath())!}</td>
                                             </tr>
                                             <tr>
-                                                <th><@s.text name='manage.source.columns'/></th>
+                                                <th>${t('manage.source.columns')}</th>
                                                 <td>${source.getColumns()}</td>
                                             </tr>
                                             <tr>
-                                                <th><@s.text name='manage.source.rows'/></th>
+                                                <th>${t('manage.source.rows')}</th>
                                                 <td>${source.rows!"-"}</td>
                                             </tr>
                                             <tr>
-                                                <th><@s.text name='manage.source.size'/></th>
+                                                <th>${t('manage.source.size')}</th>
                                                 <td>
                                                     <#attempt>
                                                         <@source.formattedFileSize(currentLocale)?interpret />
@@ -294,13 +294,13 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <th><@s.text name='manage.source.modified'/></th>
+                                                <th>${t('manage.source.modified')}</th>
                                                 <td>${(source.lastModified?datetime?string.long_medium)!}</td>
                                             </tr>
                                             <#if (logExists)>
                                                 <tr>
-                                                    <th><@s.text name='manage.source.source.log'/></th>
-                                                    <td><a href="${baseURL}/sourcelog.do?r=${resource.shortname}&s=${source.name}"><@s.text name='manage.source.view'/></a></td>
+                                                    <th>${t('manage.source.source.log')}</th>
+                                                    <td><a href="${baseURL}/sourcelog.do?r=${resource.shortname}&s=${source.name}">${t('manage.source.view')}</a></td>
                                                 </tr>
                                             </#if>
                                         </#if>
@@ -358,7 +358,7 @@
                                     <@text name="sqlSource.sql" value=sqlSource.sql! help="i18n"/>
                                     <#if sqlSource.sql?has_content>
                                         <div class="mt-3">
-                                            <a id="generatedSqlLink" href=""><@s.text name="sqlSource.sqlLimited"/></a>
+                                            <a id="generatedSqlLink" href="">${t("sqlSource.sqlLimited")}</a>
                                         </div>
                                         <div id="generatedSqlBlock" class="px-1 mt-2 text-smaller" style="display: none;">
                                             <pre>${sqlSource.getSqlLimited(10)!}</pre>

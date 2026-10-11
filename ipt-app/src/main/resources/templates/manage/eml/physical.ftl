@@ -1,7 +1,7 @@
     <#setting number_format="#####.##">
     <#include "/inc/header.ftl">
     <link rel="stylesheet" href="${baseURL}/styles/smaller-inputs.css">
-    <title><@s.text name='manage.metadata.physical.title'/></title>
+    <title>${t('manage.metadata.physical.title')}</title>
     <script>
         $(document).ready(function () {
             $('#metadata-section').change(function () {
@@ -85,16 +85,16 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.metadata.physical.title'/>
+                            ${t('manage.metadata.physical.title')}<#t>
                         </h1>
                     </div>
 
@@ -103,9 +103,9 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save" />
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </button>
                     </div>
                 </div>
@@ -124,7 +124,7 @@
                     <div class="bd-content">
                         <div class="my-md-3 p-3">
                             <p class="mb-0">
-                                <@s.text name='manage.metadata.physical.intro'/>
+                                ${t('manage.metadata.physical.intro')}<#t>
                             </p>
 
                             <div class="mt-2">
@@ -147,7 +147,7 @@
                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                         </svg>
                                                     </span>
-                                                    <span><@s.text name='manage.metadata.removethis'/> <@s.text name='manage.metadata.physical.item'/></span>
+                                                    <span>${t('manage.metadata.removethis')} ${t('manage.metadata.physical.item')}</span>
                                                 </a>
                                             </div>
                                             <div class="col-lg-6">
@@ -176,7 +176,7 @@
                                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name='manage.metadata.addnew'/> <@s.text name='manage.metadata.physical.item'/></span>
+                                        <span>${t('manage.metadata.addnew')} ${t('manage.metadata.physical.item')}</span>
                                     </a>
                                 </div>
                             </div>
@@ -192,7 +192,7 @@
                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name='manage.metadata.removethis'/> <@s.text name='manage.metadata.physical.item'/></span>
+                                        <span>${t('manage.metadata.removethis')} ${t('manage.metadata.physical.item')}</span>
                                     </a>
                                 </div>
                                 <div class="col-lg-6">

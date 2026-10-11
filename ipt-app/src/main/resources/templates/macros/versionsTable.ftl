@@ -20,7 +20,7 @@ versionsTable macro: Generates a data table that has pagination.
             [<#if (version?? && v.version == version.toPlainString()) || (!version?? && v.version == resource.emlVersion.toPlainString())>'<img class="latestVersion" src="${baseURL}/images/dataTables/forward_enabled_hover.png"/>${v.version!}'<#else>'<img class="latestVersionHidden" src="${baseURL}/images/dataTables/forward_enabled_hover.png"/><a href="${baseURL}/resource?r=${shortname}&amp;v=${v.version!}">${v.version!}</a>'</#if>,
                 '${(v.released?date?string("yyyy-MM-dd HH:mm:ss"))!""}',
                 '${v.recordsPublished}',
-                <#if v.changeSummary?has_content>"${v.changeSummary?replace("\'", "\\'")?replace("\"", '\\"')?replace("[\r\n]+", "<br>",'r')}&nbsp;<#if managerRights && !isPreviewPage><a href='${baseURL}/manage/history.do?r=${resource.shortname}&v=${v.version}'><@s.text name='button.edit'/></a></#if>"<#else>"<@s.text name="publishing.changeSummary.default"/>&nbsp;<#if managerRights && !isPreviewPage><a href='${baseURL}/manage/history.do?r=${resource.shortname}&v=${v.version}'><@s.text name='button.edit'/></a></#if>"</#if>,
+                <#if v.changeSummary?has_content>"${v.changeSummary?replace("\'", "\\'")?replace("\"", '\\"')?replace("[\r\n]+", "<br>",'r')}&nbsp;<#if managerRights && !isPreviewPage><a href='${baseURL}/manage/history.do?r=${resource.shortname}&v=${v.version}'>${t('button.edit')}</a></#if>"<#else>"${t("publishing.changeSummary.default")}&nbsp;<#if managerRights && !isPreviewPage><a href='${baseURL}/manage/history.do?r=${resource.shortname}&v=${v.version}'>${t('button.edit')}</a></#if>"</#if>,
                 <#if v.doi?? && v.status=="PUBLIC">'${v.doi!}'<#else>''</#if>,
                 <#if v.modifiedBy??>'${v.modifiedBy.firstname?replace("\'", "\\'")?replace("\"", '\\"')!} ${v.modifiedBy.lastname?replace("\'", "\\'")?replace("\"", '\\"')!}'<#else>""</#if>]<#if v_has_next>,</#if>
             </#if>
@@ -37,24 +37,24 @@ versionsTable macro: Generates a data table that has pagination.
                 "bAutoWidth": false,
                 "bSort": false,
                 "oLanguage": {
-                    "sEmptyTable": "<@s.text name="${sEmptyTable}"/>",
-                    "sZeroRecords": "<@s.text name="dataTables.sZeroRecords.versions"/>",
-                    "sInfo": "<@s.text name="dataTables.sInfo"/>",
-                    "sInfoEmpty": "<@s.text name="dataTables.sInfoEmpty"/>",
-                    "sInfoFiltered": "<@s.text name="dataTables.sInfoFiltered"/>",
+                    "sEmptyTable": "${t(sEmptyTable)}",
+                    "sZeroRecords": "${t("dataTables.sZeroRecords.versions")}",
+                    "sInfo": "${t("dataTables.sInfo")}",
+                    "sInfoEmpty": "${t("dataTables.sInfoEmpty")}",
+                    "sInfoFiltered": "${t("dataTables.sInfoFiltered")}",
                     "oPaginate": {
-                        "sNext": "<@s.text name="pager.next"/>",
-                        "sPrevious": "<@s.text name="pager.previous"/>"
+                        "sNext": "${t("pager.next")}",
+                        "sPrevious": "${t("pager.previous")}"
 
                     }
                 },
                 "aoColumns": [
-                    { "sTitle": "<@s.text name="manage.overview.published.version"/>", "bSearchable": false},
-                    { "sTitle": "<@s.text name="manage.overview.published.released"/>", "bSearchable": false},
-                    { "sTitle": "<@s.text name="portal.home.records"/>", "bSearchable": false},
-                    { "sTitle": "<@s.text name="portal.home.summary"/>", "bSearchable": false},
-                    { "sTitle": "<@s.text name="portal.home.doi"/>", "bSearchable": false},
-                    { "sTitle": "<@s.text name="portal.home.modifiedBy"/>", "bSearchable": false}
+                    { "sTitle": "${t("manage.overview.published.version")}", "bSearchable": false},
+                    { "sTitle": "${t("manage.overview.published.released")}", "bSearchable": false},
+                    { "sTitle": "${t("portal.home.records")}", "bSearchable": false},
+                    { "sTitle": "${t("portal.home.summary")}", "bSearchable": false},
+                    { "sTitle": "${t("portal.home.doi")}", "bSearchable": false},
+                    { "sTitle": "${t("portal.home.modifiedBy")}", "bSearchable": false}
                 ],
                 "aoColumnDefs": [
                     { 'bSortable': false, 'aTargets': [ 0,1,2,3,4,5] }

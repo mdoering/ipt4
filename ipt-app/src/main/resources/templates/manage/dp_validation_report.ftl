@@ -1,7 +1,7 @@
 <#setting url_escaping_charset="UTF-8">
 
 <#include "/inc/header.ftl">
-<title><@s.text name="manage.validation.data.title"/></title>
+<title>${t("manage.validation.data.title")}</title>
 <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
 <style>
@@ -95,8 +95,8 @@
             <div class="text-center fs-smaller">
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                        <li class="breadcrumb-item"><a href="${baseURL}/manage/resource?r=${shortname!}"><@s.text name="breadcrumb.manage.overview"/></a></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                        <li class="breadcrumb-item"><a href="${baseURL}/manage/resource?r=${shortname!}">${t("breadcrumb.manage.overview")}</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Validation report</li>
                     </ol>
                 </nav>
@@ -104,7 +104,7 @@
 
             <div class="text-center mt-1">
                 <h1 class="rtitle pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name="manage.validation.title"/>
+                    ${t("manage.validation.title")}<#t>
                 </h1>
 
                 <div class="text-smaller">
@@ -129,10 +129,10 @@
                 <table class="table table-sm table-hover align-middle mb-0">
                     <thead>
                     <tr>
-                        <th style="width: 100px;"><@s.text name="manage.validation.severity"/></th>
-                        <th style="width: 220px;"><@s.text name="manage.validation.type"/></th>
-                        <th><@s.text name="manage.validation.message"/></th>
-                        <th><@s.text name="manage.validation.location"/></th>
+                        <th style="width: 100px;">${t("manage.validation.severity")}</th>
+                        <th style="width: 220px;">${t("manage.validation.type")}</th>
+                        <th>${t("manage.validation.message")}</th>
+                        <th>${t("manage.validation.location")}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -156,22 +156,22 @@
             <#assign dvErrorCount = 0>
             <#list dv.issues as issue><#if issue.severity == 'ERROR'><#assign dvErrorCount = dvErrorCount + 1></#if></#list>
 
-            <h5 class="py-2 mb-3 text-gbif-header fw-400"><@s.text name="manage.validation.descriptor.title"/></h5>
+            <h5 class="py-2 mb-3 text-gbif-header fw-400">${t("manage.validation.descriptor.title")}</h5>
 
             <#if dvIssueCount == 0>
                 <div class="alert alert-success alert-dismissible fade show d-flex mb-4" role="alert">
                     <div class="me-3"><i class="bi bi-check2-circle alert-green-2 fs-bigger-2 me-2"></i></div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.descriptor.allClean"/></span>
+                        <span>${t("manage.validation.descriptor.allClean")}</span>
                     </div>
                 </div>
             <#else>
                 <div class="alert <#if dvErrorCount gt 0>alert-danger<#else>alert-warning</#if> alert-dismissible fade show d-flex mb-3" role="alert">
                     <div class="me-3"><i class="bi bi-exclamation-circle <#if dvErrorCount gt 0>alert-red-2</#if> fs-bigger-2 me-2"></i></div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.descriptor.someIssues"><@s.param>${dvIssueCount}</@s.param></@s.text></span>
+                        <span>${t("manage.validation.descriptor.someIssues", dvIssueCount)}</span>
                         <#if !dv.canProceedToDataAnalysis>
-                            <br/><strong><@s.text name="manage.validation.descriptor.blocking"/></strong>
+                            <br/><strong>${t("manage.validation.descriptor.blocking")}</strong>
                         </#if>
                     </div>
                 </div>
@@ -181,8 +181,8 @@
                         <h2 class="accordion-header" id="heading-descriptor-issues">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#descriptor-issues" aria-expanded="false" aria-controls="descriptor-issues">
-                                <span class="me-2 fw-500"><@s.text name="manage.validation.descriptor.issuesHeading"/></span>
-                                <span class="badge rounded-pill <#if dvErrorCount gt 0>text-bg-danger<#else>text-bg-warning</#if>"><@s.text name="manage.validation.issuesLower"><@s.param>${dvIssueCount}</@s.param></@s.text></span>
+                                <span class="me-2 fw-500">${t("manage.validation.descriptor.issuesHeading")}</span>
+                                <span class="badge rounded-pill <#if dvErrorCount gt 0>text-bg-danger<#else>text-bg-warning</#if>">${t("manage.validation.issuesLower", dvIssueCount)}</span>
                             </button>
                         </h2>
                         <div id="descriptor-issues" class="accordion-collapse collapse" aria-labelledby="heading-descriptor-issues" data-bs-parent="#descriptorAccordion">
@@ -202,27 +202,27 @@
             <#assign evErrorCount = 0>
             <#list ev.issues as issue><#if issue.severity == 'ERROR'><#assign evErrorCount = evErrorCount + 1></#if></#list>
 
-            <h5 class="py-2 mb-3 text-gbif-header fw-400"><@s.text name="manage.validation.eml.title"/></h5>
+            <h5 class="py-2 mb-3 text-gbif-header fw-400">${t("manage.validation.eml.title")}</h5>
 
             <#if !ev.emlPresent>
                 <div class="alert alert-secondary alert-dismissible fade show d-flex mb-4" role="alert">
                     <div class="me-3"><i class="bi bi-info-circle fs-bigger-2 me-2"></i></div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.eml.notPresent"/></span>
+                        <span>${t("manage.validation.eml.notPresent")}</span>
                     </div>
                 </div>
             <#elseif evIssueCount == 0>
                 <div class="alert alert-success alert-dismissible fade show d-flex mb-4" role="alert">
                     <div class="me-3"><i class="bi bi-check2-circle alert-green-2 fs-bigger-2 me-2"></i></div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.eml.allClean"/></span>
+                        <span>${t("manage.validation.eml.allClean")}</span>
                     </div>
                 </div>
             <#else>
                 <div class="alert <#if evErrorCount gt 0>alert-danger<#else>alert-warning</#if> alert-dismissible fade show d-flex mb-3" role="alert">
                     <div class="me-3"><i class="bi bi-exclamation-circle <#if evErrorCount gt 0>alert-red-2</#if> fs-bigger-2 me-2"></i></div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.eml.someIssues"><@s.param>${evIssueCount}</@s.param></@s.text></span>
+                        <span>${t("manage.validation.eml.someIssues", evIssueCount)}</span>
                     </div>
                 </div>
 
@@ -231,8 +231,8 @@
                         <h2 class="accordion-header" id="heading-eml-issues">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#eml-issues" aria-expanded="false" aria-controls="eml-issues">
-                                <span class="me-2 fw-500"><@s.text name="manage.validation.eml.issuesHeading"/></span>
-                                <span class="badge rounded-pill <#if evErrorCount gt 0>text-bg-danger<#else>text-bg-warning</#if>"><@s.text name="manage.validation.issuesLower"><@s.param>${evIssueCount}</@s.param></@s.text></span>
+                                <span class="me-2 fw-500">${t("manage.validation.eml.issuesHeading")}</span>
+                                <span class="badge rounded-pill <#if evErrorCount gt 0>text-bg-danger<#else>text-bg-warning</#if>">${t("manage.validation.issuesLower", evIssueCount)}</span>
                             </button>
                         </h2>
                         <div id="eml-issues" class="accordion-collapse collapse" aria-labelledby="heading-eml-issues" data-bs-parent="#emlAccordion">
@@ -246,14 +246,14 @@
         </#if>
 
         <#if validationReport.result.resourceAnalysisResults?has_content>
-            <h5 class="py-2 mb-3 text-gbif-header fw-400"><@s.text name="manage.validation.data.title"/></h5>
+            <h5 class="py-2 mb-3 text-gbif-header fw-400">${t("manage.validation.data.title")}</h5>
             <#assign totalTables = validationReport.result.resourceAnalysisResults?size>
             <#assign totalRowsAllTables = 0>
             <#assign totalIssues = 0>
             <#assign tablesWithIssues = 0>
-            <#list validationReport.result.resourceAnalysisResults as t>
-                <#assign totalRowsAllTables = totalRowsAllTables + t.totalRows>
-                <#assign tableIssueCount = t.foreignKeyViolations?size + t.dataTypeViolations?size + (t.primaryKeyViolation??)?then(1, 0)>
+            <#list validationReport.result.resourceAnalysisResults as table>
+                <#assign totalRowsAllTables = totalRowsAllTables + table.totalRows>
+                <#assign tableIssueCount = table.foreignKeyViolations?size + table.dataTypeViolations?size + (table.primaryKeyViolation??)?then(1, 0)>
                 <#assign totalIssues = totalIssues + tableIssueCount>
                 <#if tableIssueCount gt 0><#assign tablesWithIssues = tablesWithIssues + 1></#if>
             </#list>
@@ -263,7 +263,7 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="small text-muted text-uppercase"><@s.text name="manage.validation.tables"/></div>
+                            <div class="small text-muted text-uppercase">${t("manage.validation.tables")}</div>
                             <div class="fs-3 fw-500">${totalTables}</div>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="small text-muted text-uppercase"><@s.text name="manage.validation.rows"/></div>
+                            <div class="small text-muted text-uppercase">${t("manage.validation.rows")}</div>
                             <div class="fs-3 fw-500">${totalRowsAllTables?string.number}</div>
                         </div>
                     </div>
@@ -279,7 +279,7 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="small text-muted text-uppercase"><@s.text name="manage.validation.tablesClean"/></div>
+                            <div class="small text-muted text-uppercase">${t("manage.validation.tablesClean")}</div>
                             <div class="fs-3 fw-500 <#if tablesWithIssues == 0>text-gbif-primary<#else>text-gbif-danger</#if>">
                                 ${totalTables - tablesWithIssues} / ${totalTables}
                             </div>
@@ -289,7 +289,7 @@
                 <div class="col">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="small text-muted text-uppercase"><@s.text name="manage.validation.issues"/></div>
+                            <div class="small text-muted text-uppercase">${t("manage.validation.issues")}</div>
                             <div class="fs-3 fw-500 <#if totalIssues == 0>text-gbif-primary<#else>text-gbif-danger</#if>">
                                 ${totalIssues}
                             </div>
@@ -304,7 +304,7 @@
                         <i class="bi bi-check2-circle alert-green-2 fs-bigger-2 me-2"></i>
                     </div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.allClean"/></span>
+                        <span>${t("manage.validation.allClean")}</span>
                     </div>
                 </div>
             <#else>
@@ -313,27 +313,27 @@
                         <i class="bi bi-exclamation-circle alert-red-2 fs-bigger-2 me-2"></i>
                     </div>
                     <div class="overflow-x-hidden pt-1">
-                        <span><@s.text name="manage.validation.someIssues"><@s.param>${totalIssues}</@s.param><@s.param>${tablesWithIssues}</@s.param></@s.text></span>
+                        <span>${t("manage.validation.someIssues", totalIssues, tablesWithIssues)}</span>
                     </div>
                 </div>
             </#if>
 
             <#-- per table accordion-->
             <div class="accordion" id="validationAccordion">
-                <#list validationReport.result.resourceAnalysisResults as t>
-                    <#assign tableIssueCount = t.foreignKeyViolations?size + t.dataTypeViolations?size + (t.primaryKeyViolation??)?then(1, 0)>
-                    <#assign panelId = "table-" + t.name?replace("[^a-zA-Z0-9]", "-", "r")>
+                <#list validationReport.result.resourceAnalysisResults as table>
+                    <#assign tableIssueCount = table.foreignKeyViolations?size + table.dataTypeViolations?size + (table.primaryKeyViolation??)?then(1, 0)>
+                    <#assign panelId = "table-" + table.name?replace("[^a-zA-Z0-9]", "-", "r")>
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading-${panelId}">
                             <button class="accordion-button <#if tableIssueCount == 0>collapsed</#if>" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#${panelId}"
                                     aria-expanded="<#if tableIssueCount gt 0>true<#else>false</#if>" aria-controls="${panelId}">
-                                <span class="me-2 fw-500">${t.name}</span>
-                                <span class="small text-muted me-3"><@s.text name="manage.validation.rowsLower"><@s.param>${t.totalRows?string.number}</@s.param></@s.text></span>
+                                <span class="me-2 fw-500">${table.name}</span>
+                                <span class="small text-muted me-3">${t("manage.validation.rowsLower", table.totalRows?string.number)}</span>
                                 <#if tableIssueCount == 0>
-                                    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check2-circle"></i> <@s.text name="manage.validation.ok"/></span>
+                                    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check2-circle"></i> ${t("manage.validation.ok")}</span>
                                 <#else>
-                                    <span class="badge rounded-pill text-bg-danger"><@s.text name="manage.validation.issuesLower"><@s.param>${tableIssueCount}</@s.param></@s.text></span>
+                                    <span class="badge rounded-pill text-bg-danger">${t("manage.validation.issuesLower", tableIssueCount)}</span>
                                 </#if>
                             </button>
                         </h2>
@@ -342,15 +342,15 @@
                             <div class="accordion-body">
 
                                 <#-- integrity violations -->
-                                <#if t.primaryKeyViolation??>
-                                    <#assign pk = t.primaryKeyViolation>
+                                <#if table.primaryKeyViolation??>
+                                    <#assign pk = table.primaryKeyViolation>
                                     <div class="mb-3">
                                         <div class="alert alert-danger d-flex" role="alert">
                                             <div class="me-3">
                                                 <i class="bi bi-exclamation-circle alert-red-2 fs-bigger-2 me-2"></i>
                                             </div>
                                             <div class="overflow-x-hidden pt-1">
-                                                <span><@s.text name="manage.validation.pkViolation"/></span>
+                                                <span>${t("manage.validation.pkViolation")}</span>
                                             </div>
                                         </div>
 
@@ -358,9 +358,9 @@
                                             <table class="table table-sm table-hover align-middle mb-0">
                                                 <thead>
                                                 <tr>
-                                                    <th><@s.text name="manage.validation.pk.fields">Field(s)</@s.text></th>
-                                                    <th class="text-end" style="width: 90px;"><@s.text name="manage.validation.pk.count">Violations</@s.text></th>
-                                                    <th><@s.text name="manage.validation.pk.sample">Sample values</@s.text></th>
+                                                    <th>${t("manage.validation.pk.fields")}</th>
+                                                    <th class="text-end" style="width: 90px;">${t("manage.validation.pk.count")}</th>
+                                                    <th>${t("manage.validation.pk.sample")}</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -380,14 +380,14 @@
                                         </div>
                                     </div>
                                 </#if>
-                                <#if t.foreignKeyViolations?has_content>
+                                <#if table.foreignKeyViolations?has_content>
                                     <div class="mb-3">
                                         <div class="alert alert-danger d-flex" role="alert">
                                             <div class="me-3">
                                                 <i class="bi bi-exclamation-circle alert-red-2 fs-bigger-2 me-2"></i>
                                             </div>
                                             <div class="overflow-x-hidden pt-1">
-                                                <span><@s.text name="manage.validation.fkViolations"/></span>
+                                                <span>${t("manage.validation.fkViolations")}</span>
                                             </div>
                                         </div>
 
@@ -395,14 +395,14 @@
                                             <table class="table table-sm table-hover align-middle mb-0">
                                                 <thead>
                                                 <tr>
-                                                    <th><@s.text name="manage.validation.fk.fields"/></th>
-                                                    <th><@s.text name="manage.validation.fk.reference"/></th>
-                                                    <th class="text-end" style="width: 90px;"><@s.text name="manage.validation.fk.count"/></th>
-                                                    <th><@s.text name="manage.validation.fk.sample"/></th>
+                                                    <th>${t("manage.validation.fk.fields")}</th>
+                                                    <th>${t("manage.validation.fk.reference")}</th>
+                                                    <th class="text-end" style="width: 90px;">${t("manage.validation.fk.count")}</th>
+                                                    <th>${t("manage.validation.fk.sample")}</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <#list t.foreignKeyViolations as fk>
+                                                <#list table.foreignKeyViolations as fk>
                                                     <tr>
                                                         <td><code><#list fk.fields as f>${f}<#sep>, </#sep></#list></code></td>
                                                         <td>
@@ -423,11 +423,11 @@
                                         </div>
                                     </div>
                                 </#if>
-                                <#if t.dataTypeViolations?has_content>
+                                <#if table.dataTypeViolations?has_content>
                                     <div class="alert alert-danger py-2 mb-2">
-                                        <strong><@s.text name="manage.validation.typeViolations"/>:</strong>
+                                        <strong>${t("manage.validation.typeViolations")}:</strong>
                                         <ul class="mb-0">
-                                            <#list t.dataTypeViolations as dt>
+                                            <#list table.dataTypeViolations as dt>
                                                 <li>${dt}</li>
                                             </#list>
                                         </ul>
@@ -439,15 +439,15 @@
                                     <table class="table table-sm table-hover align-middle mb-0">
                                         <thead>
                                         <tr>
-                                            <th><@s.text name="manage.validation.column"/></th>
-                                            <th style="width: 30%;"><@s.text name="manage.validation.completeness"/></th>
-                                            <th class="text-end"><@s.text name="manage.validation.unique"/></th>
-                                            <th class="text-end"><@s.text name="manage.validation.note"/></th>
+                                            <th>${t("manage.validation.column")}</th>
+                                            <th style="width: 30%;">${t("manage.validation.completeness")}</th>
+                                            <th class="text-end">${t("manage.validation.unique")}</th>
+                                            <th class="text-end">${t("manage.validation.note")}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <#list t.columnAnalyses as col>
-                                            <#assign pct = (t.totalRows gt 0)?then((col.populatedValues / t.totalRows * 100)?round, 0)>
+                                        <#list table.columnAnalyses as col>
+                                            <#assign pct = (table.totalRows gt 0)?then((col.populatedValues / table.totalRows * 100)?round, 0)>
                                             <tr>
                                                 <td><code>${col.name}</code></td>
                                                 <td>

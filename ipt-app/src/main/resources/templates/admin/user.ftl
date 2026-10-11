@@ -7,7 +7,7 @@
     </#if>
 
     <#include "/inc/header.ftl">
-    <title><#if editUserPage><@s.text name="admin.user.title.edit"/><#else><@s.text name="admin.user.title.new"/></#if></title>
+    <title><#if editUserPage>${t("admin.user.title.edit")}<#else>${t("admin.user.title.new")}</#if></title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -17,19 +17,19 @@
     <script>
         $(document).ready(function(){
             $('.userConfirmDeletion').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                question: "<@s.text name="admin.user.delete.confirmation.message"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                question: "${t("admin.user.delete.confirmation.message")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
 
             $('.confirmPasswordReset').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                question: "<@s.text name="admin.user.resetPassword.confirmation.message"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                question: "${t("admin.user.resetPassword.confirmation.message")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
@@ -62,9 +62,9 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/users.do"><@s.text name="breadcrumb.admin.users"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.admin.users.user"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/users.do">${t("breadcrumb.admin.users")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.admin.users.user")}</li>
                         </ol>
                     </nav>
                 </div>
@@ -74,7 +74,7 @@
                         <#if editUserPage>
                             ${user.firstname!} ${user.lastname!}
                         <#else>
-                            <@s.text name="admin.user.title.new"/>
+                            ${t("admin.user.title.new")}<#t>
                         </#if>
                     </h1>
 
@@ -85,23 +85,23 @@
                     </#if>
 
                     <div class="mt-2">
-                        <@s.submit tabindex=7 cssClass="button btn btn-sm btn-outline-gbif-primary top-button" form="newuser" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" tabindex="${7}" form="newuser"/><#t>
                         <#if editUserPage>
                             <div class="btn-group btn-group-sm" role="group">
                                 <button id="btnGroup" tabindex=8 type="button" class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <@s.text name="button.options"/>
+                                    ${t("button.options")}<#t>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="btnGroup" style="">
                                     <li>
-                                        <@s.submit cssClass="confirmPasswordReset button btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="newuser" name="resetPassword" key="button.resetPassword" />
+                                        <input type="submit" value="${t("button.resetPassword")?markup_string}" id="resetPassword" name="resetPassword" class="confirmPasswordReset button btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="newuser"/><#t>
                                     </li>
                                     <li>
-                                        <@s.submit cssClass="userConfirmDeletion btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="newuser" name="deleteFlag" key="button.delete"/>
+                                        <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="userConfirmDeletion btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="newuser"/><#t>
                                     </li>
                                 </ul>
                             </div>
                         </#if>
-                        <@s.submit tabindex=9 cssClass="button btn btn-sm btn-outline-secondary top-button" form="newuser" name="cancel" key="button.cancel"/>
+                        <input type="submit" value="${t("button.cancel")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button" tabindex="${9}" form="newuser"/><#t>
                     </div>
                 </div>
             </div>
@@ -111,17 +111,17 @@
     <main class="container main-content-container">
         <div class="my-3 p-3">
             <p>
-                <@s.text name="admin.user.intro"/>
+                ${t("admin.user.intro")}<#t>
             </p>
             <p>
-                <@s.text name="admin.user.intro2"/>
+                ${t("admin.user.intro2")}<#t>
             </p>
 
             <form id="newuser" class="needs-validation" action="user.do" method="post">
 <@csrfField/>
                 <div class="row g-3 mt-2">
                     <#if editUserPage>
-                        <@s.hidden name="id" value="${(user.email)!}" required="true"/>
+                        <input type="hidden" name="id" value="${(user.email)!}" id="id"/><#t>
                     </#if>
 
                     <div class="col-md-6">

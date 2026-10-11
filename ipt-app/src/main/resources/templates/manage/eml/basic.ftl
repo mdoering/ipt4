@@ -2,7 +2,7 @@
     <#include "/inc/header.ftl">
     <#include "/macros/metadata.ftl"/>
     <#include "/macros/user_id_directories.ftl"/>
-    <title><@s.text name='manage.metadata.basic.title'/></title>
+    <title>${t('manage.metadata.basic.title')}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <script src="${baseURL}/js/docbook/docbook-v2.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
@@ -326,9 +326,9 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                             </ol>
                         </nav>
                     </div>
@@ -336,7 +336,7 @@
 
                 <div class="text-center">
                     <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                        <@s.text name='manage.metadata.basic.title'/>
+                        ${t('manage.metadata.basic.title')}<#t>
                     </h1>
                 </div>
 
@@ -351,9 +351,9 @@
                 </div>
 
                 <div class="text-center mt-2">
-                    <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                    <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                     <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                        <@s.text name="button.back"/>
+                        ${t("button.back")}<#t>
                     </button>
 
                 </div>
@@ -374,7 +374,7 @@
 
                     <div class="my-md-3 p-3">
 
-                        <p><@s.text name="manage.metadata.basic.required.message" /></p>
+                        <p>${t("manage.metadata.basic.required.message")}</p>
 
                         <div class="row g-3">
                             <div class="col-12">
@@ -391,9 +391,9 @@
 
                     <div class="my-0 px-3 py-0">
                         <div class="callout callout-info text-smaller">
-                            <@s.text name="manage.metadata.basic.organisation.moved"/>
+                            ${t("manage.metadata.basic.organisation.moved")}<#t>
                             <a href="${baseURL}/manage/publication-settings.do?r=${resource.shortname}" target="_blank">
-                                <@s.text name="manage.publicationSettings.title"/>
+                                ${t("manage.publicationSettings.title")}<#t>
                             </a>.
                         </div>
                     </div>
@@ -438,11 +438,11 @@
                                     <div class="cc_text">
                                         <#if eml.intellectualRights?has_content>
                                             <#if eml.intellectualRights.contains("CC-BY-NC")>
-                                                <@s.text name='eml.intellectualRights.licence.ccbync'/>
+                                                ${t('eml.intellectualRights.licence.ccbync')}<#t>
                                             <#elseif eml.intellectualRights.contains("CC-BY")>
-                                                <@s.text name='eml.intellectualRights.licence.ccby'/>
+                                                ${t('eml.intellectualRights.licence.ccby')}<#t>
                                             <#elseif eml.intellectualRights.contains("CC0")>
-                                                <@s.text name='eml.intellectualRights.licence.cczero'/>
+                                                ${t('eml.intellectualRights.licence.cczero')}<#t>
                                             <#else>
                                                 ${eml.intellectualRights!}
                                             </#if>
@@ -459,7 +459,7 @@
 
                                 <div id='disclaimerRights' style='display: none'>
                                     <p class="mt-3">
-                                        <@s.text name='eml.intellectualRights.license.disclaimer'/>
+                                        ${t('eml.intellectualRights.license.disclaimer')}<#t>
                                     </p>
                                 </div>
                             </div>

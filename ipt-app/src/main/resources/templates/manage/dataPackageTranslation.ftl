@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.DataPackageFieldTranslationAction" -->
     <#include "/inc/header.ftl">
-    <title><@s.text name="manage.translation.title"/></title>
+    <title>${t("manage.translation.title")}</title>
     <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
@@ -9,9 +9,9 @@
     <script>
         $(document).ready(function () {
             $('.confirm').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
@@ -152,13 +152,13 @@
             var maxConstraint;
             var patternConstraint;
 
-            var numberExpectedMessage = "<@s.text name='validation.number.expected'/>";
-            var integerExpectedMessage = "<@s.text name='validation.integer.expected'/>";
-            var booleanExpectedMessage = "<@s.text name='validation.boolean.expected'/>";
-            var requiredConstraintViolatedMessage = "<@s.text name='validation.required.violated'/>";
-            var patternConstraintViolatedMessage = "<@s.text name='validation.pattern.violated'/>";
-            var minimumConstraintViolatedMessage = "<@s.text name='validation.minimum.violated'/>";
-            var maximumConstraintViolatedMessage = "<@s.text name='validation.maximum.violated'/>";
+            var numberExpectedMessage = "${t('validation.number.expected')}";
+            var integerExpectedMessage = "${t('validation.integer.expected')}";
+            var booleanExpectedMessage = "${t('validation.boolean.expected')}";
+            var requiredConstraintViolatedMessage = "${t('validation.required.violated')}";
+            var patternConstraintViolatedMessage = "${t('validation.pattern.violated')}";
+            var minimumConstraintViolatedMessage = "${t('validation.minimum.violated')}";
+            var maximumConstraintViolatedMessage = "${t('validation.maximum.violated')}";
 
             <#if (field.constraints.pattern)??>
                 // escape slashes to prevent issues with patterns
@@ -366,18 +366,18 @@
                          aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
                             <li class="breadcrumb-item">
-                                <a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a>
+                                <a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a>
+                                <a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a>
                             </li>
                             <li class="breadcrumb-item">
                                 <a href="dataPackageMapping.do?r=${resource.shortname}&id=${(mapping.dataPackageSchema.identifier)!?url}&mid=${mid}">
-                                    <@s.text name="breadcrumb.manage.overview.mapping"/>
+                                    ${t("breadcrumb.manage.overview.mapping")}<#t>
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <@s.text name="breadcrumb.manage.overview.mapping.translation"/>
+                                ${t("breadcrumb.manage.overview.mapping.translation")}<#t>
                             </li>
                         </ol>
                     </nav>
@@ -385,7 +385,7 @@
 
                 <div class="text-center">
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        <@s.text name="manage.translation.title"/>
+                        ${t("manage.translation.title")}<#t>
                     </h1>
                 </div>
 
@@ -396,33 +396,33 @@
 
                 <div class="mt-2 text-center">
                     <div>
-                        <@s.submit form="translation-form" cssClass="button btn btn-sm btn-outline-gbif-primary top-button mt-1" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button mt-1" form="translation-form"/><#t>
 
                         <div class="btn-group btn-group-sm" role="group">
                             <button id="btnGroup" type="button" class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <@s.text name="button.options"/>
+                                ${t("button.options")}<#t>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnGroup" style="">
                                 <li>
                                     <a class="button btn btn-sm btn-outline-secondary w-100 dropdown-button" href='dataPackageFieldTranslationReload.do?r=${resource.shortname}&field=${field.name!}&mid=${mid}'>
-                                        <@s.text name="button.reload"/>
+                                        ${t("button.reload")}<#t>
                                     </a>
                                 </li>
                                 <#if (field.constraints.vocabulary)?has_content>
                                     <li>
                                         <a class="button btn btn-sm btn-outline-secondary w-100 dropdown-button" role="button" href='dataPackageFieldTranslationAutomap.do?r=${resource.shortname}&field=${field.name!}&mid=${mid}'>
-                                            <@s.text name="button.automap"/>
+                                            ${t("button.automap")}<#t>
                                         </a>
                                     </li>
                                 </#if>
                                 <li>
-                                    <@s.submit form="translation-form" cssClass="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" name="delete" key="button.delete"/>
+                                    <input type="submit" value="${t("button.delete")?markup_string}" id="delete" name="delete" class="confirm btn btn-sm btn-outline-gbif-danger w-100 dropdown-button" form="translation-form"/><#t>
                                 </li>
                             </ul>
                         </div>
 
                         <a class="button btn btn-sm btn-outline-secondary top-button mt-1" role="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${(mapping.dataPackageSchema.identifier)!}&mid=${mid}">
-                            <@s.text name='button.cancel'/>
+                            ${t('button.cancel')}<#t>
                         </a>
                     </div>
                 </div>
@@ -432,32 +432,32 @@
 
     <main class="container main-content-container">
         <div class="mt-3 p-3">
-            <p class="mb-0"><@s.text name="manage.translation.intro"/></p>
+            <p class="mb-0">${t("manage.translation.intro")}</p>
         </div>
 
         <div class="my-3 p-3">
             <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-                <@s.text name="manage.translation.property"/> <em>${field.name}</em>
+                ${t("manage.translation.property")} <em>${field.name}</em>
             </h5>
 
             <#if field.description?has_content>
                 <@processDescription field.description />
             <#else>
-                <@s.text name="basic.no.description"/>
+                ${t("basic.no.description")}<#t>
             </#if>
             <#if field.type??>
                 <br/><br/>
-                <em><@s.text name="schema.field.type"/>:</em>
+                <em>${t("schema.field.type")}:</em>
                 <span>${field.type!}</span>
             </#if>
             <#if field.format?? && field.format != 'default'>
                 <br><br/>
-                <em><@s.text name="schema.field.format"/></em>
+                <em>${t("schema.field.format")}</em>
                 <code>${field.format}</code>
             </#if>
             <#if field.constraints?? && (field.constraints.unique?? || field.constraints.maximum?? || field.constraints.minimum?? || field.constraints.pattern??)>
                 <br/><br/>
-                <em><@s.text name="schema.field.constraints"/>:</em>
+                <em>${t("schema.field.constraints")}:</em>
                 <ul>
                     <#if field.constraints.unique??>
                         <li>unique <code>${field.constraints.unique?string}</code></li>
@@ -480,7 +480,7 @@
                 <#if !noBrakeForExamples>
                     <br/><br/>
                 </#if>
-                <em><@s.text name="basic.examples"/></em>:
+                <em>${t("basic.examples")}</em>:
                 <#if field.example?is_collection>
                     <#list field.example as ex>
                         <code>${ex}</code><#sep>, </#sep>
@@ -505,11 +505,11 @@
                 <div id="translation">
                     <div class="row g-2 border-bottom pb-2">
                         <div class="col-6">
-                            <strong><@s.text name="manage.translation.source.value"/></strong>
+                            <strong>${t("manage.translation.source.value")}</strong>
                         </div>
 
                         <div class="col-6">
-                            <strong><@s.text name="manage.translation.translated.value"/></strong>
+                            <strong>${t("manage.translation.translated.value")}</strong>
                         </div>
                     </div>
 
@@ -523,7 +523,7 @@
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"></path>
                             </svg>
                         </span>
-                                        <span><@s.text name="manage.translation.remove"/></span>
+                                        <span>${t("manage.translation.remove")}</span>
                                     </a>
                                 </div>
 
@@ -536,7 +536,7 @@
                                     <div class="col-6">
                                         <select name="tmapP['${k}']" class="form-select">
                                             <option value="" disabled
-                                                    selected><@s.text name="manage.translation.vocabulary"/></option>
+                                                    selected>${t("manage.translation.vocabulary")}</option>
                                             <#list vocabTermsKeys as code>
                                                 <option value="${code?replace('"','\"')}"
                                                         <#if tmap.get(k) == code>selected</#if> >
@@ -548,7 +548,7 @@
                                 <#else>
                                     <div class="col-6">
                                         <input type="text"
-                                               placeholder="<@s.text name='manage.translation.empty.value'/>"
+                                               placeholder="${t('manage.translation.empty.value')}"
                                                class="translatedValue form-control" name="tmap['${k}']"
                                                value="${tmap.get(k)!}"/>
                                     </div>
@@ -568,7 +568,7 @@
                       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                   </svg>
               </span>
-                            <span><@s.text name="manage.translation.addNew"/></span>
+                            <span>${t("manage.translation.addNew")}</span>
                         </a>
                     </div>
                 </div>
@@ -584,7 +584,7 @@
                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z"></path>
             </svg>
         </span>
-                <span><@s.text name="manage.translation.remove"/></span>
+                <span>${t("manage.translation.remove")}</span>
             </a>
         </div>
         <div class="col-6">
@@ -594,7 +594,7 @@
         <#if (vocabTermsSize>0)>
             <div class="col-6">
                 <select name="tmap" class="translatedValue form-select">
-                    <option value="" disabled selected><@s.text name="manage.translation.vocabulary"/></option>
+                    <option value="" disabled selected>${t("manage.translation.vocabulary")}</option>
                     <#list vocabTermsKeys as code>
                         <option value="${code?replace('"','\"')}">
                             ${vocabTerms[code]}
@@ -604,7 +604,7 @@
             </div>
         <#else>
             <div class="col-6">
-                <input type="text" placeholder="<@s.text name='manage.translation.empty.value'/>"
+                <input type="text" placeholder="${t('manage.translation.empty.value')}"
                        class="translatedValue form-control" name="tmap" value=""/>
             </div>
         </#if>
@@ -617,10 +617,10 @@
                     <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
                 </div>
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="staticBackdropLabel"><@s.text name="manage.translation.title"/></h5>
+                    <h5 class="modal-title w-100" id="staticBackdropLabel">${t("manage.translation.title")}</h5>
                     <div>
                         <select name="addNewTranslation" id="addNewTranslation" class="form-select">
-                            <option value="" disabled selected><@s.text name="manage.translation.select"/></option>
+                            <option value="" disabled selected>${t("manage.translation.select")}</option>
                             <#list sourceValuesMap as key, val>
                                 <#if tmap?? && tmap['${key}']??>
                                 <#else>
@@ -633,8 +633,8 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button id="add-button" type="button" class="btn btn-sm btn-outline-gbif-primary"><@s.text name="button.add"/></button>
-                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
+                    <button id="add-button" type="button" class="btn btn-sm btn-outline-gbif-primary">${t("button.add")}</button>
+                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
                 </div>
             </div>
         </div>

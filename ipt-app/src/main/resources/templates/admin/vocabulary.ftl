@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name="admin.vocabulary.title"/></title>
+<title>${t("admin.vocabulary.title")}</title>
 <#assign currentMenu = "admin"/>
 <#include "/inc/menu.ftl">
 
@@ -12,7 +12,7 @@
         <div class="container my-3 p-3">
             <div class="text-center">
                 <div class="fs-smaller">
-                    <span><@s.text name="admin.vocabulary.title"/></span>
+                    <span>${t("admin.vocabulary.title")}</span>
                 </div>
 
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
@@ -26,7 +26,7 @@
                 <#if vocabulary.issued??>
                     <div class="text-smaller text-gbif-primary">
                         <span>
-                            <@s.text name='schema.version'/> <@s.text name='schema.issuedOn'/> ${vocabulary.issued?date?string.long}
+                            ${t('schema.version')} ${t('schema.issuedOn')} ${vocabulary.issued?date?string.long}
                         </span>
                     </div>
                 </#if>
@@ -38,7 +38,7 @@
 <main class="container main-content-container">
     <div class="my-3 p-3">
         <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-            <@s.text name="basic.description"/>
+            ${t("basic.description")}<#t>
         </h5>
 
         <#if vocabulary.description??>
@@ -49,29 +49,29 @@
 
       <div class="row pb-2 text-smaller">
         <div class="col-lg-3">
-          <strong><@s.text name="basic.latest"/></strong>
+          <strong>${t("basic.latest")}</strong>
         </div>
         <div class="col-lg-9">
             <#if vocabulary.latest>
               <i class="bi bi-circle-fill text-gbif-primary"></i>
-              <span class="text-gbif-primary"><@s.text name="basic.yes"/></span>
+              <span class="text-gbif-primary">${t("basic.yes")}</span>
             <#else>
               <i class="bi bi-circle-fill text-gbif-danger"></i>
-              <span class="text-gbif-danger"><@s.text name="basic.no"/></span>
+              <span class="text-gbif-danger">${t("basic.no")}</span>
             </#if>
         </div>
       </div>
 
         <div class="row pb-2 text-smaller">
             <div class="col-lg-3">
-                <strong><@s.text name="vocabulary.concepts"/></strong>
+                <strong>${t("vocabulary.concepts")}</strong>
             </div>
             <div class="col-lg-9">${vocabulary.concepts?size}</div>
         </div>
 
         <div class="row pb-2 text-smaller">
             <div class="col-lg-3">
-                <strong><@s.text name="basic.identifier"/></strong>
+                <strong>${t("basic.identifier")}</strong>
             </div>
             <div class="col-lg-9 overflow-x-auto"><a href="${vocabulary.uriString}">${vocabulary.uriString}</a></div>
         </div>
@@ -79,7 +79,7 @@
         <#if vocabulary.subject??>
             <div class="row pb-2 text-smaller">
                 <div class="col-lg-3">
-                    <strong><@s.text name="basic.keywords"/></strong>
+                    <strong>${t("basic.keywords")}</strong>
                 </div>
                 <div class="col-lg-9">${vocabulary.subject!}</div>
             </div>
@@ -87,7 +87,7 @@
 
         <div class="row pb-2 text-smaller">
             <div class="col-lg-3">
-                <strong><@s.text name="basic.lastModified"/></strong>
+                <strong>${t("basic.lastModified")}</strong>
             </div>
             <div class="col-lg-9">${vocabulary.modified?datetime?string.long_short}</div>
         </div>
@@ -95,7 +95,7 @@
 
     <div class="my-3 p-3">
         <h5 class="pb-2 mb-2 pt-2 text-gbif-header-2 fw-400">
-            <@s.text name="vocabulary.concepts"/>
+            ${t("vocabulary.concepts")}<#t>
         </h5>
 
         <div class="mt-3 text-smaller">
@@ -118,21 +118,21 @@
                             </#if>
                             <#if c.link?has_content>
                                 <p class="overflow-x-auto">
-                                    <@s.text name="basic.seealso"/>: <a href="${c.link}">${c.link}</a>
+                                    ${t("basic.seealso")}: <a href="${c.link}">${c.link}</a>
                                 </p>
                             </#if>
                             <ul>
-                                <#list c.preferredTerms as t>
-                                    <li><em>${t.title} <span class="small">[${t.lang!}]</span></em></li>
+                                <#list c.preferredTerms as term>
+                                    <li><em>${term.title} <span class="small">[${term.lang!}]</span></em></li>
                                 </#list>
                             </ul>
                             <#if c.alternativeTerms?has_content>
                                 <p class="mb-0">
-                                    <@s.text name="vocabulary.terms.alt"/>:
+                                    ${t("vocabulary.terms.alt")}:
                                 </p>
                                 <ul class="fs-smaller-2">
-                                    <#list c.alternativeTerms as t>
-                                        <li class="text-discreet"><em>${t.title} <span>[${t.lang!}]</span></em></li>
+                                    <#list c.alternativeTerms as term>
+                                        <li class="text-discreet"><em>${term.title} <span>[${term.lang!}]</span></em></li>
                                     </#list>
                                 </ul>
                             </#if>

@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#include "/inc/header.ftl">
-<title><@s.text name="title"/></title>
+<title>${t("title")}</title>
 <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
 <#include "/macros/forms.ftl"/>
@@ -19,33 +19,33 @@
     <div class="container bg-body border rounded-2 mb-4">
         <div class="container my-3 p-3">
             <div class="text-center fs-smaller">
-                <@s.text name="menu.manage.short"/>
+                ${t("menu.manage.short")}<#t>
             </div>
 
             <div class="text-center">
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name="manage.home.title"/>
+                    ${t("manage.home.title")}<#t>
                 </h1>
 
                 <#if (resources?size>0)>
                     <div class="text-smaller text-gbif-primary">
-                        <@s.text name="portal.home.resources.available"><@s.param>${resourcesSize}</@s.param></@s.text>
+                        ${t("portal.home.resources.available", resourcesSize)}
                     </div>
                 <#else>
                     <div class="text-smaller text-gbif-danger">
-                        <@s.text name="manage.home.no.resources"/>
+                        ${t("manage.home.no.resources")}<#t>
                     </div>
                 </#if>
 
                 <#if (organisations?size==0)>
                     <div class="text-smaller text-gbif-danger">
-                        <@s.text name="manage.resource.create.forbidden"/>
+                        ${t("manage.resource.create.forbidden")}<#t>
                     </div>
                 </#if>
 
                 <#if (organisations?size>0)>
                     <div class="mt-2">
-                        <a href="${baseURL}/manage/create.do" class="btn btn-sm btn-outline-gbif-primary top-button"><@s.text name="button.create.new"/></a>
+                        <a href="${baseURL}/manage/create.do" class="btn btn-sm btn-outline-gbif-primary top-button">${t("button.create.new")}</a>
                     </div>
                 </#if>
             </div>

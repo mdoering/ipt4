@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.MetadataAction" -->
 <#include "/inc/header.ftl">
-<title xmlns="http://www.w3.org/1999/html"><@s.text name='manage.metadata.geocoverage.title'/></title>
+<title xmlns="http://www.w3.org/1999/html">${t('manage.metadata.geocoverage.title')}</title>
     <#assign currentMetadataPage = "geocoverage"/>
     <#assign currentMenu="manage"/>
 
@@ -443,7 +443,7 @@
             <i class="bi bi-exclamation-triangle alert-orange-2 fs-bigger-2 me-2"></i>
         </div>
         <div class="overflow-x-hidden pt-1">
-            <span><@s.text name="eml.warning.reinfer"/></span>
+            <span>${t("eml.warning.reinfer")}</span>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -455,7 +455,7 @@
                             <i class="bi bi-exclamation-circle alert-red-2 fs-bigger-2 me-2"></i>
                         </div>
                         <div class="overflow-x-hidden pt-1">
-                            <span><@s.text name="${error}"/></span>
+                            <span>${t(error)}</span>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -471,16 +471,16 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                         </ol>
                     </nav>
                 </div>
 
                 <div class="text-center">
                     <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                        <@s.text name='manage.metadata.geocoverage.title'/>
+                        ${t('manage.metadata.geocoverage.title')}<#t>
                     </h1>
                 </div>
 
@@ -489,9 +489,9 @@
                 </div>
 
                 <div class="text-center mt-2">
-                    <input type="submit" value="<@s.text name='button.save'/>" id="top-save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button">
+                    <input type="submit" value="${t('button.save')}" id="top-save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button">
                     <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                        <@s.text name="button.back"/>
+                        ${t("button.back")}<#t>
                     </button>
                 </div>
             </div>
@@ -523,7 +523,7 @@
                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name="eml.previewInferred"/></span>
+                                        <span>${t("eml.previewInferred")}</span>
                                     </a>
                                 </div>
                                 <div id="dateInferred" class="text-smaller mt-0 d-flex justify-content-end" style="display: none !important;">
@@ -534,7 +534,7 @@
                                                 <path d="m19 8-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"></path>
                                             </svg>
                                         </span>
-                                        <span><@s.text name="eml.reinfer"/></span>
+                                        <span>${t("eml.reinfer")}</span>
                                     </a>
                                 </div>
                             </div>
@@ -547,8 +547,8 @@
                                 <div class="table-responsive">
                                     <table class="table table-sm table-borderless">
                                         <tr>
-                                            <th class="col-4"><@s.text name='eml.geospatialCoverages.boundingCoordinates'/></th>
-                                            <td><@s.text name='eml.geospatialCoverages.boundingCoordinates.min.latitude'/>&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.min.longitude'/>&nbsp;&#91;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.min.latitude)!},&nbsp;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.min.longitude)!}&#93;&#44;&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.max.latitude'/>&nbsp;<@s.text name='eml.geospatialCoverages.boundingCoordinates.max.longitude'/>&nbsp;&#91;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.max.latitude)!},&nbsp;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.max.longitude)!}&#93;</td>
+                                            <th class="col-4">${t('eml.geospatialCoverages.boundingCoordinates')}</th>
+                                            <td>${t('eml.geospatialCoverages.boundingCoordinates.min.latitude')}&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.min.longitude')}&nbsp;&#91;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.min.latitude)!},&nbsp;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.min.longitude)!}&#93;&#44;&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.max.latitude')}&nbsp;${t('eml.geospatialCoverages.boundingCoordinates.max.longitude')}&nbsp;&#91;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.max.latitude)!},&nbsp;${(inferredMetadata.inferredGeographicCoverage.data.boundingCoordinates.max.longitude)!}&#93;</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -556,18 +556,18 @@
                             <#elseif (inferredMetadata.inferredGeographicCoverage)?? && inferredMetadata.inferredGeographicCoverage.errors?size != 0>
                                 <#list inferredMetadata.inferredGeographicCoverage.errors as error>
                                     <div class="callout callout-danger text-smaller">
-                                        <@s.text name="${error}"/>
+                                        ${t(error)}<#t>
                                     </div>
                                 </#list>
                             <!-- Other -->
                             <#else>
                                 <div class="callout callout-warning text-smaller">
-                                    <@s.text name="eml.warning.reinfer"/>
+                                    ${t("eml.warning.reinfer")}<#t>
                                 </div>
                             </#if>
                         </div>
 
-                        <p class="intro mt-1"><@s.text name='manage.metadata.geocoverage.intro'/></p>
+                        <p class="intro mt-1">${t('manage.metadata.geocoverage.intro')}</p>
 
                         <div id="map"></div>
 
@@ -578,40 +578,40 @@
 
                             <div id="coordinates" class="mt-0">
                                 <div id="separator-warning" class="callout callout-info text-smaller">
-                                    <@s.text name='manage.metadata.geocoverage.warning'/>
+                                    ${t('manage.metadata.geocoverage.warning')}<#t>
                                 </div>
                                 <div class="row g-3 mt-0">
                                     <div class="col-md-6">
                                         <label class="form-label" for="eml.geospatialCoverages[0].boundingCoordinates.min.longitude">
-                                            <@s.text name="eml.geospatialCoverages.boundingCoordinates.min.longitude"/>
+                                            ${t("eml.geospatialCoverages.boundingCoordinates.min.longitude")}<#t>
                                             <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <input type="text" class="form-control" id="eml.geospatialCoverages[0].boundingCoordinates.min.longitude" name="eml.geospatialCoverages[0].boundingCoordinates.min.longitude" <#if (eml.geospatialCoverages[0].boundingCoordinates.min.longitude)?has_content>value="${(eml.geospatialCoverages[0].boundingCoordinates.min.longitude)?string["0.###"]}" <#else>value=""</#if> />
-                                        <@s.fielderror id="field-error-eml.geospatialCoverages[0].boundingCoordinates.min.longitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.min.longitude"/>
+                                        <@fieldError id="field-error-eml.geospatialCoverages[0].boundingCoordinates.min.longitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.min.longitude"/>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label" for="eml.geospatialCoverages[0].boundingCoordinates.max.longitude">
-                                            <@s.text name="eml.geospatialCoverages.boundingCoordinates.max.longitude"/>
+                                            ${t("eml.geospatialCoverages.boundingCoordinates.max.longitude")}<#t>
                                             <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <input type="text" id="eml.geospatialCoverages[0].boundingCoordinates.max.longitude" name="eml.geospatialCoverages[0].boundingCoordinates.max.longitude" class="form-control" <#if (eml.geospatialCoverages[0].boundingCoordinates.max.longitude)?has_content> value="${(eml.geospatialCoverages[0].boundingCoordinates.max.longitude)?string["0.###"]}" <#else>value=""</#if> />
-                                        <@s.fielderror id="field-error-eml.geospatialCoverages[0].boundingCoordinates.max.longitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.max.longitude"/>
+                                        <@fieldError id="field-error-eml.geospatialCoverages[0].boundingCoordinates.max.longitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.max.longitude"/>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label" for="eml.geospatialCoverages[0].boundingCoordinates.min.latitude">
-                                            <@s.text name="eml.geospatialCoverages.boundingCoordinates.min.latitude"/>
+                                            ${t("eml.geospatialCoverages.boundingCoordinates.min.latitude")}<#t>
                                             <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <input type="text" id="eml.geospatialCoverages[0].boundingCoordinates.min.latitude" name="eml.geospatialCoverages[0].boundingCoordinates.min.latitude" class="form-control" <#if (eml.geospatialCoverages[0].boundingCoordinates.min.latitude)?has_content> value="${(eml.geospatialCoverages[0].boundingCoordinates.min.latitude)?string["0.###"]}" <#else>value=""</#if> />
-                                        <@s.fielderror id="field-error-eml.geospatialCoverages[0].boundingCoordinates.min.latitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.min.latitude"/>
+                                        <@fieldError id="field-error-eml.geospatialCoverages[0].boundingCoordinates.min.latitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.min.latitude"/>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label" for="eml.geospatialCoverages[0].boundingCoordinates.max.latitude">
-                                            <@s.text name="eml.geospatialCoverages.boundingCoordinates.max.latitude"/>
+                                            ${t("eml.geospatialCoverages.boundingCoordinates.max.latitude")}<#t>
                                             <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <input type="text" id="eml.geospatialCoverages[0].boundingCoordinates.max.latitude" name="eml.geospatialCoverages[0].boundingCoordinates.max.latitude" class="form-control" <#if (eml.geospatialCoverages[0].boundingCoordinates.max.latitude)?has_content>value="${(eml.geospatialCoverages[0].boundingCoordinates.max.latitude)?string["0.###"]}" <#else>value=""</#if> />
-                                        <@s.fielderror id="field-error-eml.geospatialCoverages[0].boundingCoordinates.max.latitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.max.latitude"/>
+                                        <@fieldError id="field-error-eml.geospatialCoverages[0].boundingCoordinates.max.latitude" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="eml.geospatialCoverages[0].boundingCoordinates.max.latitude"/>
                                     </div>
                                 </div>
                             </div>

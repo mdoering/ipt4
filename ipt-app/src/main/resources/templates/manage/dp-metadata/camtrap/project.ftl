@@ -1,5 +1,5 @@
     <#include "/inc/header.ftl">
-    <title><@s.text name='manage.datapackagemetadata.camtrap.project.title'/></title>
+    <title>${t('manage.datapackagemetadata.camtrap.project.title')}</title>
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-4.0.13.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/smaller-inputs.css">
@@ -68,9 +68,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item"><a href="/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -78,7 +78,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.datapackagemetadata.camtrap.project.title'/>
+                            ${t('manage.datapackagemetadata.camtrap.project.title')}<#t>
                         </h1>
                     </div>
 
@@ -93,8 +93,8 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
-                        <@s.submit cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button"/><#t>
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@
 
                     <div class="bd-content">
                         <div class="my-md-3 p-3">
-                            <p class="mb-5"><@s.text name="datapackagemetadata.project.intro"/></p>
+                            <p class="mb-5">${t("datapackagemetadata.project.intro")}</p>
 
                             <div class="row g-3">
                                 <div class="col-12">
@@ -142,7 +142,7 @@
                                     <div class="form-group">
                                         <@popoverPropertyInfo "datapackagemetadata.project.captureMethod.help"/>
                                         <label for="metadata.project.captureMethod" class="form-label" style="margin-bottom: 6px !important;">
-                                            <@s.text name="datapackagemetadata.project.captureMethod"/> <span class="text-gbif-danger">&#42;</span>
+                                            ${t("datapackagemetadata.project.captureMethod")} <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <select name="metadata.project.captureMethod" id="metadata.project.captureMethod" class="form-select" required multiple>
                                             <#if captureMethods?has_content>
@@ -151,7 +151,7 @@
                                                 </#list>
                                             </#if>
                                         </select>
-                                        <@s.fielderror id="field-error-metadata.project.captureMethod" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="metadata.project.captureMethod"/>
+                                        <@fieldError id="field-error-metadata.project.captureMethod" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="metadata.project.captureMethod"/>
                                     </div>
                                 </div>
 
@@ -159,7 +159,7 @@
                                     <div class="form-group">
                                         <@popoverPropertyInfo "datapackagemetadata.project.observationLevel.help"/>
                                         <label for="metadata.project.observationLevel" class="form-label" style="margin-bottom: 6px !important;">
-                                            <@s.text name="datapackagemetadata.project.observationLevel"/> <span class="text-gbif-danger">&#42;</span>
+                                            ${t("datapackagemetadata.project.observationLevel")} <span class="text-gbif-danger">&#42;</span>
                                         </label>
                                         <select name="metadata.project.observationLevel" id="metadata.project.observationLevel" class="form-select" required multiple>
                                             <#if observationLevels?has_content>
@@ -168,7 +168,7 @@
                                                 </#list>
                                             </#if>
                                         </select>
-                                        <@s.fielderror id="field-error-metadata.project.observationLevel" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="metadata.project.observationLevel"/>
+                                        <@fieldError id="field-error-metadata.project.observationLevel" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="metadata.project.observationLevel"/>
                                     </div>
                                 </div>
 

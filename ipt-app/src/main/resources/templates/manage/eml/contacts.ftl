@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="${baseURL}/styles/select2/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="${baseURL}/styles/smaller-inputs.css">
     <script src="${baseURL}/js/select2/select2-4.0.13.min.js"></script>
-    <title><@s.text name='manage.metadata.contacts.title'/></title>
+    <title>${t('manage.metadata.contacts.title')}</title>
     <script src="${baseURL}/js/metadata-agent.js"></script>
     <script>
         $(document).ready(function () {
@@ -226,24 +226,24 @@
         <#include "/inc/action_alerts.ftl">
     </div>
 
-    <#assign inputIdentifierPlaceholder><@s.text name="eml.contact.identifier"/></#assign>
-    <#assign copyLink><@s.text name="eml.metadataAgent.copyLink"/></#assign>
+    <#assign inputIdentifierPlaceholder>${t("eml.contact.identifier")}<#t></#assign>
+    <#assign copyLink>${t("eml.metadataAgent.copyLink")}<#t></#assign>
     <#assign copyLink = copyLink?markup_string>
-    <#assign copyFromAnotherLink><@s.text name="eml.metadataAgent.copyFromAnother"/></#assign>
+    <#assign copyFromAnotherLink>${t("eml.metadataAgent.copyFromAnother")}<#t></#assign>
     <#assign copyFromAnotherLink = copyFromAnotherLink?markup_string>
-    <#assign removeContactLink><@s.text name='manage.metadata.removethis'/> <@s.text name='eml.contact'/></#assign>
+    <#assign removeContactLink>${t('manage.metadata.removethis')}<#t> ${t('eml.contact')}</#assign>
     <#assign removeContactLink = removeContactLink?markup_string>
-    <#assign removeCreatorLink><@s.text name='manage.metadata.removethis'/> <@s.text name='portal.resource.creator'/></#assign>
+    <#assign removeCreatorLink>${t('manage.metadata.removethis')}<#t> ${t('portal.resource.creator')}</#assign>
     <#assign removeCreatorLink = removeCreatorLink?markup_string>
-    <#assign removeMetadataProviderLink><@s.text name='manage.metadata.removethis'/> <@s.text name='eml.metadataProvider'/></#assign>
+    <#assign removeMetadataProviderLink>${t('manage.metadata.removethis')}<#t> ${t('eml.metadataProvider')}</#assign>
     <#assign removeMetadataProviderLink = removeMetadataProviderLink?markup_string>
-    <#assign addContactLink><@s.text name='manage.metadata.addnew'/> <@s.text name='eml.contact'/></#assign>
+    <#assign addContactLink>${t('manage.metadata.addnew')}<#t> ${t('eml.contact')}</#assign>
     <#assign addContactLink = addContactLink?markup_string>
-    <#assign addCreatorLink><@s.text name='manage.metadata.addnew'/> <@s.text name='portal.resource.creator'/></#assign>
+    <#assign addCreatorLink>${t('manage.metadata.addnew')}<#t> ${t('portal.resource.creator')}</#assign>
     <#assign addCreatorLink = addCreatorLink?markup_string>
-    <#assign addMetadataProviderLink><@s.text name='manage.metadata.addnew'/> <@s.text name='eml.metadataProvider'/></#assign>
+    <#assign addMetadataProviderLink>${t('manage.metadata.addnew')}<#t> ${t('eml.metadataProvider')}</#assign>
     <#assign addMetadataProviderLink = addMetadataProviderLink?markup_string>
-    <#assign addNew><@s.text name='manage.metadata.addnew'/></#assign>
+    <#assign addNew>${t('manage.metadata.addnew')}<#t></#assign>
     <#assign addNew = addNew?markup_string>
 
     <form class="needs-validation track-unsaved" action="metadata-${section}.do" method="post" novalidate>
@@ -254,16 +254,16 @@
                     <div class="text-center fs-smaller">
                         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                             <ol class="breadcrumb justify-content-center mb-0">
-                                <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                             </ol>
                         </nav>
                     </div>
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.metadata.contacts.title'/>
+                            ${t('manage.metadata.contacts.title')}<#t>
                         </h1>
                     </div>
 
@@ -272,9 +272,9 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </button>
                     </div>
                 </div>
@@ -337,7 +337,7 @@
                                             <div id="contact-${contact_index}-positions" class="contact-positions">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.position" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.position"/>
+                                                        ${t("eml.contact.position")}<#t>
                                                     </label>
                                                     <a id="plus-contact-position-${contact_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -374,7 +374,7 @@
                                             <div id="contact-${contact_index}-address" class="contact-address">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.address" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.address.address"/>
+                                                        ${t("eml.contact.address.address")}<#t>
                                                     </label>
                                                     <a id="plus-contact-address-${contact_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -423,7 +423,7 @@
                                             <div id="contact-${contact_index}-phones" class="contact-phones">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.phone" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.phone"/>
+                                                        ${t("eml.contact.phone")}<#t>
                                                     </label>
                                                     <a id="plus-contact-phone-${contact_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -460,7 +460,7 @@
                                             <div id="contact-${contact_index}-emails" class="contact-emails">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.email" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.email"/>
+                                                        ${t("eml.contact.email")}<#t>
                                                     </label>
                                                     <a id="plus-contact-email-${contact_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -497,7 +497,7 @@
                                             <div id="contact-${contact_index}-homepages" class="contact-homepages">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.homepage" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.homepage"/>
+                                                        ${t("eml.contact.homepage")}<#t>
                                                     </label>
                                                     <a id="plus-contact-homepage-${contact_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -538,11 +538,11 @@
                                                        data-bs-toggle="popover"
                                                        data-bs-trigger="focus"
                                                        data-bs-html="true"
-                                                       data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                                       data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                         <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                                     </a>
                                                     <label for="eml.contacts.userIds" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.identifier"/>
+                                                        ${t("eml.contact.identifier")}<#t>
                                                     </label>
                                                     <a id="plus-contact-identifier-${contact_index}" href="" class="metadata-action-link custom-link add-identifier">
                                                         <span>
@@ -634,7 +634,7 @@
                                     <div id="contact-positions" class="contact-positions">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.contacts.position" class="form-label mb-0">
-                                                <@s.text name="eml.contact.position"/>
+                                                ${t("eml.contact.position")}<#t>
                                             </label>
                                             <a id="plus-contact-position" href="" class="metadata-action-link custom-link add-contact-position">
                                                 <span>
@@ -651,7 +651,7 @@
                                     <div id="contact-address" class="contact-address">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.contacts.address" class="form-label mb-0">
-                                                <@s.text name="eml.contact.address.address"/>
+                                                ${t("eml.contact.address.address")}<#t>
                                             </label>
                                             <a id="plus-contact-address" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -680,7 +680,7 @@
                                     <div id="contact-phones" class="contact-phones">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.contacts.phone" class="form-label mb-0">
-                                                <@s.text name="eml.contact.phone"/>
+                                                ${t("eml.contact.phone")}<#t>
                                             </label>
                                             <a id="plus-contact-phone" href="" class="metadata-action-link custom-link add-contact-phone">
                                                 <span>
@@ -697,7 +697,7 @@
                                     <div id="contact-emails" class="contact-emails">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.contacts.email" class="form-label mb-0">
-                                                <@s.text name="eml.contact.email"/>
+                                                ${t("eml.contact.email")}<#t>
                                             </label>
                                             <a id="plus-contact-email" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -714,7 +714,7 @@
                                     <div id="contact-homepages" class="contact-homepages">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.contacts.homepage" class="form-label mb-0">
-                                                <@s.text name="eml.contact.homepage"/>
+                                                ${t("eml.contact.homepage")}<#t>
                                             </label>
                                             <a id="plus-contact-homepage" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -735,11 +735,11 @@
                                                data-bs-toggle="popover"
                                                data-bs-trigger="focus"
                                                data-bs-html="true"
-                                               data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                               data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                 <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                             </a>
                                             <label for="eml.contacts.userIds" class="form-label mb-0">
-                                                <@s.text name="eml.contact.identifier"/>
+                                                ${t("eml.contact.identifier")}<#t>
                                             </label>
                                             <a id="plus-contact-identifier" href="" class="metadata-action-link custom-link add-identifier">
                                                 <span>
@@ -764,7 +764,7 @@
                                         <div class="handle columnLinks mt-4 col-12">
                                             <div class="row g-1">
                                                 <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
-                                                    <span class="contact-citation-banner"><@s.text name="eml.contact.citation"/></span>
+                                                    <span class="contact-citation-banner">${t("eml.contact.citation")}</span>
                                                 </div>
                                                 <div class="col-md-6 d-flex justify-content-end">
                                                     <div class="btn-group">
@@ -778,8 +778,8 @@
                                                         </a>
 
                                                         <ul class="dropdown-menu" aria-labelledby="dropdown-creator-copy-${creator_index}">
-                                                            <li><a id="creator-from-contact-${creator_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                            <li><a id="creator-copy-${creator_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                            <li><a id="creator-from-contact-${creator_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                            <li><a id="creator-copy-${creator_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                         </ul>
                                                     </div>
                                                     <a id="creator-removeLink-${creator_index}" class="removeAgentLink metadata-action-link custom-link" href="">
@@ -809,7 +809,7 @@
                                             <div id="creator-${creator_index}-positions" class="creator-positions">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.position" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.position"/>
+                                                        ${t("eml.contact.position")}<#t>
                                                     </label>
                                                     <a id="plus-creator-position-${creator_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -846,7 +846,7 @@
                                             <div id="creator-${creator_index}-address" class="creator-address">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.creators.address" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.address.address"/>
+                                                        ${t("eml.contact.address.address")}<#t>
                                                     </label>
                                                     <a id="plus-creator-address-${creator_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -895,7 +895,7 @@
                                             <div id="creator-${creator_index}-phones" class="creator-phones">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.creators.phone" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.phone"/>
+                                                        ${t("eml.contact.phone")}<#t>
                                                     </label>
                                                     <a id="plus-creator-phone-${creator_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -932,7 +932,7 @@
                                             <div id="creator-${creator_index}-emails" class="creator-emails">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.creators.email" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.email"/>
+                                                        ${t("eml.contact.email")}<#t>
                                                     </label>
                                                     <a id="plus-creator-email-${creator_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -969,7 +969,7 @@
                                             <div id="creator-${creator_index}-homepages" class="creator-homepages">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.creators.homepage" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.homepage"/>
+                                                        ${t("eml.contact.homepage")}<#t>
                                                     </label>
                                                     <a id="plus-creator-homepage-${creator_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1010,11 +1010,11 @@
                                                        data-bs-toggle="popover"
                                                        data-bs-trigger="focus"
                                                        data-bs-html="true"
-                                                       data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                                       data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                         <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                                     </a>
                                                     <label for="eml.creators.userIds" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.identifier"/>
+                                                        ${t("eml.contact.identifier")}<#t>
                                                     </label>
                                                     <a id="plus-creator-identifier-${creator_index}" href="" class="metadata-action-link custom-link add-identifier">
                                                         <span>
@@ -1069,7 +1069,7 @@
                                 <div class="handle columnLinks mt-4 col-12">
                                     <div class="row g-1">
                                         <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
-                                            <span class="contact-citation-banner"><@s.text name="eml.contact.citation"/></span>
+                                            <span class="contact-citation-banner">${t("eml.contact.citation")}</span>
                                         </div>
                                         <div class="col-md-6 d-flex justify-content-end">
                                             <div class="btn-group">
@@ -1082,8 +1082,8 @@
                                                     <span>${copyLink?lower_case?cap_first}</span>
                                                 </a>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdown-creator-copy">
-                                                    <li><a id="creator-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                    <li><a id="creator-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                    <li><a id="creator-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                    <li><a id="creator-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                 </ul>
                                             </div>
                                             <a id="creator-removeLink" class="removeAgentLink metadata-action-link custom-link" href="">
@@ -1113,7 +1113,7 @@
                                     <div id="creator-positions" class="creator-positions">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.creators.position" class="form-label mb-0">
-                                                <@s.text name="eml.contact.position"/>
+                                                ${t("eml.contact.position")}<#t>
                                             </label>
                                             <a id="plus-creator-position" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1130,7 +1130,7 @@
                                     <div id="creator-address" class="creator-address">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.creators.address" class="form-label mb-0">
-                                                <@s.text name="eml.contact.address.address"/>
+                                                ${t("eml.contact.address.address")}<#t>
                                             </label>
                                             <a id="plus-creator-address" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1159,7 +1159,7 @@
                                     <div id="creator-phones" class="creator-phones">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.creators.phone" class="form-label mb-0">
-                                                <@s.text name="eml.contact.phone"/>
+                                                ${t("eml.contact.phone")}<#t>
                                             </label>
                                             <a id="plus-creator-phone" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1176,7 +1176,7 @@
                                     <div id="creator-emails" class="creator-emails">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.creators.email" class="form-label mb-0">
-                                                <@s.text name="eml.contact.email"/>
+                                                ${t("eml.contact.email")}<#t>
                                             </label>
                                             <a id="plus-creator-email" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1193,7 +1193,7 @@
                                     <div id="creator-homepages" class="creator-homepages">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.creators.homepage" class="form-label mb-0">
-                                                <@s.text name="eml.contact.homepage"/>
+                                                ${t("eml.contact.homepage")}<#t>
                                             </label>
                                             <a id="plus-creator-homepage" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1214,11 +1214,11 @@
                                                data-bs-toggle="popover"
                                                data-bs-trigger="focus"
                                                data-bs-html="true"
-                                               data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                               data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                 <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                             </a>
                                             <label for="eml.creators.userIds" class="form-label mb-0">
-                                                <@s.text name="eml.contact.identifier"/>
+                                                ${t("eml.contact.identifier")}<#t>
                                             </label>
                                             <a id="plus-creator-identifier" href="" class="metadata-action-link custom-link add-identifier">
                                                 <span>
@@ -1243,7 +1243,7 @@
                                         <div class="handle columnLinks mt-4 col-12">
                                             <div class="row g-1">
                                                 <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
-                                                    <span class="contact-citation-banner"><@s.text name="eml.contact.citation"/></span>
+                                                    <span class="contact-citation-banner">${t("eml.contact.citation")}</span>
                                                 </div>
                                                 <div class="col-md-6 d-flex justify-content-end">
                                                     <div class="btn-group">
@@ -1256,8 +1256,8 @@
                                                             <span>${copyLink?lower_case?cap_first}</span>
                                                         </a>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdown-metadataProvider-copy-${metadataProvider_index}">
-                                                            <li><a id="metadataProvider-from-contact-${metadataProvider_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                            <li><a id="metadataProvider-copy-${metadataProvider_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                            <li><a id="metadataProvider-from-contact-${metadataProvider_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                            <li><a id="metadataProvider-copy-${metadataProvider_index}" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                         </ul>
                                                     </div>
                                                     <a id="metadataProvider-removeLink-${metadataProvider_index}" class="removeAgentLink metadata-action-link custom-link" href="">
@@ -1287,7 +1287,7 @@
                                             <div id="metadataProvider-${metadataProvider_index}-positions" class="metadataProvider-positions">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.position" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.position"/>
+                                                        ${t("eml.contact.position")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-position-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1324,7 +1324,7 @@
                                             <div id="metadataProvider-${metadataProvider_index}-address" class="metadataProvider-address">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.contacts.address" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.address.address"/>
+                                                        ${t("eml.contact.address.address")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-address-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1373,7 +1373,7 @@
                                             <div id="metadataProvider-${metadataProvider_index}-phones" class="metadataProvider-phones">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.metadataProviders.phone" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.phone"/>
+                                                        ${t("eml.contact.phone")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-phone-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1410,7 +1410,7 @@
                                             <div id="metadataProvider-${metadataProvider_index}-emails" class="metadataProvider-emails">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.metadataProviders.email" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.email"/>
+                                                        ${t("eml.contact.email")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-email-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1447,7 +1447,7 @@
                                             <div id="metadataProvider-${metadataProvider_index}-homepages" class="metadataProvider-homepages">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.metadataProviders.homepage" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.homepage"/>
+                                                        ${t("eml.contact.homepage")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-homepage-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1488,11 +1488,11 @@
                                                        data-bs-toggle="popover"
                                                        data-bs-trigger="focus"
                                                        data-bs-html="true"
-                                                       data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                                       data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                         <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                                     </a>
                                                     <label for="eml.contacts.userIds" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.identifier"/>
+                                                        ${t("eml.contact.identifier")}<#t>
                                                     </label>
                                                     <a id="plus-metadataProvider-identifier-${metadataProvider_index}" href="" class="metadata-action-link custom-link add-identifier">
                                                         <span>
@@ -1545,7 +1545,7 @@
                                 <div class="handle columnLinks mt-4 col-12">
                                     <div class="row g-1">
                                         <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
-                                            <span class="contact-citation-banner"><@s.text name="eml.contact.citation"/></span>
+                                            <span class="contact-citation-banner">${t("eml.contact.citation")}</span>
                                         </div>
                                         <div class="col-md-6 d-flex justify-content-end">
                                             <div class="btn-group">
@@ -1558,8 +1558,8 @@
                                                     <span>${copyLink?lower_case?cap_first}</span>
                                                 </a>
                                                 <ul class="dropdown-menu" aria-labelledby="metadataProvider-creator-copy">
-                                                    <li><a id="metadataProvider-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromContact"/></a></li>
-                                                    <li><a id="metadataProvider-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#"><@s.text name="eml.metadataAgent.fromAnother"/></a></li>
+                                                    <li><a id="metadataProvider-from-contact" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromContact")}</a></li>
+                                                    <li><a id="metadataProvider-copy" class="dropdown-item menu-link w-100 dropdown-button fs-smaller-2" href="#">${t("eml.metadataAgent.fromAnother")}</a></li>
                                                 </ul>
                                             </div>
                                             <a id="metadataProvider-removeLink" class="removeAgentLink metadata-action-link custom-link" href="">
@@ -1589,7 +1589,7 @@
                                     <div id="metadataProvider-positions" class="metadataProvider-positions">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.metadataProviders.position" class="form-label mb-0">
-                                                <@s.text name="eml.contact.position"/>
+                                                ${t("eml.contact.position")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-position" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1606,7 +1606,7 @@
                                     <div id="metadataProvider-address" class="metadataProvider-address">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.metadataProviders.address" class="form-label mb-0">
-                                                <@s.text name="eml.contact.address.address"/>
+                                                ${t("eml.contact.address.address")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-address" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1635,7 +1635,7 @@
                                     <div id="metadataProvider-phones" class="metadataProvider-phones">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.metadataProviders.phone" class="form-label mb-0">
-                                                <@s.text name="eml.contact.phone"/>
+                                                ${t("eml.contact.phone")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-phone" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1652,7 +1652,7 @@
                                     <div id="metadataProvider-emails" class="metadataProvider-emails">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.metadataProviders.email" class="form-label mb-0">
-                                                <@s.text name="eml.contact.email"/>
+                                                ${t("eml.contact.email")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-email" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1669,7 +1669,7 @@
                                     <div id="metadataProvider-homepages" class="metadataProvider-homepages">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.metadataProviders.homepage" class="form-label mb-0">
-                                                <@s.text name="eml.contact.homepage"/>
+                                                ${t("eml.contact.homepage")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-homepage" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -1690,11 +1690,11 @@
                                                data-bs-toggle="popover"
                                                data-bs-trigger="focus"
                                                data-bs-html="true"
-                                               data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                               data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                 <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                             </a>
                                             <label for="eml.metadataProviders.userIds" class="form-label mb-0">
-                                                <@s.text name="eml.contact.identifier"/>
+                                                ${t("eml.contact.identifier")}<#t>
                                             </label>
                                             <a id="plus-metadataProvider-identifier" href="" class="metadata-action-link custom-link add-identifier">
                                                 <span>
@@ -1835,16 +1835,16 @@
                             <@textinline name="manage.metadata.parties.title" help="i18n"/>
 
                             <!-- retrieve some link names one time -->
-                            <#assign copyLink><@s.text name="eml.metadataAgent.copyLink"/></#assign>
+                            <#assign copyLink>${t("eml.metadataAgent.copyLink")}<#t></#assign>
                             <#assign copyLink = copyLink?markup_string>
-                            <#assign removeLink><@s.text name='manage.metadata.removethis'/> <@s.text name='manage.metadata.parties.item'/></#assign>
+                            <#assign removeLink>${t('manage.metadata.removethis')}<#t> ${t('manage.metadata.parties.item')}</#assign>
                             <#assign removeLink = removeLink?markup_string>
-                            <#assign addLink><@s.text name='manage.metadata.addnew'/> <@s.text name='manage.metadata.parties.item'/></#assign>
+                            <#assign addLink>${t('manage.metadata.addnew')}<#t> ${t('manage.metadata.parties.item')}</#assign>
                             <#assign addLink = addLink?markup_string>
-                            <#assign copyFromAnotherLink><@s.text name="eml.metadataAgent.copyFromAnother"/></#assign>
+                            <#assign copyFromAnotherLink>${t("eml.metadataAgent.copyFromAnother")}<#t></#assign>
                             <#assign copyFromAnotherLink = copyFromAnotherLink?markup_string>
-                            <#assign inputIdentifierPlaceholder><@s.text name="eml.contact.identifier"/></#assign>
-                            <#assign addNew><@s.text name='manage.metadata.addnew'/></#assign>
+                            <#assign inputIdentifierPlaceholder>${t("eml.contact.identifier")}<#t></#assign>
+                            <#assign addNew>${t('manage.metadata.addnew')}<#t></#assign>
                             <#assign addNew = addNew?markup_string>
 
                             <div id="associatedParty-items">
@@ -1854,7 +1854,7 @@
                                             <div class="row g-1">
                                                 <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
                                                     <#if item.role?? && (item.role == 'originator' || item.role == 'metadataProvider')>
-                                                    <span class="contact-citation-banner"><@s.text name="eml.contact.citation"/></span>
+                                                    <span class="contact-citation-banner">${t("eml.contact.citation")}</span>
                                                     </#if>
                                                 </div>
                                                 <div class="col-md-6 d-flex justify-content-end">
@@ -1896,7 +1896,7 @@
                                             <div id="associatedParty-${item_index}-positions" class="associatedParty-positions">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.associatedParties.position" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.position"/>
+                                                        ${t("eml.contact.position")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-position-${item_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1933,7 +1933,7 @@
                                             <div id="associatedParty-${item_index}-address" class="associatedParty-address">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.associatedParties.address" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.address.address"/>
+                                                        ${t("eml.contact.address.address")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-address-${item_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -1982,7 +1982,7 @@
                                             <div id="associatedParty-${item_index}-phones" class="associatedParty-phones">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.associatedParties.phone" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.phone"/>
+                                                        ${t("eml.contact.phone")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-phone-${item_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -2019,7 +2019,7 @@
                                             <div id="associatedParty-${item_index}-emails" class="associatedParty-emails">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.associatedParties.email" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.email"/>
+                                                        ${t("eml.contact.email")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-email-${item_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -2056,7 +2056,7 @@
                                             <div id="associatedParty-${item_index}-homepages" class="associatedParty-homepages">
                                                 <div class="d-flex text-smaller">
                                                     <label for="eml.associatedParties.homepage" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.homepage"/>
+                                                        ${t("eml.contact.homepage")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-homepage-${item_index}" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                         <span>
@@ -2097,11 +2097,11 @@
                                                        data-bs-toggle="popover"
                                                        data-bs-trigger="focus"
                                                        data-bs-html="true"
-                                                       data-bs-content="<@s.text name='eml.contact.directory.help'/><br><br><@s.text name='eml.contact.identifier.help'/>">
+                                                       data-bs-content="${t('eml.contact.directory.help')}<br><br>${t('eml.contact.identifier.help')}">
                                                         <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                                     </a>
                                                     <label for="eml.associatedParties.userIds" class="form-label mb-0">
-                                                        <@s.text name="eml.contact.identifier"/>
+                                                        ${t("eml.contact.identifier")}<#t>
                                                     </label>
                                                     <a id="plus-associatedParty-identifier-${item_index}" href="" class="metadata-action-link custom-link add-identifier">
                                                         <span>
@@ -2156,7 +2156,7 @@
                                 <div class="handle columnLinks mt-4 col-12">
                                     <div class="row g-1">
                                         <div class="col-md-6 d-flex justify-content-end justify-content-md-start">
-                                            <span class="contact-citation-banner" style="display: none;"><@s.text name="eml.contact.citation"/></span>
+                                            <span class="contact-citation-banner" style="display: none;">${t("eml.contact.citation")}</span>
                                         </div>
                                         <div class="col-md-6 d-flex justify-content-end">
                                             <a id="associatedParty-copy" href="" class="metadata-action-link custom-link">
@@ -2197,7 +2197,7 @@
                                     <div id="associatedParty-positions" class="associatedParty-positions">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.associatedParties..position" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.position"/>
+                                                ${t("eml.associatedParties.position")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-position" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -2214,7 +2214,7 @@
                                     <div id="associatedParty-address" class="associatedParty-address">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.associatedParties..address" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.address.address"/>
+                                                ${t("eml.associatedParties.address.address")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-address" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -2243,7 +2243,7 @@
                                     <div id="associatedParty-phones" class="associatedParty-phones">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.associatedParties..phone" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.phone"/>
+                                                ${t("eml.associatedParties.phone")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-phone" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -2260,7 +2260,7 @@
                                     <div id="associatedParty-emails" class="associatedParty-emails">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.associatedParties..email" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.email"/>
+                                                ${t("eml.associatedParties.email")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-email" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -2277,7 +2277,7 @@
                                     <div id="associatedParty-homepages" class="associatedParty-homepages">
                                         <div class="d-flex text-smaller">
                                             <label for="eml.associatedParties..homepage" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.homepage"/>
+                                                ${t("eml.associatedParties.homepage")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-homepage" href="" class="metadata-action-link custom-link add-agent-contact-info">
                                                 <span>
@@ -2298,11 +2298,11 @@
                                                data-bs-toggle="popover"
                                                data-bs-trigger="focus"
                                                data-bs-html="true"
-                                               data-bs-content="<@s.text name='eml.associatedParties.directory.help'/><br><br><@s.text name='eml.associatedParties.identifier.help'/>">
+                                               data-bs-content="${t('eml.associatedParties.directory.help')}<br><br>${t('eml.associatedParties.identifier.help')}">
                                                 <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                             </a>
                                             <label for="eml.associatedParties..userIds" class="form-label mb-0">
-                                                <@s.text name="eml.associatedParties.identifier"/>
+                                                ${t("eml.associatedParties.identifier")}<#t>
                                             </label>
                                             <a id="plus-associatedParty-identifier" href="" class="metadata-action-link custom-link add-identifier">
                                                 <span>
@@ -2437,11 +2437,11 @@
                     <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
                 </div>
                 <div class="modal-body" style="text-align: left !important;">
-                    <h5 class="modal-title w-100" id="staticBackdropLabel"><@s.text name="eml.metadataAgent.copy"/></h5>
+                    <h5 class="modal-title w-100" id="staticBackdropLabel">${t("eml.metadataAgent.copy")}</h5>
                     <div class="row g-3">
                         <div class="col-12">
                             <label for="resource" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.resource"/>
+                                ${t("eml.metadataAgent.copy.resource")}<#t>
                             </label>
                             <select name="resource" id="resource" size="1" class="form-select">
                                 <option value=""></option>
@@ -2449,20 +2449,20 @@
                         </div>
                         <div class="col-12">
                             <label for="agentType" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.agentType"/>
+                                ${t("eml.metadataAgent.copy.agentType")}<#t>
                             </label>
                             <select name="agentType" id="agentType" size="1" class="form-select">
                                 <option value=""></option>
-                                <option value="creators"><@s.text name="eml.metadataAgent.copy.agentType.creator"/></option>
-                                <option value="contacts"><@s.text name="eml.metadataAgent.copy.agentType.contact"/></option>
-                                <option value="metadataProviders"><@s.text name="eml.metadataAgent.copy.agentType.metadataProvider"/></option>
-                                <option value="associatedParties"><@s.text name="eml.metadataAgent.copy.agentType.associatedParty"/></option>
-                                <option value="projectPersonnel"><@s.text name="eml.metadataAgent.copy.agentType.projectPersonnel"/></option>
+                                <option value="creators">${t("eml.metadataAgent.copy.agentType.creator")}</option>
+                                <option value="contacts">${t("eml.metadataAgent.copy.agentType.contact")}</option>
+                                <option value="metadataProviders">${t("eml.metadataAgent.copy.agentType.metadataProvider")}</option>
+                                <option value="associatedParties">${t("eml.metadataAgent.copy.agentType.associatedParty")}</option>
+                                <option value="projectPersonnel">${t("eml.metadataAgent.copy.agentType.projectPersonnel")}</option>
                             </select>
                         </div>
                         <div class="col-12">
                             <label for="agent" class="form-label">
-                                <@s.text name="eml.metadataAgent.copy.agent"/>
+                                ${t("eml.metadataAgent.copy.agent")}<#t>
                             </label>
                             <select name="agent" id="agent" size="1" class="form-select">
                                 <option value=""></option>
@@ -2472,10 +2472,10 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button id="copy-agent-button" type="button" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">
-                        <@s.text name="button.copy"/>
+                        ${t("button.copy")}<#t>
                     </button>
                     <button id="copy-agent-cancel" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>

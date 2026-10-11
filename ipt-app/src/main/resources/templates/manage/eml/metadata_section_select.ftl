@@ -5,13 +5,13 @@
         <div class="p-3">
             <div>
                 <label for="metadata-section" class="form-label">
-                    <@s.text name="manage.metadata.section"/>
+                    ${t("manage.metadata.section")}<#t>
                 </label>
             </div>
             <select name="metadata-section" id="metadata-section" size="1" class="form-select" required="" >
                 <#list ["basic", "contacts", "acknowledgements", "geocoverage", "taxcoverage","tempcoverage", "additionalDescription", "keywords", "project", "methods", "citations", "collections", "physical", "additional"] as it>
                     <option value="${it}" <#if it == currentMetadataPage>selected</#if>>
-                        <@s.text name="submenu.${it}"/>
+                        ${t("submenu.${it}")}<#t>
                     </option>
                 </#list>
             </select>

@@ -1,5 +1,5 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.OverviewAction" -->
-<#assign lastModifiedNotSet><@s.text name='basic.lastModified.not.set'/></#assign>
+<#assign lastModifiedNotSet>${t('basic.lastModified.not.set')}<#t></#assign>
 
 <!-- Represents source data section on resource overview page -->
 <span class="anchor anchor-overview-page" id="anchor-sources"></span>
@@ -9,11 +9,11 @@
             <div class="d-flex">
                 <h5 class="my-auto text-gbif-header-2 fw-400">
                     <#assign sourcesInfo>
-                        <@s.text name='manage.overview.source.description1'/>&nbsp;<@s.text name='manage.overview.source.description2'/>&nbsp;<@s.text name='manage.overview.source.description3'><@s.param><@s.text name='button.add'/></@s.param></@s.text><br><br><@s.text name='manage.overview.source.description4'><@s.param><@s.text name="button.connectDB"/></@s.param></@s.text><#if !resource.dataPackage??><br><br><@s.text name='manage.overview.source.description5'/></#if>
+                        ${t('manage.overview.source.description1')}&nbsp;${t('manage.overview.source.description2')}&nbsp;${t('manage.overview.source.description3', t('button.add'))}<br><br>${t('manage.overview.source.description4', t("button.connectDB"))}<#if !resource.dataPackage??><br><br>${t('manage.overview.source.description5')}</#if>
                     </#assign>
                     <@popoverTextInfo sourcesInfo/>
 
-                    <@s.text name='manage.overview.source.data'/>
+                    ${t('manage.overview.source.data')}<#t>
                 </h5>
             </div>
 
@@ -22,7 +22,7 @@
                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                     </svg>
-                    <@s.text name="button.add"/>
+                    ${t("button.add")}<#t>
                 </a>
             </div>
         </div>
@@ -32,9 +32,9 @@
             <small>
                 <span>
                     <#if sourcesModifiedSinceLastPublication>
-                        <@s.text name='manage.home.last.modified'/> ${resource.getSourcesModified()?datetime?string.medium!}
+                        ${t('manage.home.last.modified')} ${resource.getSourcesModified()?datetime?string.medium!}
                     <#elseif resource.lastPublished??>
-                        <@s.text name="manage.overview.notModified"/>
+                        ${t("manage.overview.notModified")}<#t>
                     </#if>
                 </span>
             </small>
@@ -44,9 +44,9 @@
         <div class="mt-4">
             <p class="mb-0">
                 <#if isDataPackage>
-                    <@s.text name='manage.overview.source.dataPackage.intro'/>
+                    ${t('manage.overview.source.dataPackage.intro')}<#t>
                 <#else>
-                    <@s.text name='manage.overview.source.intro'/>
+                    ${t('manage.overview.source.intro')}<#t>
                 </#if>
             </p>
 
@@ -59,36 +59,36 @@
                                     <#if src.isFileSource()>
                                         <div class="d-flex source-item-icon ps-2 my-auto" data-ipt-resource="${resource.shortname}" data-ipt-source="${src.name}">
                                             <#if src.readable>
-                                                <i class="bi bi-file-text me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.file'/><br><span class='text-gbif-primary'><@s.text name='manage.source.readable'/><span><br>"></i>
+                                                <i class="bi bi-file-text me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.file')}<br><span class='text-gbif-primary'>${t('manage.source.readable')}<span><br>"></i>
                                             <#else>
-                                                <i class="bi bi-file-text me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.file'/><br><span class='text-gbif-danger'><@s.text name='manage.source.notReadable'/><span><br>"></i>
+                                                <i class="bi bi-file-text me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.file')}<br><span class='text-gbif-danger'>${t('manage.source.notReadable')}<span><br>"></i>
                                             </#if>
                                         </div>
 
                                     <#elseif src.isExcelSource()>
                                         <div class="d-flex source-item-icon ps-2 my-auto" data-ipt-resource="${resource.shortname}" data-ipt-source="${src.name}">
                                             <#if src.readable>
-                                                <i class="bi bi-file-excel me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.excel'/><br><span class='text-gbif-primary'><@s.text name='manage.source.readable'/><span><br>"></i>
+                                                <i class="bi bi-file-excel me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.excel')}<br><span class='text-gbif-primary'>${t('manage.source.readable')}<span><br>"></i>
                                             <#else>
-                                                <i class="bi bi-file-excel me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.excel'/><br><span class='text-gbif-danger'><@s.text name='manage.source.notReadable'/><span><br>"></i>
+                                                <i class="bi bi-file-excel me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.excel')}<br><span class='text-gbif-danger'>${t('manage.source.notReadable')}<span><br>"></i>
                                             </#if>
                                         </div>
 
                                     <#elseif src.isUrlSource()>
                                         <div class="d-flex source-item-icon ps-2 my-auto" data-ipt-resource="${resource.shortname}" data-ipt-source="${src.name}">
                                             <#if src.readable>
-                                                <i class="bi bi-link me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.url'/><br><span class='text-gbif-primary'><@s.text name='manage.source.readable'/><span><br>"></i>
+                                                <i class="bi bi-link me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.url')}<br><span class='text-gbif-primary'>${t('manage.source.readable')}<span><br>"></i>
                                             <#else>
-                                                <i class="bi bi-link me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.url'/><br><span class='text-gbif-danger'><@s.text name='manage.source.notReadable'/><span><br>"></i>
+                                                <i class="bi bi-link me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.url')}<br><span class='text-gbif-danger'>${t('manage.source.notReadable')}<span><br>"></i>
                                             </#if>
                                         </div>
 
                                     <#else>
                                         <div class="d-flex source-item-icon ps-2 my-auto" data-ipt-resource="${resource.shortname}" data-ipt-source="${src.name}">
                                             <#if src.readable>
-                                                <i class="bi bi-database me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.sql'/><br><span class='text-gbif-primary'><@s.text name='manage.source.readable'/><span><br>"></i>
+                                                <i class="bi bi-database me-1 text-gbif-primary"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.sql')}<br><span class='text-gbif-primary'>${t('manage.source.readable')}<span><br>"></i>
                                             <#else>
-                                                <i class="bi bi-database me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<@s.text name='manage.overview.source.sql'/><br><span class='text-gbif-danger'><@s.text name='manage.source.notReadable'/><span><br>"></i>
+                                                <i class="bi bi-database me-1 text-gbif-danger"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="${t('manage.overview.source.sql')}<br><span class='text-gbif-danger'>${t('manage.source.notReadable')}<span><br>"></i>
                                             </#if>
                                         </div>
 
@@ -98,12 +98,12 @@
                                         <span class="fs-smaller fw-bold">${src.name!}</span><br>
                                         <#if src.isSqlSource()>
                                             <small>
-                                                ${src.columns}&nbsp;<@s.text name='manage.overview.source.columns'/> <span class="fw-bold">|</span>
+                                                ${src.columns}&nbsp;${t('manage.overview.source.columns')} <span class="fw-bold">|</span>
                                             </small>
                                         <#else>
                                             <small>
                                                 <#attempt>${src.formattedFileSize(currentLocale)}<#recover>-</#attempt> <span class="fw-bold">|</span>
-                                                ${src.rows}&nbsp;<@s.text name='manage.overview.source.rows'/>/${src.getColumns()}&nbsp;<@s.text name='manage.overview.source.columns'/> <span class="fw-bold">|</span>
+                                                ${src.rows}&nbsp;${t('manage.overview.source.rows')}/${src.getColumns()}&nbsp;${t('manage.overview.source.columns')} <span class="fw-bold">|</span>
                                             </small>
                                         </#if>
 
@@ -112,19 +112,19 @@
                                         </small>
                                     </div>
                                     <div class="d-flex justify-content-end my-auto source-item-actions">
-                                        <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="source.do?r=${resource.shortname}&id=${src.name}">
+                                        <a title="${t("button.edit")}" class="icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="source.do?r=${resource.shortname}&id=${src.name}">
                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                             </svg>
                                         </a>
                                         <#if src.isFileSource() || src.isExcelSource()>
-                                            <a title="<@s.text name="button.download"/>" class="icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="raw-source.do?r=${resource.shortname}&id=${src.name}">
+                                            <a title="${t("button.download")}" class="icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="raw-source.do?r=${resource.shortname}&id=${src.name}">
                                                 <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                     <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path>
                                                 </svg>
                                             </a>
                                         </#if>
-                                        <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-source icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-source.do?r=${resource.shortname}&id=${src.name}">
+                                        <a data-method="post" title="${t("button.delete")}" class="delete-source icon-button icon-material-actions source-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-source.do?r=${resource.shortname}&id=${src.name}">
                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                             </svg>
@@ -143,7 +143,7 @@
                                                             <svg class="overview-item-dropdown-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"></path>
                                                             </svg>
-                                                            <@s.text name="button.download"/>
+                                                            ${t("button.download")}<#t>
                                                         </a>
                                                     </li>
                                                 </#if>
@@ -152,7 +152,7 @@
                                                         <svg class="overview-item-dropdown-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                         </svg>
-                                                        <@s.text name="button.delete"/>
+                                                        ${t("button.delete")}<#t>
                                                     </a>
                                                 </li>
                                             </ul>
@@ -177,11 +177,11 @@
             <div class="d-flex">
                 <h5 class="my-auto text-gbif-header-2 fw-400">
                     <#assign mappingsInfo>
-                        <@s.text name='manage.overview.mappings.info'/>
+                        ${t('manage.overview.mappings.info')}<#t>
                     </#assign>
                     <@popoverTextInfo mappingsInfo/>
 
-                    <@s.text name='manage.overview.mappings'/>
+                    ${t('manage.overview.mappings')}<#t>
                 </h5>
             </div>
 
@@ -195,7 +195,7 @@
                             <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                             </svg>
-                            <@s.text name="button.add"/>
+                            ${t("button.add")}<#t>
                         </button>
                     </form>
                 <#else>
@@ -203,7 +203,7 @@
                         <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                         </svg>
-                        <@s.text name="button.add"/>
+                        ${t("button.add")}<#t>
                     </a>
                 </#if>
             </div>
@@ -214,9 +214,9 @@
                 <small>
                     <span>
                         <#if mappingsModifiedSinceLastPublication>
-                            <@s.text name='manage.home.last.modified'/> ${resource.getMappingsModified()?datetime?string.medium!}
+                            ${t('manage.home.last.modified')} ${resource.getMappingsModified()?datetime?string.medium!}
                         <#elseif resource.lastPublished??>
-                            <@s.text name="manage.overview.notModified"/>
+                            ${t("manage.overview.notModified")}<#t>
                         </#if>
                     </span>
                 </small>
@@ -225,16 +225,12 @@
 
         <div class="row mt-4">
             <p>
-                <@s.text name='manage.overview.mappings.description'/>
+                ${t('manage.overview.mappings.description')}<#t>
             </p>
 
             <#if !dataPackageMappingsMissing && dataPackageSchemaChanged>
                 <p class="text-gbif-danger">
-                    <@s.text name='manage.overview.mappings.schemaChanged'>
-                        <@s.param><b>${installedSchemaName!"?"}</b></@s.param>
-                        <@s.param><b>v${resource.dataPackageVersion!"?"}</b></@s.param>
-                        <@s.param><b>v${installedSchemaVersion!"?"}</b></@s.param>
-                    </@s.text>
+                    <#assign textArg1><b>${installedSchemaName!"?"}</b></#assign><#assign textArg2><b>v${resource.dataPackageVersion!"?"}</b></#assign><#assign textArg3><b>v${installedSchemaVersion!"?"}</b></#assign>${t('manage.overview.mappings.schemaChanged', textArg1, textArg2, textArg3)}<#t>
                 </p>
             </#if>
 
@@ -271,15 +267,15 @@
                                                 <i class="bi bi-arrow-right"></i>
                                                 <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                                 <br>
-                                                <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                                <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                             </div>
                                             <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                                <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                     </svg>
                                                 </a>
-                                                <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                     </svg>
@@ -298,7 +294,7 @@
                                                                 <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                 </svg>
-                                                                <@s.text name="button.delete"/>
+                                                                ${t("button.delete")}<#t>
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -326,15 +322,15 @@
                                             <i class="bi bi-arrow-right"></i>
                                             <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                             <br>
-                                            <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                            <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                         </div>
                                         <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                            <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                            <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                 <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                 </svg>
                                             </a>
-                                            <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                            <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                 <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                 </svg>
@@ -353,7 +349,7 @@
                                                             <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                             </svg>
-                                                            <@s.text name="button.delete"/>
+                                                            ${t("button.delete")}<#t>
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -381,15 +377,15 @@
                                                 <i class="bi bi-arrow-right"></i>
                                                 <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                                 <br>
-                                                <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                                <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                             </div>
                                             <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                                <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                     </svg>
                                                 </a>
-                                                <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                     </svg>
@@ -408,7 +404,7 @@
                                                                 <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                 </svg>
-                                                                <@s.text name="button.delete"/>
+                                                                ${t("button.delete")}<#t>
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -436,15 +432,15 @@
                                                 <i class="bi bi-arrow-right"></i>
                                                 <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                                 <br>
-                                                <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                                <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                             </div>
                                             <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                                <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                     </svg>
                                                 </a>
-                                                <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                     <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                     </svg>
@@ -463,7 +459,7 @@
                                                                 <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                 </svg>
-                                                                <@s.text name="button.delete"/>
+                                                                ${t("button.delete")}<#t>
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -491,15 +487,15 @@
                                                     <i class="bi bi-arrow-right"></i>
                                                     <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                                     <br>
-                                                    <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                                    <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                                 </div>
                                                 <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                                    <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                    <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                         </svg>
                                                     </a>
-                                                    <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                                    <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                         </svg>
@@ -518,7 +514,7 @@
                                                                     <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                     </svg>
-                                                                    <@s.text name="button.delete"/>
+                                                                    ${t("button.delete")}<#t>
                                                                 </a>
                                                             </li>
                                                         </ul>
@@ -545,15 +541,15 @@
                                             <i class="bi bi-arrow-right"></i>
                                             <strong class="fs-smaller">${(m.dataPackageTableSchemaName.name)!"?"}</strong>
                                             <br>
-                                            <small><@s.text name='manage.overview.mappings.fields'><@s.param>${(m.fields)!?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                            <small>${t('manage.overview.mappings.fields', (m.fields)!?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                         </div>
                                         <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                            <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                            <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="dataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                 <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                 </svg>
                                             </a>
-                                            <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
+                                            <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="deleteDataPackageMapping.do?r=${resource.shortname}&id=${m.dataPackageSchema.identifier?url}&mid=${m_index}">
                                                 <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                 </svg>
@@ -572,7 +568,7 @@
                                                             <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                             </svg>
-                                                            <@s.text name="button.delete"/>
+                                                            ${t("button.delete")}<#t>
                                                         </a>
                                                     </li>
                                                 </ul>
@@ -591,11 +587,11 @@
             <div class="d-flex">
                 <h5 class="my-auto text-gbif-header-2 fw-400">
                     <#assign mappingsInfo>
-                        <@s.text name='manage.overview.DwC.Mappings.coretype.description1'/><br><br><@s.text name='manage.overview.DwC.Mappings.coretype.description2'/><br><br><@s.text name='manage.overview.DwC.Mappings.coretype.description3'/><br><br><@s.text name='manage.overview.DwC.Mappings.coretype.description4'/>
+                        ${t('manage.overview.DwC.Mappings.coretype.description1')}<br><br>${t('manage.overview.DwC.Mappings.coretype.description2')}<br><br>${t('manage.overview.DwC.Mappings.coretype.description3')}<br><br>${t('manage.overview.DwC.Mappings.coretype.description4')}
                     </#assign>
                     <@popoverTextInfo mappingsInfo/>
 
-                    <@s.text name='manage.overview.DwC.Mappings'/>
+                    ${t('manage.overview.DwC.Mappings')}<#t>
                 </h5>
             </div>
 
@@ -604,7 +600,7 @@
                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                     </svg>
-                    <@s.text name="button.add"/>
+                    ${t("button.add")}<#t>
                 </a>
             </div>
         </div>
@@ -613,9 +609,9 @@
             <div class="text-smaller">
                 <small>
                     <#if mappingsModifiedSinceLastPublication>
-                        <@s.text name='manage.home.last.modified'/> ${resource.mappingsModified?datetime?string.medium!}
+                        ${t('manage.home.last.modified')} ${resource.mappingsModified?datetime?string.medium!}
                     <#elseif resource.lastPublished??>
-                        <@s.text name="manage.overview.notModified"/>
+                        ${t("manage.overview.notModified")}<#t>
                     </#if>
                 </small>
             </div>
@@ -623,7 +619,7 @@
 
         <div class="mt-4">
             <p class="mb-0">
-                <@s.text name='manage.overview.DwC.Mappings.description'/>
+                ${t('manage.overview.DwC.Mappings.description')}<#t>
             </p>
 
             <#if resource.coreRowType?has_content>
@@ -634,7 +630,7 @@
                     <#assign deleteCoreMappingClass="delete-mapping"/>
                 </#if>
                 <div class="details mt-3">
-                    <div class="mapping_head"><@s.text name='manage.overview.DwC.Mappings.cores.select'/></div>
+                    <div class="mapping_head">${t('manage.overview.DwC.Mappings.cores.select')}</div>
                     <div class="row g-2">
                         <#list resource.getMappings(resource.coreRowType) as m>
                             <div class="col-xl-6">
@@ -647,20 +643,20 @@
                                         <i class="bi bi-arrow-right"></i>
                                         <strong class="fs-smaller">${m.extension.title}</strong>
                                         <br>
-                                        <small><@s.text name='manage.overview.mappings.terms'><@s.param>${m.fields?size}</@s.param></@s.text> | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
+                                        <small>${t('manage.overview.mappings.terms', m.fields?size)} | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                     </div>
                                     <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                        <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mapping.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
+                                        <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mapping.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                             </svg>
                                         </a>
-                                        <a title="<@s.text name="button.preview"/>" class="peekBtn icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mappingPeek.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
+                                        <a title="${t("button.preview")}" class="peekBtn icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mappingPeek.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
                                             <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                             </svg>
                                         </a>
-                                        <a data-method="post" title="<@s.text name="button.delete"/>" class="${deleteCoreMappingClass} icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-mapping.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
+                                        <a data-method="post" title="${t("button.delete")}" class="${deleteCoreMappingClass} icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-mapping.do?r=${resource.shortname}&id=${m.extension.rowType?url}&mid=${m_index}">
                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                             </svg>
@@ -679,7 +675,7 @@
                                                         <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                         </svg>
-                                                        <@s.text name="button.preview"/>
+                                                        ${t("button.preview")}<#t>
                                                     </a>
                                                 </li>
                                                 <li>
@@ -687,7 +683,7 @@
                                                         <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                         </svg>
-                                                        <@s.text name="button.delete"/>
+                                                        ${t("button.delete")}<#t>
                                                     </a>
                                                 </li>
                                             </ul>
@@ -698,7 +694,7 @@
                         </#list>
                     </div>
                     <#if (extensionMappingsSize > 1)>
-                        <div class="mapping_head mt-3"><@s.text name='manage.overview.DwC.Mappings.extensions.select'/></div>
+                        <div class="mapping_head mt-3">${t('manage.overview.DwC.Mappings.extensions.select')}</div>
                         <div class="row g-2">
                             <#list resource.getMappedExtensions() as ext>
                                 <#if ext.rowType != resource.coreRowType>
@@ -716,19 +712,19 @@
                                                     <small>${m.fields?size} terms | ${(m.lastModified?datetime?string.medium)!lastModifiedNotSet}</small>
                                                 </div>
                                                 <div class="my-auto d-flex justify-content-end pt-0 mapping-item-actions">
-                                                    <a title="<@s.text name="button.edit"/>" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mapping.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
+                                                    <a title="${t("button.edit")}" class="icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mapping.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                                         </svg>
                                                     </a>
-                                                    <a title="<@s.text name="button.preview"/>" class="peekBtn icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mappingPeek.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
+                                                    <a title="${t("button.preview")}" class="peekBtn icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="mappingPeek.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                             </svg>
                                                         </svg>
                                                     </a>
-                                                    <a data-method="post" title="<@s.text name="button.delete"/>" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-mapping.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
+                                                    <a data-method="post" title="${t("button.delete")}" class="delete-mapping icon-button icon-material-actions mapping-item-action fs-smaller-2 d-sm-max-none" type="button" href="delete-mapping.do?r=${resource.shortname}&id=${ext.rowType?url}&mid=${m_index}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                         </svg>
@@ -747,7 +743,7 @@
                                                                     <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                     </svg>
-                                                                    <@s.text name="button.preview"/>
+                                                                    ${t("button.preview")}<#t>
                                                                 </a>
                                                             </li>
                                                             <li>
@@ -755,7 +751,7 @@
                                                                     <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                     </svg>
-                                                                    <@s.text name="button.delete"/>
+                                                                    ${t("button.delete")}<#t>
                                                                 </a>
                                                             </li>
                                                         </ul>

@@ -1,6 +1,6 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.admin.DataPackageSchemaAction" -->
 <#include "/inc/header.ftl">
-<title><@s.text name="admin.home.manageDataPackageSchemas"/></title>
+<title>${t("admin.home.manageDataPackageSchemas")}</title>
 <script src="${baseURL}/js/scrollspy.js"></script>
 <script>
     $(document).ready(function () {
@@ -74,12 +74,12 @@
                 <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);"
                      aria-label="breadcrumb">
                     <ol class="breadcrumb justify-content-center mb-0">
-                        <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a>
+                        <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a>
                         </li>
                         <li class="breadcrumb-item"><a
-                                    href="${baseURL}/admin/dataPackages.do"><@s.text name="breadcrumb.admin.dataPackageSchemas"/></a>
+                                    href="${baseURL}/admin/dataPackages.do">${t("breadcrumb.admin.dataPackageSchemas")}</a>
                         </li>
-                        <li class="breadcrumb-item"><@s.text name="breadcrumb.admin.dataPackageSchema"/></li>
+                        <li class="breadcrumb-item">${t("breadcrumb.admin.dataPackageSchema")}</li>
                     </ol>
                 </nav>
             </div>
@@ -98,11 +98,11 @@
                 <div class="text-smaller">
                     <#if dataPackageSchema.isLatest()>
                         <span class="text-gbif-primary">
-                                <@s.text name="schema.version.issued.upToDate"><@s.param>${dataPackageSchema.version}</@s.param><@s.param>${dataPackageSchema.issued?date?string["d MMMM yyyy"]}</@s.param></@s.text>
+                                ${t("schema.version.issued.upToDate", dataPackageSchema.version, dataPackageSchema.issued?date?string["d MMMM yyyy"])}
                             </span>
                     <#else>
                         <span class="text-gbif-danger">
-                                <@s.text name="schema.version.issued.outdated"><@s.param>${dataPackageSchema.version}</@s.param><@s.param>${dataPackageSchema.issued?date?string["d MMMM yyyy"]}</@s.param></@s.text>
+                                ${t("schema.version.issued.outdated", dataPackageSchema.version, dataPackageSchema.issued?date?string["d MMMM yyyy"])}
                             </span>
                     </#if>
                 </div>
@@ -112,20 +112,20 @@
                         <button id="btnGroup" type="button"
                                 class="btn btn-sm btn-outline-gbif-primary dropdown-toggle align-self-start top-button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                            <@s.text name="button.options"/>
+                            ${t("button.options")}<#t>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="btnGroup" style="">
                             <li>
                                 <a id="button-display-raw-data" href="#"
                                    class="btn btn-sm btn-outline-gbif-primary w-100 dropdown-button">
-                                    <@s.text name="schema.view.source"/>
+                                    ${t("schema.view.source")}<#t>
                                 </a>
                             </li>
                         </ul>
                     </div>
 
                     <a href="dataPackages.do" class="btn btn-sm btn-outline-secondary mt-1 me-xl-1 top-button">
-                        <@s.text name="button.back"/>
+                        ${t("button.back")}<#t>
                     </a>
                 </div>
             </div>
@@ -192,7 +192,7 @@
                                                     </p>
                                                 </#if>
                                                 <#if field.constraints?? && (field.constraints.unique?? || field.constraints.maximum?? || field.constraints.minimum?? || field.constraints.pattern??)>
-                                                    <em><@s.text name="schema.field.constraints"/>:</em>
+                                                    <em>${t("schema.field.constraints")}:</em>
                                                     <ul>
                                                         <#if field.constraints.unique??>
                                                             <li>unique <code>${field.constraints.unique?string}</code>
@@ -210,17 +210,17 @@
                                                     </ul>
                                                 </#if>
                                                 <p class="overflow-x-auto">
-                                                    <em><@s.text name="schema.field.type"/></em> ${field.type!}
+                                                    <em>${t("schema.field.type")}</em> ${field.type!}
                                                 </p>
                                                 <#if field.format?? && field.format != 'default'>
                                                     <p class="overflow-x-auto">
-                                                        <em><@s.text name="schema.field.format"/></em>
+                                                        <em>${t("schema.field.format")}</em>
                                                         <code>${field.format}</code>
                                                     </p>
                                                 </#if>
                                                 <#if field.example?has_content>
                                                     <p class="overflow-x-auto">
-                                                        <em><@s.text name="basic.examples"/></em>:
+                                                        <em>${t("basic.examples")}</em>:
                                                         <#if field.example?is_collection>
                                                             <#list field.example as ex>
                                                                 <#if field.example?is_boolean>
@@ -240,7 +240,7 @@
                                                 </#if>
                                                 <#if field.constraints?? && field.constraints.vocabulary??>
                                                     <p class="overflow-x-auto">
-                                                        <em><@s.text name="extension.vocabulary"/></em>:
+                                                        <em>${t("extension.vocabulary")}</em>:
                                                         <#list field.constraints.vocabulary as item>
                                                             ${item}<#sep>,</#sep>
                                                         </#list>

@@ -517,4 +517,10 @@ introduced each. Generated from `docs/deviations.md` by `tools/docs/deviations-t
 |The previous publication's checksum and record counts are kept
 |Auto-publishing publishes changed data after an outage
 |M6
+
+|Organisation form, node key
+|The hidden node key field was filled with the contact phone number
+|Filled with the node key
+|Bug fix
+|M7
 |===

@@ -5,17 +5,17 @@
         <#if report.completed>
             <#if !report.hasException() >
                 <div class="alert alert-success" role="alert">
-                    <@s.text name='mapping.preview.success'/>
+                    ${t('mapping.preview.success')}<#t>
                 </div>
             <#else>
                 <div class="alert alert-danger" role="alert">
-                    <@s.text name='mapping.preview.failed'/>
+                    ${t('mapping.preview.failed')}<#t>
                 </div>
             </#if>
         </#if>
 
         <h6 class="text-gbif-header">
-            <@s.text name='manage.report.logMessage'/>
+            ${t('manage.report.logMessage')}<#t>
         </h6>
         <ul class="simple">
             <#list report.messages as msg>
@@ -26,7 +26,7 @@
         <#if cfg.debug() && report.hasException()>
             <br/>
             <h6 class="text-gbif-header">
-                <@s.text name='manage.report.exception'/>: ${report.exceptionMessage!}
+                ${t('manage.report.exception')}: ${report.exceptionMessage!}
             </h6>
             <ul class="simple">
                 <#list report.exceptionStacktrace as msg>

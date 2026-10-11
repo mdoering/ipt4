@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="${baseURL}/styles/smaller-inputs.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.js"></script>
-    <title><@s.text name='manage.metadata.acknowledgements.title'/></title>
+    <title>${t('manage.metadata.acknowledgements.title')}</title>
     <script src="${baseURL}/js/docbook/docbook-v2.js"></script>
     <script>
         $(document).ready(function() {
@@ -99,9 +99,9 @@
                         <div class="text-center fs-smaller">
                             <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                                 <ol class="breadcrumb justify-content-center mb-0">
-                                    <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                                    <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.metadata"/></li>
+                                    <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                                    <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.metadata")}</li>
                                 </ol>
                             </nav>
                         </div>
@@ -109,7 +109,7 @@
 
                     <div class="text-center">
                         <h1 class="py-2 mb-0 text-gbif-header fs-2 fw-normal">
-                            <@s.text name='manage.metadata.acknowledgements.title'/>
+                            ${t('manage.metadata.acknowledgements.title')}<#t>
                         </h1>
                     </div>
 
@@ -124,9 +124,9 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <@s.submit cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button"/><#t>
                         <button type="button" class="btn btn-sm btn-outline-secondary top-button" onclick="window.history.back();">
-                            <@s.text name="button.back"/>
+                            ${t("button.back")}<#t>
                         </button>
                     </div>
                 </div>
@@ -150,14 +150,14 @@
                                    data-bs-toggle="popover"
                                    data-bs-trigger="focus"
                                    data-bs-html="true"
-                                   data-bs-content="<@s.text name='manage.metadata.acknowledgements.info' escapeHtml=true/>">
+                                   data-bs-content="${t('manage.metadata.acknowledgements.info')?markup_string}">
                                     <i class="bi bi-info-circle text-gbif-primary px-1"></i>
                                 </a>
-                                <@s.text name='manage.metadata.acknowledgements.intro'/>
+                                ${t('manage.metadata.acknowledgements.intro')}<#t>
                             </p>
 
                             <p class="mb-3 text-smaller fst-italic">
-                                <@s.text name='manage.metadata.acknowledgements.description'/>
+                                ${t('manage.metadata.acknowledgements.description')}<#t>
                             </p>
 
                             <textarea id="acknowledgements-editor" name="acknowledgements"></textarea>

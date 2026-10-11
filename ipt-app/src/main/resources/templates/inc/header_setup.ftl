@@ -4,7 +4,7 @@
 <head>
     <meta name="copyright" lang="en" content="GBIF" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>[@s.text name="admin.config.setup.title"/]</title>
+    <title>${t("admin.config.setup.title")}</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="${baseURL}/styles/bootstrap/bootstrap.min.css">

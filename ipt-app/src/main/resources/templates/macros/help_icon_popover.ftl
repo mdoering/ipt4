@@ -2,9 +2,9 @@
 <div class='info'>
     <#if help=='i18n'>
         <#if i18nkey==''>
-            <@s.text name='${name}.help' escapeHtml=true/>
+            ${t('${name}.help')?markup_string}<#t>
         <#else>
-            <@s.text name='${i18nkey}.help' escapeHtml=true/>
+            ${t('${i18nkey}.help')?markup_string}<#t>
         </#if>
     <#else>
         <#if help?has_content>
@@ -12,7 +12,7 @@
         </#if>
     </#if>
     <#if (helpOptions?? && helpOptions?size>0)>
-        <p><@s.text name='help.options'/></p>
+        <p>${t('help.options')}</p>
         <ol>
             <#list helpOptions?keys as val>
                 <li>

@@ -115,4 +115,4 @@
     [/#if]
 
     [#assign currentMenu = "home"]
-    [#assign selectNoResultsFound][@s.text name="select.noResults"/][/#assign]
+    [#assign selectNoResultsFound]${t("select.noResults")}[#t][/#assign]

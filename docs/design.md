@@ -237,17 +237,17 @@ One `OncePerRequestFilter` runs at highest precedence, before Security. It strip
   - `rethrow` exception handling in tests
 - The `datadir::` loader is dropped unless the docs show it is a used feature (it looks unwired on dwc-dp).
 
-### Runtime shim `s`
+### Text function `t` (the Struts tag shim was removed in M7)
 
-`IptTagLibrary` is a FreeMarker shared variable, so `<@s.text>` and `[@s.text]` keep working. It implements about 10 directives:
-- `text` + `param`, using a param stack
-- `submit`, matching the Struts simple-theme markup and id rules
-- `hidden`, `file`, `select`, `form`
-- `checkbox`, which emits the `__checkbox_` marker
-- `fielderror`, reading `fieldErrors`
-- `property`, a `BeanWrapper` path lookup with escaping
-
-A shared `getText(...)` method is also registered. Together these keep about 2,800 tag uses working, and templates stay diffable against upstream while dwc-dp keeps moving. The shim is removed after parity (M7).
+Until M7 a runtime shim `s` (`IptTagLibrary`, about 10 Java directives) kept the Struts tags working. M7 removed it. Templates now use FreeMarker only:
+- `${t("key", args...)}` (`TextFunction`) replaces `<@s.text>` and `<@s.param>`.
+  - It returns HTML markup: message texts are not escaped, as with `s.text`.
+  - String arguments are escaped and numbers formatted like `${n}`; markup arguments (a captured `<#assign>`, another `t()`) are inserted as they are.
+  - `t(k)?markup_string` gives plain text (Struts' `escapeHtml=true`).
+- `s.submit`, `s.hidden`, `s.file`, `s.select` and `s.checkbox` became the HTML that Struts' simple theme wrote.
+- `s.fielderror` became the `fieldError` macro and `s.property` the `propertyText` function, both in `macros/forms.ftl`.
+- Lines that held only a Struts tag got `<#t>`/`<#lt>`/`<#rt>`, so FreeMarker's white-space stripping and the rendered pages stay the same.
+- The crawler's page snapshots (`-Dipt.snapshots=DIR`) compared every page before and after the removal.
 
 ### Script `tools/ftl-migrate/`
 
@@ -255,6 +255,7 @@ The script is re-runnable on upstream templates. It:
 - rewrites `/WEB-INF/pages/` paths;
 - replaces `Session.curr_user` with `currentUser` and `Parameters.` with `RequestParameters.`;
 - inserts `<@csrfField/>` into POST forms;
+- converts the Struts tags (see above), keeping white-space stripping, and reports the ones it cannot convert (`s.select`, `s.checkbox`, default texts, OGNL);
 - reports leftover OGNL (`%{}`, `#attr`, `stack.`).
 
 About 20–25 templates need manual work: `manage/overview*.ftl`, `manage/eml/contacts.ftl`, `macros/metadata*.ftl` (JS index renaming), `mapping*.ftl`, `dataPackageMapping*.ftl`, `translation*.ftl`, `source.ftl`, `create_input.ftl`, `dp-metadata/**`, `portal/resource_*.ftl`, `login.ftl`, `inc/menu.ftl`, `admin/ui_management.ftl` and `admin/logs.ftl`.
@@ -297,7 +298,7 @@ Each milestone exits with the app running on a migrated copy of a real IPT3 data
 
 ### M0: Skeleton
 - **Scope:**
-  - Multi-module POM; Boot app with `IptFreeMarkerView`, the `s` shim and `GlobalModel`.
+  - Multi-module POM; Boot app with `IptFreeMarkerView`, the `s` shim (removed in M7) and `GlobalModel`.
   - Static assets; header, menu and footer; `about.ftl`; `/actuator/health` for the Docker health check. The legacy `/api/health` JSON is ported in M2, pinned by golden files.
   - Logback, the `.do` filter, the Security skeleton.
   - Dockerfile, CI (GitHub Actions; the Jenkins release pipeline follows in M6), Renovate, enforcer/ArchUnit rules, Jackson convergence check.
@@ -387,7 +388,7 @@ Bootstrap 5.3, self-hosted fonts, a layout macro, replacing `@s.*` with `${t()}`
 
 | Risk | Mitigation |
 |---|---|
-| dwc-dp keeps moving | Frozen SHA. Weekly `upstream-delta.sh` triage. Same package names and shimmed templates keep patches applicable. Resource-format changes after the freeze must be mirrored in the frozen legacy model. |
+| dwc-dp keeps moving | Frozen SHA. Weekly `upstream-delta.sh` triage. Same package names keep patches applicable; upstream template changes go through `tools/ftl-migrate`. Resource-format changes after the freeze must be mirrored in the frozen legacy model. |
 | JSON shape drift on harvested endpoints | Golden files from IPT3 are a merge gate |
 | FreeMarker setup differences between Struts and Spring | Explicit config matching Struts, rethrow in tests, full render and crawl coverage |
 | Binding semantics (list clearing, auto-grow, empty-to-null, JS index renaming) | Verbatim `clearOwnedLists`, high auto-grow limit, per-section round-trip tests |

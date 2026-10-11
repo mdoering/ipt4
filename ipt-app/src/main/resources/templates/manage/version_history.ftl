@@ -1,5 +1,5 @@
 <#include "/inc/header.ftl">
-<title><@s.text name='manage.history.title'/></title>
+<title>${t('manage.history.title')}</title>
 <script src="${baseURL}/js/jconfirmation.jquery.js"></script>
 <#assign currentMenu = "manage"/>
 <#include "/inc/menu.ftl">
@@ -12,15 +12,15 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}"><@s.text name="breadcrumb.manage.overview"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview.version"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item"><a href="resource?r=${resource.shortname}">${t("breadcrumb.manage.overview")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview.version")}</li>
                         </ol>
                     </nav>
                 </div>
 
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                    <@s.text name='manage.history.title'/>
+                    ${t('manage.history.title')}<#t>
                 </h1>
 
                 <div class="text-smaller">
@@ -29,12 +29,12 @@
 
                 <div class="mt-2">
                     <#if resource?? && version?? && resource.versionHistory??>
-                        <@s.submit form="history" cssClass="button btn btn-sm btn-outline-gbif-primary top-button" name="save" key="button.save"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" form="history"/><#t>
                         <a href="${baseURL}/resource?r=${resource.shortname}" class="btn btn-sm btn-outline-secondary mt-1 me-xl-1 top-button">
-                            <@s.text name="button.cancel"/>
+                            ${t("button.cancel")}<#t>
                         </a>
                     <#else>
-                        <@s.submit form="history" cssClass="button btn btn-sm btn-outline-secondary top-button" name="cancel" key="button.back"/>
+                        <input type="submit" value="${t("button.back")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button" form="history"/><#t>
                     </#if>
                 </div>
             </div>
@@ -51,22 +51,22 @@
                 <input type="hidden" name="v" value="${version.toPlainString()}" />
 
                 <p>
-                    <@s.text name="manage.history.intro"><@s.param>${version.toPlainString()}</@s.param><@s.param>${resource.title!resource.shortname}</@s.param></@s.text>
+                    ${t("manage.history.intro", version.toPlainString(), resource.title!resource.shortname)}
                 </p>
 
-                <#assign versionTitle><@s.text name="manage.overview.published.version"/></#assign>
+                <#assign versionTitle>${t("manage.overview.published.version")}<#t></#assign>
                 <#assign versionTitle = versionTitle?markup_string>
-                <#assign releasedTitle><@s.text name="manage.overview.published.released"/></#assign>
+                <#assign releasedTitle>${t("manage.overview.published.released")}<#t></#assign>
                 <#assign releasedTitle = releasedTitle?markup_string>
-                <#assign recordsTitle><@s.text name="portal.home.records"/></#assign>
+                <#assign recordsTitle>${t("portal.home.records")}<#t></#assign>
                 <#assign recordsTitle = recordsTitle?markup_string>
-                <#assign modifiedTitle><@s.text name="portal.home.modifiedBy"/></#assign>
+                <#assign modifiedTitle>${t("portal.home.modifiedBy")}<#t></#assign>
                 <#assign modifiedTitle = modifiedTitle?markup_string>
-                <#assign summaryTitle><@s.text name="portal.home.summary"/></#assign>
+                <#assign summaryTitle>${t("portal.home.summary")}<#t></#assign>
                 <#assign summaryTitle = summaryTitle?markup_string>
-                <#assign doiTitle><@s.text name="portal.home.doi"/></#assign>
+                <#assign doiTitle>${t("portal.home.doi")}<#t></#assign>
                 <#assign doiTitle = doiTitle?markup_string>
-                <#assign none><@s.text name="basic.none"/></#assign>
+                <#assign none>${t("basic.none")}<#t></#assign>
                 <#assign emptyPlaceholder="-"/>
 
                 <div>

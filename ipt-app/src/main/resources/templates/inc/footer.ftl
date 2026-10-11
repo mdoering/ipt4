@@ -3,20 +3,20 @@
     <div class="container">
         <div class="mb-1 footer-text">
             <img title="IPT ${(cfg.version)!}" class="footer-gbif-logo" alt="GBIF" src="${baseURL}/images/GBIF-2015-standard-ipt.png"/>
-            Integrated Publishing Toolkit (IPT) <@s.text name="footer.version"/> ${(cfg.shortVersion)!}
+            Integrated Publishing Toolkit (IPT) ${t("footer.version")} ${(cfg.shortVersion)!}
         </div>
         <ul class="list-inline mb-0">
             <li class="list-inline-item ipt-footer-item">
-                <a class="footer-link" href="https://www.gbif.org/ipt"><small><@s.text name="footer.projectHome"/></small></a>
+                <a class="footer-link" href="https://www.gbif.org/ipt"><small>${t("footer.projectHome")}</small></a>
             </li>
             <li class="list-inline-item ipt-footer-item">
-                <a class="footer-link" href="https://ipt.gbif.org/manual/" target="_blank"><small><@s.text name="footer.useManual"/></small></a>
+                <a class="footer-link" href="https://ipt.gbif.org/manual/" target="_blank"><small>${t("footer.useManual")}</small></a>
             </li>
             <li class="list-inline-item ipt-footer-item">
-                <a class="footer-link" href="https://github.com/gbif/ipt/issues/new" target="_blank"><small><@s.text name="footer.bugReport"/></small></a>
+                <a class="footer-link" href="https://github.com/gbif/ipt/issues/new" target="_blank"><small>${t("footer.bugReport")}</small></a>
             </li>
             <li class="list-inline-item">
-                <a class="footer-link" href="https://github.com/gbif/ipt/issues/new" target="_blank"><small><@s.text name="footer.featureRequest"/></small></a>
+                <a class="footer-link" href="https://github.com/gbif/ipt/issues/new" target="_blank"><small>${t("footer.featureRequest")}</small></a>
             </li>
         </ul>
     </div>

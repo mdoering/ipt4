@@ -1,7 +1,7 @@
 <#-- @ftlvariable name="" type="org.gbif.ipt.action.manage.OverviewAction" -->
 <#macro dwcaValidator>
     <#if (resource.recordsPublished>0)>
-        <a href="https://tools.gbif.org/dwca-validator/?archiveUrl=${baseURL}/archive.do?r=${resource.shortname}" title="<@s.text name="manage.overview.publishing.validator"/>" target="_blank" class="icon icon-validate">
+        <a href="https://tools.gbif.org/dwca-validator/?archiveUrl=${baseURL}/archive.do?r=${resource.shortname}" title="${t("manage.overview.publishing.validator")}" target="_blank" class="icon icon-validate">
             <i class="bi bi-check2 text-gbif-primary"></i>
         </a>
     </#if>
@@ -16,27 +16,27 @@
         <form id="doiForm" action='resource-reserveDoi.do' method='post'>
 <@csrfField/>
             <input name="r" type="hidden" value="${resource.shortname}"/>
-            <@s.submit cssClass="confirmReserveDoi btn btn-sm btn-outline-gbif-primary" name="reserveDoi" key="button.reserve" disabled="${missingBasicMetadata?string}"/>
+            <input type="submit" value="${t("button.reserve")?markup_string}" id="reserveDoi" name="reserveDoi"<#if missingBasicMetadata> disabled="disabled"</#if> class="confirmReserveDoi btn btn-sm btn-outline-gbif-primary"/><#t>
             <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                <@s.text name="button.cancel"/>
+                ${t("button.cancel")}<#t>
             </button>
         </form>
     <#elseif resource.identifierStatus == "PUBLIC_PENDING_PUBLICATION">
         <form id="doiForm" action='resource-deleteDoi.do' method='post'>
 <@csrfField/>
             <input name="r" type="hidden" value="${resource.shortname}"/>
-            <@s.submit cssClass="confirmDeleteDoi btn btn-sm btn-outline-gbif-danger" name="deleteDoi" key="button.delete" disabled="${missingBasicMetadata?string}"/>
+            <input type="submit" value="${t("button.delete")?markup_string}" id="deleteDoi" name="deleteDoi"<#if missingBasicMetadata> disabled="disabled"</#if> class="confirmDeleteDoi btn btn-sm btn-outline-gbif-danger"/><#t>
             <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                <@s.text name="button.cancel"/>
+                ${t("button.cancel")}<#t>
             </button>
         </form>
     <#elseif resource.identifierStatus == "PUBLIC" && resource.isAlreadyAssignedDoi() >
         <form id="doiForm" action='resource-reserveDoi.do' method='post'>
 <@csrfField/>
             <input name="r" type="hidden" value="${resource.shortname}"/>
-            <@s.submit cssClass="confirmReserveDoi btn btn-sm btn-outline-gbif-primary" name="reserveDoi" key="button.reserve.new" disabled="${missingBasicMetadata?string}"/>
+            <input type="submit" value="${t("button.reserve.new")?markup_string}" id="reserveDoi" name="reserveDoi"<#if missingBasicMetadata> disabled="disabled"</#if> class="confirmReserveDoi btn btn-sm btn-outline-gbif-primary"/><#t>
             <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                <@s.text name="button.cancel"/>
+                ${t("button.cancel")}<#t>
             </button>
         </form>
     </#if>
@@ -63,13 +63,13 @@
     <#elseif licenseUrl?contains("http://www.opendatacommons.org/licenses/by/1.0")>
         ODC-By 1.0
     <#elseif licenseUrl?has_content>
-        <@s.text name='manage.overview.noGBIFLicense'/>
+        ${t('manage.overview.noGBIFLicense')}<#t>
     <#else>
         -
     </#if>
 </#macro>
 <#include "/inc/header.ftl">
-<title><@s.text name="manage.overview.title"/>: ${resource.title!resource.shortname}</title>
+<title>${t("manage.overview.title")}: ${resource.title!resource.shortname}</title>
 
 <style>
     :root {
@@ -192,31 +192,31 @@
             <#assign resourceVisibility="public" />
         </#if>
 
-        $('.confirm').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmRegistration').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.visibility.confirm.registration'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", checkboxText: "<@s.text name='manage.overview.visibility.confirm.agreement'/>",<#if resource.isDwcDp()> select: {label: "<@s.text name='manage.overview.registration.datasetType'/>", placeholder: "<@s.text name='manage.overview.registration.datasetType.select'/>", target: "#dwcDpDatasetType", options: [<#list action.getDwcDpRegistrationDatasetTypes() as datasetType>{value: "${datasetType.name()}", label: "<@s.text name='portal.resource.type.${datasetType.name()?lower_case?replace("_", "")}'/>"}<#sep>, </#sep></#list>]},</#if> buttonType: "primary", processing: true, baseUrl: "${baseURL}"});
-        $('.confirmEmlReplace').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.metadata.replace.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmDatapackageMetadataReplace').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.metadata.replace.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", buttonType: "primary", baseUrl: "${baseURL}"});
-        $('.confirmDeletionFromIptAndGbif').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<#if resource.isAlreadyAssignedDoi()><@s.text name='manage.resource.delete.confirm.doi'/></br></br></#if><#if resource.status=='REGISTERED'><@s.text name='manage.resource.delete.fromIptAndGbif.confirm.registered'/></br></br></#if><@s.text name='manage.resource.delete.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", baseUrl: "${baseURL}"});
-        $('.confirmDeletionFromIptOnly').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<#if resource.isAlreadyAssignedDoi()><@s.text name='manage.resource.delete.confirm.doi'/></br></br></#if><#if resource.status=='REGISTERED'><@s.text name='manage.resource.delete.fromIptOnly.confirm.registered'/></br></br></#if><@s.text name='manage.resource.delete.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", baseUrl: "${baseURL}"});
-        $('.confirmUndeletion').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.resource.undoDelete.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirm').jConfirmAction({titleQuestion : "${t("basic.confirm")}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmRegistration').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.visibility.confirm.registration')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", checkboxText: "${t('manage.overview.visibility.confirm.agreement')}",<#if resource.isDwcDp()> select: {label: "${t('manage.overview.registration.datasetType')}", placeholder: "${t('manage.overview.registration.datasetType.select')}", target: "#dwcDpDatasetType", options: [<#list action.getDwcDpRegistrationDatasetTypes() as datasetType>{value: "${datasetType.name()}", label: "${t('portal.resource.type.${datasetType.name()?lower_case?replace("_", "")}')}"}<#sep>, </#sep></#list>]},</#if> buttonType: "primary", processing: true, baseUrl: "${baseURL}"});
+        $('.confirmEmlReplace').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.metadata.replace.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmDatapackageMetadataReplace').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.metadata.replace.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", buttonType: "primary", baseUrl: "${baseURL}"});
+        $('.confirmDeletionFromIptAndGbif').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "<#if resource.isAlreadyAssignedDoi()>${t('manage.resource.delete.confirm.doi')}</br></br></#if><#if resource.status=='REGISTERED'>${t('manage.resource.delete.fromIptAndGbif.confirm.registered')}</br></br></#if>${t('manage.resource.delete.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", baseUrl: "${baseURL}"});
+        $('.confirmDeletionFromIptOnly').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "<#if resource.isAlreadyAssignedDoi()>${t('manage.resource.delete.confirm.doi')}</br></br></#if><#if resource.status=='REGISTERED'>${t('manage.resource.delete.fromIptOnly.confirm.registered')}</br></br></#if>${t('manage.resource.delete.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", baseUrl: "${baseURL}"});
+        $('.confirmUndeletion').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.resource.undoDelete.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
 
-        $('.confirmReserveDoi').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.doi.reserve.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmDeleteDoi').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.doi.delete.confirm'/>", yesAnswer : "<@s.text name='basic.yes'/>", cancelAnswer : "<@s.text name='basic.no'/>", baseUrl: "${baseURL}"});
+        $('.confirmReserveDoi').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.doi.reserve.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmDeleteDoi').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.doi.delete.confirm')}", yesAnswer : "${t('basic.yes')}", cancelAnswer : "${t('basic.no')}", baseUrl: "${baseURL}"});
         <#if !outdatedExtensions>
-        $('.confirmPublish').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMinorVersion').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.doi.minorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMajorVersion').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.doi.majorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", checkboxText: "<@s.text name='manage.overview.publishing.doi.register.agreement'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMajorVersionWithoutDOI').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.withoutDoi.majorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublish').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMinorVersion').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.doi.minorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMajorVersion').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.doi.majorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", checkboxText: "${t('manage.overview.publishing.doi.register.agreement')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMajorVersionWithoutDOI').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.withoutDoi.majorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
         <#else>
-        $('.confirmPublish').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.outdatedExtensions'/><br><br><@s.text name='manage.overview.publishing.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMinorVersion').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.outdatedExtensions'/><br><br><@s.text name='manage.overview.publishing.doi.minorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMajorVersion').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.outdatedExtensions'/><br><br><@s.text name='manage.overview.publishing.doi.majorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", checkboxText: "<@s.text name='manage.overview.publishing.doi.register.agreement'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
-        $('.confirmPublishMajorVersionWithoutDOI').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name='manage.overview.publishing.outdatedExtensions'/><br><br><@s.text name='manage.overview.publishing.withoutDoi.majorVersion.confirm'><@s.param>${resourceVisibility}</@s.param><@s.param>${resourceVisibility}</@s.param></@s.text>", yesAnswer : "<@s.text name='button.publish'/>", summary : "<@s.text name='manage.overview.publishing.doi.summary.placeholder'/>", cancelAnswer : "<@s.text name='button.cancel'/>", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublish').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.outdatedExtensions')}<br><br>${t('manage.overview.publishing.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMinorVersion').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.outdatedExtensions')}<br><br>${t('manage.overview.publishing.doi.minorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMajorVersion').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.outdatedExtensions')}<br><br>${t('manage.overview.publishing.doi.majorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", checkboxText: "${t('manage.overview.publishing.doi.register.agreement')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
+        $('.confirmPublishMajorVersionWithoutDOI').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t('manage.overview.publishing.outdatedExtensions')}<br><br>${t('manage.overview.publishing.withoutDoi.majorVersion.confirm', resourceVisibility, resourceVisibility)}", yesAnswer : "${t('button.publish')}", summary : "${t('manage.overview.publishing.doi.summary.placeholder')}", cancelAnswer : "${t('button.cancel')}", buttonType: "primary", baseUrl: "${baseURL}", logo: "success"});
         </#if>
 
-        $('.delete-source').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name="manage.source.confirmation.message"/>", yesAnswer : "<@s.text name="basic.yes"/>", cancelAnswer : "<@s.text name="basic.no"/>", buttonType: "danger", baseUrl: "${baseURL}"});
-        $('.delete-mapping').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name ="manage.mapping.confirmation.message"/>", yesAnswer : "<@s.text name="basic.yes"/>", cancelAnswer : "<@s.text name="basic.no"/>", buttonType: "danger", baseUrl: "${baseURL}"});
-        $('.delete-core-mapping').jConfirmAction({titleQuestion : "<@s.text name="basic.confirm"/>", question : "<@s.text name ="manage.mapping.confirmation.message"/><br><br><@s.text name ="manage.mapping.confirmation.message.core"/>", yesAnswer : "<@s.text name="basic.yes"/>", cancelAnswer : "<@s.text name="basic.no"/>", buttonType: "danger", baseUrl: "${baseURL}"});
+        $('.delete-source').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t("manage.source.confirmation.message")}", yesAnswer : "${t("basic.yes")}", cancelAnswer : "${t("basic.no")}", buttonType: "danger", baseUrl: "${baseURL}"});
+        $('.delete-mapping').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t("manage.mapping.confirmation.message")}", yesAnswer : "${t("basic.yes")}", cancelAnswer : "${t("basic.no")}", buttonType: "danger", baseUrl: "${baseURL}"});
+        $('.delete-core-mapping').jConfirmAction({titleQuestion : "${t("basic.confirm")}", question : "${t("manage.mapping.confirmation.message")}<br><br>${t("manage.mapping.confirmation.message.core")}", yesAnswer : "${t("basic.yes")}", cancelAnswer : "${t("basic.no")}", buttonType: "danger", baseUrl: "${baseURL}"});
 
         // Initialize scrollspy
         IptScrollSpy.init({tocSelector: '.bd-toc nav a'});
@@ -225,11 +225,11 @@
         $("#toggleReport").click(function () {
             if (showReport) {
                 showReport = false;
-                $("#toggleReport-text").text("<@s.text name='manage.overview.published.report.show'/>");
+                $("#toggleReport-text").text("${t('manage.overview.published.report.show')}");
                 $('#dwcaReport').fadeOut();
             } else {
                 showReport = true;
-                $("#toggleReport-text").text("<@s.text name='manage.overview.published.report.hide'/>");
+                $("#toggleReport-text").text("${t('manage.overview.published.report.hide')}");
                 $('#dwcaReport').fadeIn();
             }
         });
@@ -335,7 +335,7 @@
                 sendButton.hide();
                 $(".progress-bar-container").show();
                 clearButton.hide();
-                addButton.attr("value", '<@s.text name="button.add"/>');
+                addButton.attr("value", '${t("button.add")}');
                 addButton.hide();
                 urlSourceInfoBlock.hide();
 
@@ -352,7 +352,7 @@
                 $(".progress-bar-container").hide();
                 fileInput.prop("value", "");
                 clearButton.show();
-                addButton.attr("value", '<@s.text name="button.add"/>');
+                addButton.attr("value", '${t("button.add")}');
                 addButton.show();
 
                 // display "Check URL"
@@ -431,7 +431,7 @@
                 urlInput.hide();
                 urlInput.prop("value", "");
                 clearButton.hide();
-                addButton.attr("value", '<@s.text name="button.connect"/>');
+                addButton.attr("value", '${t("button.connect")}');
                 addButton.show();
 
                 fileItems.forEach(function(item) {
@@ -807,8 +807,8 @@
         }
 
         function showSourceCreatedSuccessfullyInfoWindow() {
-            const templateOneSource = `<@s.text name="manage.overview.source.created"/>`;
-            const templateMultipleSources = `<@s.text name="manage.overview.sources.created"/>`;
+            const templateOneSource = `${t("manage.overview.source.created")}`;
+            const templateMultipleSources = `${t("manage.overview.sources.created")}`;
             const files = sessionStorage.getItem("uploadedFiles");
             sessionStorage.removeItem("uploadedFiles");
 
@@ -952,11 +952,11 @@
             var displayWarning = isFileNameInvalid || isFileSizeTooBig || isSourceAlreadyExistOrRepeated;
 
             if (isFileNameInvalid) {
-                fileError.innerText = `<@s.text name='manage.overview.source.file.name.invalid'/>`;
+                fileError.innerText = `${t('manage.overview.source.file.name.invalid')}`;
             } else if (isFileSizeTooBig) {
-                fileError.innerText = `<@s.text name='manage.overview.source.file.too.big'/>`;
+                fileError.innerText = `${t('manage.overview.source.file.too.big')}`;
             } else if (isSourceAlreadyExistOrRepeated) {
-                fileError.innerText = `<@s.text name='manage.resource.addSource.sameName.confirm'/>`;
+                fileError.innerText = `${t('manage.resource.addSource.sameName.confirm')}`;
 
                 var confirmOverwriteLink = document.createElement("a");
                 confirmOverwriteLink.id = 'confirmOverwriteSourceFileLink-' + index;
@@ -1118,7 +1118,7 @@
                             ")";
 
                         if (percent === 100) {
-                            fileStatus.innerText = `<@s.text name='manage.resource.addSource.processingFile'/>`;
+                            fileStatus.innerText = `${t('manage.resource.addSource.processingFile')}`;
                             progressBar.classList.add("progressBar-loader");
                         } else {
                             progressBar.classList.remove("progressBar-loader");
@@ -1411,8 +1411,8 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/manage/"><@s.text name="breadcrumb.manage"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.manage.overview"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/manage/">${t("breadcrumb.manage")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.manage.overview")}</li>
                         </ol>
                     </nav>
                 </div>
@@ -1428,9 +1428,9 @@
 
                     <div>
                         <div class="my-auto me-3">
-                            <span class="fs-smaller-2 text-nowrap type-pill dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1"><@s.text name="portal.resource.type.${resourceTypeLowerCase}"/></span>
+                            <span class="fs-smaller-2 text-nowrap type-pill dt-content-link dt-content-pill type-${resourceTypeLowerCase} me-1">${t("portal.resource.type.${resourceTypeLowerCase}")}</span>
                             <#if resourceSubtypeLowerCase?has_content>
-                                <span class="fs-smaller-2 text-nowrap subtype-pill dt-content-link dt-content-pill type-${resourceSubtypeLowerCase} me-1"><@s.text name="portal.resource.subtype.${resourceSubtypeLowerCase}"/></span>
+                                <span class="fs-smaller-2 text-nowrap subtype-pill dt-content-link dt-content-pill type-${resourceSubtypeLowerCase} me-1">${t("portal.resource.subtype.${resourceSubtypeLowerCase}")}</span>
                             </#if>
                             <#assign isStatusPending = resource.pendingStatus?has_content && resource.status != resource.pendingStatus>
                             <#if isStatusPending>
@@ -1447,7 +1447,7 @@
                                     <#else>
                                         <i class="bi bi-circle-fill fs-smaller-2"></i>
                                     </#if>
-                                    <span><@s.text name="manage.home.visible.pending.${resource.pendingStatus!?lower_case}"/></span>
+                                    <span>${t("manage.home.visible.pending.${resource.pendingStatus!?lower_case}")}</span>
                                 </span>
                             <#elseif resource.status?has_content>
                                 <span class="text-nowrap text-discreet fs-smaller-2 status-pill main-status-pill status-${resource.status!?lower_case}">
@@ -1456,25 +1456,25 @@
                                     <#else>
                                         <i class="bi bi-circle-fill fs-smaller-2"></i>
                                     </#if>
-                                    <span><@s.text name="manage.home.visible.${resource.status!?lower_case}"/></span>
+                                    <span>${t("manage.home.visible.${resource.status!?lower_case}")}</span>
                                 </span>
                             </#if>
                         </div>
                         <#if isStatusPending>
                             <div class="mt-2">
                                 <span class="fs-smaller-2 text-discreet">
-                                    <@s.text name="manage.overview.changed.publication.status.description"/>: <b class="text-gbif-${pendingStatusColor}">${resource.pendingStatus}</b>. <@s.text name="manage.overview.changed.publication.status.republication"/>
+                                    ${t("manage.overview.changed.publication.status.description")}: <b class="text-gbif-${pendingStatusColor}">${resource.pendingStatus}</b>. ${t("manage.overview.changed.publication.status.republication")}
                                 </span>
                             </div>
                         </#if>
                         <div class="mt-2">
-                            <span class="fs-smaller-2 text-discreet"><@s.text name="basic.createdByOn"><@s.param>${(resource.creator.name)!}</@s.param><@s.param>${resource.created?date?string("MMM d, yyyy")}</@s.param></@s.text></span>
+                            <span class="fs-smaller-2 text-discreet">${t("basic.createdByOn", (resource.creator.name)!, resource.created?date?string("MMM d, yyyy"))}</span>
                         </div>
                     </div>
 
                     <div class="mt-2">
                         <#if resource.published>
-                            <a href="${baseURL}/resource?r=${resource.shortname}" id="top-button-view-resource" class="btn btn-sm btn-outline-gbif-primary top-button"><@s.text name="button.view"/></a>
+                            <a href="${baseURL}/resource?r=${resource.shortname}" id="top-button-view-resource" class="btn btn-sm btn-outline-gbif-primary top-button">${t("button.view")}</a>
                         </#if>
 
                         <#if resource.status == "DELETED">
@@ -1483,10 +1483,10 @@
                                     <form action='resource-undelete.do' method='post'>
 <@csrfField/>
                                         <input name="r" type="hidden" value="${resource.shortname}" />
-                                        <@s.submit cssClass="btn btn-sm btn-outline-gbif-primary confirmUndeletion top-button" name="undelete" key="button.undelete"/>
+                                        <input type="submit" value="${t("button.undelete")?markup_string}" id="undelete" name="undelete" class="btn btn-sm btn-outline-gbif-primary confirmUndeletion top-button"/><#t>
                                     </form>
                                 <#else>
-                                    <button class="btn btn-sm btn-outline-gbif-primary button-show-delete-resource-disabled-modal top-button" name="undelete"><@s.text name="button.undelete"/></button>
+                                    <button class="btn btn-sm btn-outline-gbif-primary button-show-delete-resource-disabled-modal top-button" name="undelete">${t("button.undelete")}</button>
                                 </#if>
                             </div>
                         <#else>
@@ -1495,37 +1495,37 @@
                                     <form action="resource-delete.do" method='post' style="display: none;">
 <@csrfField/>
                                         <input name="r" type="hidden" value="${resource.shortname}" />
-                                        <@s.submit cssClass="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptAndGbif w-100 dropdown-button" cssStyle="text-transform: unset !important" name="deleteFlag" key="button.delete.fromIptAndGbif"/>
+                                        <input type="submit" value="${t("button.delete.fromIptAndGbif")?markup_string}" id="deleteFlag" name="deleteFlag" class="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptAndGbif w-100 dropdown-button" style="text-transform: unset !important"/><#t>
                                     </form>
                                     <form action="resource-deleteFromIpt.do" method='post' style="display: none;">
 <@csrfField/>
                                         <input name="r" type="hidden" value="${resource.shortname}" />
-                                        <@s.submit cssClass="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptOnly w-100 dropdown-button" cssStyle="text-transform: unset !important" name="deleteFlag" key="button.delete.fromIpt"/>
+                                        <input type="submit" value="${t("button.delete.fromIpt")?markup_string}" id="deleteFlag" name="deleteFlag" class="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptOnly w-100 dropdown-button" style="text-transform: unset !important"/><#t>
                                     </form>
-                                    <button class="btn btn-sm btn-outline-gbif-danger top-button button-show-delete-resource-modal" name="deleteFlag"><@s.text name="button.delete"/></button>
+                                    <button class="btn btn-sm btn-outline-gbif-danger top-button button-show-delete-resource-modal" name="deleteFlag">${t("button.delete")}</button>
                                 <#else>
                                     <form action="resource-deleteFromIpt.do" method='post' style="display: none;">
 <@csrfField/>
                                         <input name="r" type="hidden" value="${resource.shortname}" />
-                                        <@s.submit cssClass="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptOnly top-button" name="deleteFlag" key="button.delete.fromIpt"/>
+                                        <input type="submit" value="${t("button.delete.fromIpt")?markup_string}" id="deleteFlag" name="deleteFlag" class="btn btn-sm btn-outline-gbif-danger confirmDeletion confirmDeletionFromIptOnly top-button"/><#t>
                                     </form>
-                                    <button class="btn btn-sm btn-outline-gbif-danger top-button proxy-button-delete-from-ipt" name="deleteFlag"><@s.text name="button.delete"/></button>
+                                    <button class="btn btn-sm btn-outline-gbif-danger top-button proxy-button-delete-from-ipt" name="deleteFlag">${t("button.delete")}</button>
                                 </#if>
                             <#else>
-                                <button class="btn btn-sm btn-outline-gbif-danger button-show-delete-resource-disabled-modal top-button" name="deleteFlag"><@s.text name="button.delete"/></button>
+                                <button class="btn btn-sm btn-outline-gbif-danger button-show-delete-resource-disabled-modal top-button" name="deleteFlag">${t("button.delete")}</button>
                             </#if>
                         </#if>
 
-                        <a href="${baseURL}/manage/" id="top-button-cancel" class="btn btn-sm btn-outline-secondary top-button"><@s.text name="button.cancel"/></a>
+                        <a href="${baseURL}/manage/" id="top-button-cancel" class="btn btn-sm btn-outline-secondary top-button">${t("button.cancel")}</a>
                     </div>
 
                     <p class="mt-3 mb-0 text-smaller fst-italic">
                         <#if isDataPackage>
-                            <@s.text name="manage.overview.dataPackageSchema.description"/>
+                            ${t("manage.overview.dataPackageSchema.description")}<#t>
                         <#elseif resource.coreType?has_content && resource.coreType==metadataType>
-                            <@s.text name="manage.overview.description.metadataOnly"/>
+                            ${t("manage.overview.description.metadataOnly")}<#t>
                         <#else>
-                            <@s.text name="manage.overview.description"/>
+                            ${t("manage.overview.description")}<#t>
                         </#if>
                     </p>
 
@@ -1543,17 +1543,17 @@
                     <nav id="sidebar-content">
                         <ul>
                             <#if resource.coreType?has_content && resource.coreType==metadataType>
-                                <li><a href="#anchor-metadata" class="sidebar-navigation-link"><@s.text name='manage.overview.metadata'/></a></li>
+                                <li><a href="#anchor-metadata" class="sidebar-navigation-link">${t('manage.overview.metadata')}</a></li>
                             <#else>
-                                <li><a href="#anchor-sources" class="sidebar-navigation-link"><@s.text name='manage.overview.source.data'/></a></li>
-                                <li><a href="#anchor-mappings" class="sidebar-navigation-link"><#if isDataPackage><@s.text name='manage.overview.mappings'/><#else><@s.text name='manage.overview.DwC.Mappings'/></#if></a></li>
-                                <li><a href="#anchor-metadata" class="sidebar-navigation-link"><@s.text name='manage.overview.metadata'/></a></li>
+                                <li><a href="#anchor-sources" class="sidebar-navigation-link">${t('manage.overview.source.data')}</a></li>
+                                <li><a href="#anchor-mappings" class="sidebar-navigation-link"><#if isDataPackage>${t('manage.overview.mappings')}<#else>${t('manage.overview.DwC.Mappings')}</#if></a></li>
+                                <li><a href="#anchor-metadata" class="sidebar-navigation-link">${t('manage.overview.metadata')}</a></li>
                             </#if>
-                            <li><a href="#anchor-visibility" class="sidebar-navigation-link"><@s.text name='manage.overview.visibility'/></a></li>
-                            <li><a href="#anchor-publish" class="sidebar-navigation-link"><@s.text name='manage.overview.published'/></a></li>
-                            <li><a href="#anchor-registration" class="sidebar-navigation-link"><@s.text name='manage.overview.registration'/></a></li>
-                            <li><a href="#anchor-networks" class="sidebar-navigation-link"><@s.text name='manage.overview.networks.title'/></a></li>
-                            <li><a href="#anchor-managers" class="sidebar-navigation-link"><@s.text name='manage.overview.resource.managers'/></a></li>
+                            <li><a href="#anchor-visibility" class="sidebar-navigation-link">${t('manage.overview.visibility')}</a></li>
+                            <li><a href="#anchor-publish" class="sidebar-navigation-link">${t('manage.overview.published')}</a></li>
+                            <li><a href="#anchor-registration" class="sidebar-navigation-link">${t('manage.overview.registration')}</a></li>
+                            <li><a href="#anchor-networks" class="sidebar-navigation-link">${t('manage.overview.networks.title')}</a></li>
+                            <li><a href="#anchor-managers" class="sidebar-navigation-link">${t('manage.overview.resource.managers')}</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -1573,11 +1573,11 @@
                             <div class="d-flex">
                                 <h5 class="my-auto text-gbif-header-2 fw-400">
                                     <#assign visibilityTitleInfo>
-                                        <@s.text name='manage.overview.visibility.description'/>
+                                        ${t('manage.overview.visibility.description')}<#t>
                                     </#assign>
 
                                     <@popoverTextInfo visibilityTitleInfo/>
-                                    <@s.text name='manage.overview.visibility'/>
+                                    ${t('manage.overview.visibility')}<#t>
                                 </h5>
                             </div>
 
@@ -1591,7 +1591,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                             </svg>
-                                            <@s.text name='button.change'/>
+                                            ${t('button.change')}<#t>
                                         </button>
                                     </form>
                                 <#elseif action.canBeMadePrivate()>
@@ -1604,7 +1604,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                             </svg>
-                                            <@s.text name='button.change'/>
+                                            ${t('button.change')}<#t>
                                         </button>
                                     </form>
                                 <#elseif resource.pendingStatus?has_content>
@@ -1612,14 +1612,14 @@
                                         <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                         </svg>
-                                        <@s.text name='button.change'/>
+                                        ${t('button.change')}<#t>
                                     </button>
                                 <#else>
                                     <button id="show-visibility-disabled-modal" class="text-gbif-header-2 icon-button icon-material-actions overview-action-button" type="button">
                                         <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                         </svg>
-                                        <@s.text name='button.change'/>
+                                        ${t('button.change')}<#t>
                                     </button>
                                 </#if>
                             </div>
@@ -1629,29 +1629,27 @@
                             <#if isStatusPending>
                                 <#if resource.pendingStatus=="PRIVATE">
                                     <p>
-                                        <@s.text name="manage.resource.status.intro.pending.private"/> <@s.text name="manage.overview.changed.publication.status.republication"/>
+                                        ${t("manage.resource.status.intro.pending.private")}<#t> ${t("manage.overview.changed.publication.status.republication")}
                                     </p>
                                 <#elseif resource.pendingStatus=="PUBLIC">
                                     <p>
-                                        <@s.text name="manage.resource.status.intro.pending.public"/> <@s.text name="manage.overview.changed.publication.status.republication"/>
+                                        ${t("manage.resource.status.intro.pending.public")}<#t> ${t("manage.overview.changed.publication.status.republication")}
                                     </p>
                                 </#if>
                             <#else>
                             <p class="mb-0">
                                 <#if resource.status=="PRIVATE">
                                     <#if resource.makePublicDate?has_content>
-                                        <@s.text name="manage.resource.status.intro.private.public.scheduled">
-                                            <@s.param>${resource.makePublicDate?datetime?string.long_short}</@s.param>
-                                        </@s.text>
+                                        ${t("manage.resource.status.intro.private.public.scheduled", resource.makePublicDate?datetime?string.long_short)}<#t>
                                     <#else>
-                                        <@s.text name="manage.resource.status.intro.private"/>
+                                        ${t("manage.resource.status.intro.private")}<#t>
                                     </#if>
                                 <#elseif resource.status=="PUBLIC">
-                                    <@s.text name="manage.resource.status.intro.public"/>
+                                    ${t("manage.resource.status.intro.public")}<#t>
                                 <#elseif resource.status=="REGISTERED">
-                                    <@s.text name="manage.resource.status.intro.registered"/>
+                                    ${t("manage.resource.status.intro.registered")}<#t>
                                 <#elseif resource.status=="DELETED">
-                                    <@s.text name="manage.resource.status.intro.deleted"/>
+                                    ${t("manage.resource.status.intro.deleted")}<#t>
                                 </#if>
                             </p>
                             </#if>
@@ -1665,34 +1663,34 @@
                                 <h5 class="my-auto text-gbif-header-2 fw-400">
                                     <#assign overviewTitleInfo>
                                         <#if resource.coreType?has_content && resource.coreType==metadataType>
-                                            <@s.text name="manage.overview.published.description.metadataOnly"/>
+                                            ${t("manage.overview.published.description.metadataOnly")}<#t>
                                         <#elseif resource.dataPackage==true>
-                                            <@s.text name="manage.overview.published.description.dp"/>
+                                            ${t("manage.overview.published.description.dp")}<#t>
                                         <#else>
-                                            <@s.text name="manage.overview.published.description"/>
+                                            ${t("manage.overview.published.description")}<#t>
                                         </#if>
                                         <br/><br/>
 
                                         <#assign displayDoiFunctionality = (organisationWithPrimaryDoiAccount.key)?has_content && (resource.organisation.key)?has_content && (organisationWithPrimaryDoiAccount.key == resource.organisation.key || currentUser.role == "Admin" || resourceOrganisationAssociatedWithDoiAgency) && currentUser.hasRegistrationRights()>
 
                                         <#if displayDoiFunctionality>
-                                            <@s.text name='manage.overview.published.description.doiAccount'><@s.param>${organisationWithPrimaryDoiAccount.doiRegistrationAgency}</@s.param><@s.param>${organisationWithPrimaryDoiAccount.name}</@s.param><@s.param>${organisationWithPrimaryDoiAccount.doiPrefix}</@s.param></@s.text>
+                                            ${t('manage.overview.published.description.doiAccount', organisationWithPrimaryDoiAccount.doiRegistrationAgency, organisationWithPrimaryDoiAccount.name, organisationWithPrimaryDoiAccount.doiPrefix)}
                                         <#else>
-                                            <@s.text name="manage.overview.published.description.noDoiAccount"/>
+                                            ${t("manage.overview.published.description.noDoiAccount")}<#t>
                                         </#if>
                                     </#assign>
                                     <@popoverTextInfo overviewTitleInfo/>
 
-                                    <@s.text name='manage.overview.published'/>
+                                    ${t('manage.overview.published')}<#t>
                                 </h5>
                             </div>
 
                             <#if displayDoiFunctionality>
                                 <#assign doiActionName>
-                                    <#if resource.identifierStatus == "UNRESERVED"><@s.text name="button.reserve"/> DOI<#t>
-                                    <#elseif resource.identifierStatus == "PUBLIC_PENDING_PUBLICATION"><@s.text name="button.delete"/> DOI<#t>
-                                    <#elseif resource.identifierStatus == "PUBLIC" && resource.isAlreadyAssignedDoi()><@s.text name="button.reserve.new"/> DOI<#t>
-                                    <#else><@s.text name="button.reserve"/> DOI<#t>
+                                    <#if resource.identifierStatus == "UNRESERVED">${t("button.reserve")} DOI<#t>
+                                    <#elseif resource.identifierStatus == "PUBLIC_PENDING_PUBLICATION">${t("button.delete")} DOI<#t>
+                                    <#elseif resource.identifierStatus == "PUBLIC" && resource.isAlreadyAssignedDoi()>${t("button.reserve.new")} DOI<#t>
+                                    <#else>${t("button.reserve")} DOI<#t>
                                     </#if>
                                 </#assign>
                             </#if>
@@ -1702,7 +1700,7 @@
                                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                     </svg>
-                                    <@s.text name="button.edit"/>
+                                    ${t("button.edit")}<#t>
                                 </a>
 
                                 <@publish resource/>
@@ -1711,7 +1709,7 @@
                                         <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                             <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"></path>
                                         </svg>
-                                        <@s.text name="button.options"/>
+                                        ${t("button.options")}<#t>
                                     </button>
 
                                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="publicationDropdown">
@@ -1734,43 +1732,43 @@
                             <p class="mb-2">
                                 <#if resource.usesAutoPublishing()>
                                     <span class="fs-smaller-2 text-nowrap dt-content-link dt-content-pill autopublish-enabled">
-                                        <@s.text name="manage.overview.autopublish.enabled"/>: ${autoPublishFrequencies.get(resource.updateFrequency.identifier)}
+                                        ${t("manage.overview.autopublish.enabled")}: ${autoPublishFrequencies.get(resource.updateFrequency.identifier)}
                                     </span>
-                                    <@s.text name="manage.overview.autopublish.intro.activated"/>
+                                    ${t("manage.overview.autopublish.intro.activated")}<#t>
                                 </#if>
                             </p>
 
                             <#if (resource.organisation.name)?has_content>
                             <div class="mb-2">
-                                <@s.text name="eml.publishingOrganisation"/>: <i>${resource.organisation.name}</i>
+                                ${t("eml.publishingOrganisation")}: <i>${resource.organisation.name}</i>
                             </div>
                             </#if>
 
                             <p class="mb-0">
-                                <@s.text name="manage.overview.published.intro"/>
+                                ${t("manage.overview.published.intro")}<#t>
                             </p>
 
                             <div class="details mt-3">
-                                <#assign lastPublishedTitle><@s.text name="manage.overview.published.last.publication.intro"/></#assign>
+                                <#assign lastPublishedTitle>${t("manage.overview.published.last.publication.intro")}<#t></#assign>
                                 <#assign lastPublishedTitle = lastPublishedTitle?markup_string>
-                                <#assign nextPublishedTitle><@s.text name="manage.overview.published.next.publication.intro"/></#assign>
+                                <#assign nextPublishedTitle>${t("manage.overview.published.next.publication.intro")}<#t></#assign>
                                 <#assign nextPublishedTitle = nextPublishedTitle?markup_string>
-                                <#assign versionTitle><@s.text name="manage.overview.published.version"/></#assign>
-                                <#assign releasedTitle><@s.text name="manage.overview.published.released"/></#assign>
+                                <#assign versionTitle>${t("manage.overview.published.version")}<#t></#assign>
+                                <#assign releasedTitle>${t("manage.overview.published.released")}<#t></#assign>
                                 <#assign releasedTitle = releasedTitle?markup_string>
-                                <#assign nextPublicationDate><@s.text name="manage.overview.published.next.date"/></#assign>
+                                <#assign nextPublicationDate>${t("manage.overview.published.next.date")}<#t></#assign>
                                 <#assign nextPublicationDate = nextPublicationDate?markup_string>
-                                <#assign pubLogTitle><@s.text name="portal.publication.log"/></#assign>
+                                <#assign pubLogTitle>${t("portal.publication.log")}<#t></#assign>
                                 <#assign pubLogTitle = pubLogTitle?markup_string>
-                                <#assign pubRepTitle><@s.text name="manage.overview.published.report.show"/></#assign>
+                                <#assign pubRepTitle>${t("manage.overview.published.report.show")}<#t></#assign>
                                 <#assign pubRepTitle = pubRepTitle?markup_string>
-                                <#assign downloadTitle><@s.text name='manage.overview.published.download'/></#assign>
-                                <#assign showTitle><@s.text name="basic.show"/></#assign>
-                                <#assign viewTitle><@s.text name='button.view'/></#assign>
-                                <#assign previewTitle><@s.text name='button.preview'/></#assign>
+                                <#assign downloadTitle>${t('manage.overview.published.download')}<#t></#assign>
+                                <#assign showTitle>${t("basic.show")}<#t></#assign>
+                                <#assign viewTitle>${t('button.view')}<#t></#assign>
+                                <#assign previewTitle>${t('button.preview')}<#t></#assign>
                                 <#assign emptyCell="-"/>
-                                <#assign visibilityTitle><@s.text name='manage.overview.visibility'/></#assign>
-                                <#assign licenseTitle><@s.text name='eml.intellectualRights.license'/></#assign>
+                                <#assign visibilityTitle>${t('manage.overview.visibility')}<#t></#assign>
+                                <#assign licenseTitle>${t('eml.intellectualRights.license')}<#t></#assign>
                                 <#assign licenseTitle = licenseTitle?markup_string>
 
                                 <div class="row g-2">
@@ -1782,20 +1780,20 @@
                                                 <div class="ps-2 published-version-item-link">
                                                     <span>
                                                         <#if lastPublishedVersionStatus == "registered">
-                                                            <i class="bi bi-circle-fill status-registered" title="<@s.text name="resource.status.registered"/>"></i>
+                                                            <i class="bi bi-circle-fill status-registered" title="${t("resource.status.registered")}"></i>
                                                         <#elseif lastPublishedVersionStatus == "public">
-                                                            <i class="bi bi-circle status-public" title="<@s.text name="resource.status.public"/>"></i>
+                                                            <i class="bi bi-circle status-public" title="${t("resource.status.public")}"></i>
                                                         <#elseif lastPublishedVersionStatus == "private">
-                                                            <i class="bi bi-circle status-private" title="<@s.text name="resource.status.private"/>"></i>
+                                                            <i class="bi bi-circle status-private" title="${t("resource.status.private")}"></i>
                                                         <#elseif lastPublishedVersionStatus == "deleted">
-                                                            <i class="bi bi-circle-fill status-deleted" title="<@s.text name="resource.status.deleted"/>"></i>
+                                                            <i class="bi bi-circle-fill status-deleted" title="${t("resource.status.deleted")}"></i>
                                                         </#if>
                                                     </span>
                                                     <span class="me-2 overview-version-title">
                                                         <#if isDataPackage>
-                                                            <strong><@s.text name="footer.version"/> ${resource.metadataVersion}</strong>
+                                                            <strong>${t("footer.version")} ${resource.metadataVersion}</strong>
                                                         <#else>
-                                                            <strong><@s.text name="footer.version"/> ${resource.emlVersion.toPlainString()}</strong>
+                                                            <strong>${t("footer.version")} ${resource.emlVersion.toPlainString()}</strong>
                                                         </#if>
                                                     </span><br>
                                                     <span class="fs-smaller-2">
@@ -1813,7 +1811,7 @@
                                                         <#if isDwcDp>
                                                             <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-current mt-2 mb-1"><@shortLicense action.getLastPublishedVersionAssignedLicense(resource)!/></span><br>
                                                         <#elseif !(resource.dataPackageMetadata.licenses)?has_content && !(resource.dataPackageMetadata.license)?has_content>
-                                                            <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-current mt-2 mb-1"><@s.text name="manage.overview.published.licenseNotSet"/></span><br>
+                                                            <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-current mt-2 mb-1">${t("manage.overview.published.licenseNotSet")}</span><br>
                                                         <#elseif resource.coreType?? && resource.coreType == "camtrap-dp">
                                                             <#list resource.dataPackageMetadata.licenses as license>
                                                                 <#if license.scope?? && license.scope == "data">
@@ -1827,7 +1825,7 @@
                                                 </div>
 
                                                 <div class="d-flex justify-content-end my-auto version-item-actions">
-                                                    <a title="<@s.text name="button.view"/>" class="icon-button icon-material-actions version-item-action fs-smaller-2 d-sm-max-none" type="button" href="${baseURL}/resource?r=${resource.shortname}">
+                                                    <a title="${t("button.view")}" class="icon-button icon-material-actions version-item-action fs-smaller-2 d-sm-max-none" type="button" href="${baseURL}/resource?r=${resource.shortname}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
@@ -1864,7 +1862,7 @@
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                     </svg>
-                                                                    <@s.text name="button.view"/>
+                                                                    ${t("button.view")}<#t>
                                                                 </a>
                                                             </li>
 
@@ -1912,24 +1910,24 @@
                                             <div class="ps-2 next-version-item-link">
                                                 <span>
                                                     <#if nextVersionStatus == "registered">
-                                                        <i class="bi bi-circle-fill status-registered" title="<@s.text name="resource.status.registered"/>"></i>
+                                                        <i class="bi bi-circle-fill status-registered" title="${t("resource.status.registered")}"></i>
                                                     <#elseif nextVersionStatus == "public">
-                                                        <i class="bi bi-circle status-public" title="<@s.text name="resource.status.public"/>"></i>
+                                                        <i class="bi bi-circle status-public" title="${t("resource.status.public")}"></i>
                                                     <#elseif nextVersionStatus == "private">
-                                                        <i class="bi bi-circle status-private" title="<@s.text name="resource.status.private"/>"></i>
+                                                        <i class="bi bi-circle status-private" title="${t("resource.status.private")}"></i>
                                                     <#elseif nextVersionStatus == "deleted">
-                                                        <i class="bi bi-circle-fill status-deleted" title="<@s.text name="resource.status.deleted"/>"></i>
+                                                        <i class="bi bi-circle-fill status-deleted" title="${t("resource.status.deleted")}"></i>
                                                     </#if>
                                                 </span>
                                                 <span class="me-2 overview-version-title">
-                                                    <strong><@s.text name="footer.version"/> ${resource.nextVersionPlainString}</strong>
+                                                    <strong>${t("footer.version")} ${resource.nextVersionPlainString}</strong>
                                                 </span><br>
                                                 <span class="fs-smaller-2">
                                                     <small>
                                                         <#if resource.nextPublished??>
                                                             ${nextPublicationDate?cap_first} ${resource.nextPublished?datetime?string.medium}
                                                         <#else>
-                                                            <@s.text name="manage.overview.published.date.not.set"/>
+                                                            ${t("manage.overview.published.date.not.set")}<#t>
                                                         </#if>
                                                     </small>
                                                 </span><br>
@@ -1943,17 +1941,17 @@
                                                     <#if resource.getEml().parseLicenseUrl()?has_content>
                                                         <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1"><@shortLicense resource.getEml().parseLicenseUrl()/></span><br>
                                                     <#else>
-                                                        <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1"><@s.text name="manage.overview.published.licenseNotSet"/></span><br>
+                                                        <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1">${t("manage.overview.published.licenseNotSet")}</span><br>
                                                     </#if>
                                                 <#elseif isDataPackage>
                                                     <#if isDwcDp>
                                                         <#if resource.getEml().parseLicenseUrl()?has_content>
                                                             <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1"><@shortLicense resource.getEml().parseLicenseUrl()/></span><br>
                                                         <#else>
-                                                            <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1"><@s.text name="manage.overview.published.licenseNotSet"/></span><br>
+                                                            <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1">${t("manage.overview.published.licenseNotSet")}</span><br>
                                                         </#if>
                                                     <#elseif !(resource.dataPackageMetadata.licenses)?has_content && !(resource.dataPackageMetadata.license)?has_content>
-                                                        <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1"><@s.text name="manage.overview.published.licenseNotSet"/></span><br>
+                                                        <span title="${licenseTitle?cap_first}" class="fs-smaller-2 text-nowrap license-pill license-pill-next mt-2 mb-1">${t("manage.overview.published.licenseNotSet")}</span><br>
                                                     <#elseif resource.coreType?? && resource.coreType == "camtrap-dp">
                                                         <#list resource.dataPackageMetadata.licenses as license>
                                                             <#if license.scope?? && license.scope == "data">
@@ -1968,7 +1966,7 @@
 
                                             <div class="d-flex justify-content-end my-auto version-item-actions">
                                                 <#if validMetadata>
-                                                    <a title="<@s.text name="button.preview"/>" class="icon-button icon-material-actions version-item-action fs-smaller-2 d-sm-max-none" type="button" href="${baseURL}/resource/preview?r=${resource.shortname}">
+                                                    <a title="${t("button.preview")}" class="icon-button icon-material-actions version-item-action fs-smaller-2 d-sm-max-none" type="button" href="${baseURL}/resource/preview?r=${resource.shortname}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
@@ -1991,7 +1989,7 @@
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                     </svg>
-                                                                    <@s.text name="button.preview"/>
+                                                                    ${t("button.preview")}<#t>
                                                                 </a>
                                                             </li>
                                                         </#if>
@@ -2043,14 +2041,14 @@
                             <div class="d-flex">
                                 <h5 class="my-auto text-gbif-header-2 fw-400">
                                     <#assign registrationTitleInfo>
-                                        <@s.text name="manage.resource.status.intro.registration"/>
-                                        <#if !resource.dataPackage??><br><br><@s.text name='manage.resource.status.intro.public.migration'><@s.param><a href="${baseURL}/manage/metadata-additional.do?r=${resource.shortname}&amp;edit=Edit"><@s.text name="submenu.additional"/></a></@s.param></@s.text></#if>
+                                        ${t("manage.resource.status.intro.registration")}<#t>
+                                        <#if !resource.dataPackage??><br><br><#assign textArg1><a href="${baseURL}/manage/metadata-additional.do?r=${resource.shortname}&amp;edit=Edit">${t("submenu.additional")}</a></#assign>${t('manage.resource.status.intro.public.migration', textArg1)}</#if>
                                         <br><br>
-                                        <@s.text name='manage.resource.status.intro.public.gbifWarning'/>
+                                        ${t('manage.resource.status.intro.public.gbifWarning')}<#t>
                                     </#assign>
 
                                     <@popoverTextInfo registrationTitleInfo/>
-                                    <@s.text name='manage.overview.registration'/>
+                                    ${t('manage.overview.registration')}<#t>
                                 </h5>
                             </div>
 
@@ -2059,13 +2057,13 @@
                                     <#if !currentUser.hasRegistrationRights()>
                                         <!-- Hide register button and show warning: user must have registration rights -->
                                         <#assign visibilityConfirmRegistrationWarning>
-                                            <@s.text name="manage.resource.status.registration.forbidden"/>&nbsp;<@s.text name="manage.resource.role.change"/>
+                                            ${t("manage.resource.status.registration.forbidden")}&nbsp;${t("manage.resource.role.change")}
                                         </#assign>
                                         <button id="show-registration-disabled-modal" class="text-gbif-header-2 icon-button icon-material-actions overview-action-button" type="button">
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                             </svg>
-                                            <@s.text name='button.register'/>
+                                            ${t('button.register')}<#t>
                                         </button>
                                     <#elseif missingValidPublishingOrganisation?string == "true">
                                         <!-- Hide register button and show warning: user must assign valid publishing organisation -->
@@ -2073,7 +2071,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                             </svg>
-                                            <@s.text name='button.register'/>
+                                            ${t('button.register')}<#t>
                                         </button>
                                     <#elseif missingRegistrationMetadata?string == "true">
                                         <!-- Hide register button and show warning: user must fill in minimum registration metadata -->
@@ -2081,7 +2079,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                             </svg>
-                                            <@s.text name='button.register'/>
+                                            ${t('button.register')}<#t>
                                         </button>
                                     <#elseif !resource.isLastPublishedVersionPublic()>
                                         <!-- Hide register button and show warning: last published version must be publicly available to register -->
@@ -2089,7 +2087,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                             </svg>
-                                            <@s.text name='button.register'/>
+                                            ${t('button.register')}<#t>
                                         </button>
                                     <#elseif !action.isLastPublishedVersionAssignedGBIFSupportedLicense(resource)>
                                         <!-- Hide register button and show warning: resource must be assigned a GBIF-supported license to register if resource has occurrence data -->
@@ -2097,7 +2095,7 @@
                                             <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                 <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                             </svg>
-                                            <@s.text name='button.register'/>
+                                            ${t('button.register')}<#t>
                                         </button>
                                     <#else>
                                         <form action="resource-registerResource.do" method="post">
@@ -2110,7 +2108,7 @@
                                                 <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                                     <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                                 </svg>
-                                                <@s.text name='button.register'/>
+                                                ${t('button.register')}<#t>
                                             </button>
                                         </form>
                                     </#if>
@@ -2119,7 +2117,7 @@
                                         <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                             <path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"></path>
                                         </svg>
-                                        <@s.text name='button.register'/>
+                                        ${t('button.register')}<#t>
                                     </button>
                                 </#if>
                                 <#if resource.isDwcDp() && resource.status=="REGISTERED" && resource.key?? && currentUser.hasRegistrationRights()>
@@ -2127,7 +2125,7 @@
                                         <svg viewBox="0 0 24 24" class="overview-action-button-icon">
                                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                                         </svg>
-                                        <@s.text name='manage.overview.registration.datasetType.change'/>
+                                        ${t('manage.overview.registration.datasetType.change')}<#t>
                                     </button>
                                 </#if>
                             </div>
@@ -2136,7 +2134,7 @@
                         <div class="row mt-4">
                             <#if resource.status=="REGISTERED" && resource.key??>
                                 <p class="mb-0">
-                                    <@s.text name="manage.overview.registration.intro"/>
+                                    ${t("manage.overview.registration.intro")}<#t>
                                 </p>
 
                                 <div class="details mt-3">
@@ -2160,12 +2158,12 @@
                                                     </#if>
                                                     <#if resource.isDwcDp() && resource.dwcDpDatasetType??>
                                                         |
-                                                        <small><@s.text name="portal.resource.type.${resource.dwcDpDatasetType.name()?lower_case?replace('_', '')}"/></small>
+                                                        <small>${t("portal.resource.type.${resource.dwcDpDatasetType.name()?lower_case?replace('_', '')}")}</small>
                                                     </#if>
                                                 </div>
 
                                                 <div class="d-flex justify-content-end my-auto registration-item-actions">
-                                                    <a title="<@s.text name="manage.overview.registration.view"/>" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="${cfg.portalUrl}/dataset/${resource.key!}">
+                                                    <a title="${t("manage.overview.registration.view")}" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="${cfg.portalUrl}/dataset/${resource.key!}">
                                                         <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                         </svg>
@@ -2184,7 +2182,7 @@
                                                                     <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                     </svg>
-                                                                    <@s.text name="manage.overview.registration.view"/>
+                                                                    ${t("manage.overview.registration.view")}<#t>
                                                                 </a>
                                                             </li>
                                                         </ul>
@@ -2197,12 +2195,12 @@
 
                                 <#if resource.isDwcDp() && !resource.dwcDpDatasetType??>
                                     <p class="mt-3 mb-0 text-gbif-danger">
-                                        <@s.text name="manage.overview.registration.datasetType.missing"/>
+                                        ${t("manage.overview.registration.datasetType.missing")}<#t>
                                     </p>
                                 </#if>
                             <#else>
                                 <p class="mb-0">
-                                    <@s.text name="manage.overview.registration.notRegistered"/>
+                                    ${t("manage.overview.registration.notRegistered")}<#t>
                                 </p>
                             </#if>
                         </div>
@@ -2214,7 +2212,7 @@
                             <div class="d-flex">
                                 <h5 class="my-auto text-gbif-header-2 fw-400">
                                     <@popoverPropertyInfo "manage.overview.networks.description"/>
-                                    <@s.text name="manage.overview.networks.title"/>
+                                    ${t("manage.overview.networks.title")}<#t>
                                 </h5>
                             </div>
 
@@ -2223,7 +2221,7 @@
                                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                     </svg>
-                                    <@s.text name="button.add"/>
+                                    ${t("button.add")}<#t>
                                 </a>
                             </div>
                         </div>
@@ -2231,7 +2229,7 @@
                         <div class="mt-4">
                             <#if resource.key?has_content && (resourceNetworks?size>0)>
                                 <p class="mb-0">
-                                    <@s.text name="manage.overview.networks.intro"/>
+                                    ${t("manage.overview.networks.intro")}<#t>
                                 </p>
                                 <div class="details mt-3">
                                     <div class="row g-2">
@@ -2248,13 +2246,13 @@
                                                     </div>
 
                                                     <div class="d-flex justify-content-end my-auto network-item-actions">
-                                                        <a title="<@s.text name="manage.overview.networks.view.gbif"/>" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="${cfg.portalUrl}/network/${n.key!}">
+                                                        <a title="${t("manage.overview.networks.view.gbif")}" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="${cfg.portalUrl}/network/${n.key!}">
                                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                             </svg>
                                                         </a>
 
-                                                        <a data-post="true" title="<@s.text name="button.delete"/>" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="resource-deleteNetwork.do?r=${resource.shortname}&id=${n.key!}">
+                                                        <a data-post="true" title="${t("button.delete")}" class="icon-button icon-material-actions network-item-action fs-smaller-2 d-sm-max-none" type="button" href="resource-deleteNetwork.do?r=${resource.shortname}&id=${n.key!}">
                                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                             </svg>
@@ -2273,7 +2271,7 @@
                                                                         <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path>
                                                                         </svg>
-                                                                        <@s.text name="manage.overview.networks.view.gbif"/>
+                                                                        ${t("manage.overview.networks.view.gbif")}<#t>
                                                                     </a>
                                                                 </li>
                                                                 <li>
@@ -2281,7 +2279,7 @@
                                                                         <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                         </svg>
-                                                                        <@s.text name="button.delete"/>
+                                                                        ${t("button.delete")}<#t>
                                                                     </a>
                                                                 </li>
                                                             </ul>
@@ -2294,7 +2292,7 @@
                                 </div>
                             <#else>
                                 <p class="mb-0">
-                                    <@s.text name="manage.overview.networks.noNetworks"/>
+                                    ${t("manage.overview.networks.noNetworks")}<#t>
                                 </p>
                             </#if>
                         </div>
@@ -2306,7 +2304,7 @@
                             <div class="d-flex">
                                 <h5 class="my-auto text-gbif-header-2 fw-400">
                                     <@popoverPropertyInfo "manage.overview.resource.managers.description"/>
-                                    <@s.text name="manage.overview.resource.managers"/>
+                                    ${t("manage.overview.resource.managers")}<#t>
                                 </h5>
                             </div>
 
@@ -2315,14 +2313,14 @@
                                     <svg class="overview-action-button-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                         <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
                                     </svg>
-                                    <@s.text name="button.add"/>
+                                    ${t("button.add")}<#t>
                                 </a>
                             </div>
                         </div>
 
                         <div class="mt-4">
                             <p class="mb-0">
-                                <@s.text name="manage.overview.resource.managers.intro"><@s.param>${resource.shortname}</@s.param></@s.text>
+                                ${t("manage.overview.resource.managers.intro", resource.shortname)}
                             </p>
 
                             <div class="details mt-3">
@@ -2334,7 +2332,7 @@
                                             </div>
                                             <div class="my-auto text-truncate ps-2 fs-smaller-2">
                                                 <strong class="fs-smaller">${resource.creator.name!}</strong><br>
-                                                <small><@s.text name="manage.overview.resource.managers.creator"/>
+                                                <small>${t("manage.overview.resource.managers.creator")}
                                                     | ${resource.creator.email}</small>
                                             </div>
                                             <div class="d-flex justify-content-end my-auto manager-item-actions"></div>
@@ -2350,11 +2348,11 @@
                                                     </div>
                                                     <div class="my-auto text-truncate ps-2 fs-smaller-2 me-auto">
                                                         <strong class="fs-smaller">${u.name}</strong><br>
-                                                        <small><@s.text name="manage.overview.resource.managers.manager"/>
+                                                        <small>${t("manage.overview.resource.managers.manager")}
                                                             | ${u.email}</small>
                                                     </div>
                                                     <div class="d-flex justify-content-end my-auto manager-item-actions">
-                                                        <a data-post="true" title="<@s.text name="button.delete"/>" class="icon-button icon-material-actions manager-item-action fs-smaller-2 d-sm-max-none" type="button" href="resource-deleteManager.do?r=${resource.shortname}&id=${u.email}">
+                                                        <a data-post="true" title="${t("button.delete")}" class="icon-button icon-material-actions manager-item-action fs-smaller-2 d-sm-max-none" type="button" href="resource-deleteManager.do?r=${resource.shortname}&id=${u.email}">
                                                             <svg class="icon-button-svg" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                             </svg>
@@ -2373,7 +2371,7 @@
                                                                         <svg class="overview-item-action-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24">
                                                                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                                                                         </svg>
-                                                                        <@s.text name="button.delete"/>
+                                                                        ${t("button.delete")}<#t>
                                                                     </a>
                                                                 </li>
                                                             </ul>
@@ -2400,7 +2398,7 @@
                     <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
                 </div>
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="make-public-modal-title"><@s.text name="manage.overview.visibility.change.public"/></h5>
+                    <h5 class="modal-title w-100" id="make-public-modal-title">${t("manage.overview.visibility.change.public")}</h5>
 
                     <div class="border rounded px-3 py-1 mt-3">
                         <div class="simpleCallout">
@@ -2411,7 +2409,7 @@
                                     </div>
                                     <div class="simpleCalloutMeta">
                                         <div class="simpleCalloutMessage">
-                                            <@s.text name="manage.overview.visibility.change.republish"/>
+                                            ${t("manage.overview.visibility.change.republish")}<#t>
                                         </div>
                                     </div>
                                 </div>
@@ -2422,11 +2420,11 @@
                     <div class="pt-3">
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="makePublicOptions" id="makePublicImmediately" value="makePublicImmediately" <#if !resource.makePublicDate?has_content>checked</#if> >
-                            <label class="form-check-label" for="inlineRadio1"><@s.text name="manage.overview.visibility.change.public.immediately"/></label>
+                            <label class="form-check-label" for="inlineRadio1">${t("manage.overview.visibility.change.public.immediately")}</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="makePublicOptions" id="makePublicAtDate" value="makePublicAtDate" <#if resource.makePublicDate?has_content>checked</#if> >
-                            <label class="form-check-label" for="inlineRadio2"><@s.text name="manage.overview.visibility.change.public.date"/></label>
+                            <label class="form-check-label" for="inlineRadio2">${t("manage.overview.visibility.change.public.date")}</label>
                         </div>
                     </div>
 
@@ -2449,10 +2447,10 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
-                    <button id="changeStateSubmit" type="submit" form="make-public-modal-form" class="btn btn-sm btn-outline-gbif-primary"><@s.text name="button.submit"/></button>
+                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
+                    <button id="changeStateSubmit" type="submit" form="make-public-modal-form" class="btn btn-sm btn-outline-gbif-primary">${t("button.submit")}</button>
                     <#if resource.makePublicDate?has_content>
-                        <button id="cancelMakePublic" type="submit" form="cancel-make-public" class="btn btn-sm btn-outline-gbif-danger"><@s.text name="button.reset"/></button>
+                        <button id="cancelMakePublic" type="submit" form="cancel-make-public" class="btn btn-sm btn-outline-gbif-danger">${t("button.reset")}</button>
                     </#if>
                 </div>
             </div>
@@ -2466,7 +2464,7 @@
                     <img src="${baseURL}/images/logo-modal-warning.png" alt="Warning" class="modal-image" />
                 </div>
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="make-private-modal-title"><@s.text name="manage.overview.visibility.change.private"/></h5>
+                    <h5 class="modal-title w-100" id="make-private-modal-title">${t("manage.overview.visibility.change.private")}</h5>
 
                     <div class="border rounded px-3 py-1 mt-3">
                         <div class="simpleCallout">
@@ -2477,7 +2475,7 @@
                                     </div>
                                     <div class="simpleCalloutMeta">
                                         <div class="simpleCalloutMessage">
-                                            <@s.text name="manage.overview.visibility.change.republish"/>
+                                            ${t("manage.overview.visibility.change.republish")}<#t>
                                         </div>
                                     </div>
                                 </div>
@@ -2491,13 +2489,13 @@
                             <input name="r" type="hidden" value="${resource.shortname}"/>
                             <input name="unpublish" type="hidden" value="Change"/>
                         </form>
-                        <@s.text name="manage.overview.visibility.confirm.make.private"/>
+                        ${t("manage.overview.visibility.confirm.make.private")}<#t>
                     </div>
                 </div>
 
                 <div class="modal-footer justify-content-center">
-                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
-                    <button id="changeStateSubmit" type="submit" form="make-private-modal-form" class="btn btn-sm btn-outline-gbif-danger"><@s.text name="button.submit"/></button>
+                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
+                    <button id="changeStateSubmit" type="submit" form="make-private-modal-form" class="btn btn-sm btn-outline-gbif-danger">${t("button.submit")}</button>
                 </div>
             </div>
         </div>
@@ -2510,20 +2508,20 @@
                     <img src="${baseURL}/images/logo-modal-warning.png" alt="Warning" class="modal-image" />
                 </div>
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="cancel-visibility-change-modal-title"><@s.text name="manage.overview.visibility.change.cancel"/></h5>
+                    <h5 class="modal-title w-100" id="cancel-visibility-change-modal-title">${t("manage.overview.visibility.change.cancel")}</h5>
 
                     <div class="mt-3">
                         <form id="cancel-visibility-change-modal-form" action="resource-cancelVisibilityChange.do" method="post">
 <@csrfField/>
                             <input name="r" type="hidden" value="${resource.shortname}"/>
                         </form>
-                        <@s.text name="manage.overview.visibility.confirm.cancel.change"><@s.param>${resource.status!}</@s.param><@s.param>${resource.pendingStatus!}</@s.param></@s.text>
+                        ${t("manage.overview.visibility.confirm.cancel.change", resource.status!, resource.pendingStatus!)}
                     </div>
                 </div>
 
                 <div class="modal-footer justify-content-center">
-                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
-                    <button id="changeStateSubmit" type="submit" form="cancel-visibility-change-modal-form" class="btn btn-sm btn-outline-gbif-danger"><@s.text name="button.submit"/></button>
+                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
+                    <button id="changeStateSubmit" type="submit" form="cancel-visibility-change-modal-form" class="btn btn-sm btn-outline-gbif-danger">${t("button.submit")}</button>
                 </div>
             </div>
         </div>
@@ -2537,21 +2535,21 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="make-public-modal-title"><@s.text name="manage.overview.visibility"/></h5>
+                    <h5 class="modal-title w-100" id="make-public-modal-title">${t("manage.overview.visibility")}</h5>
                     <#if resource.status == "DELETED">
-                        <@s.text name="manage.overview.visibility.warning.deleted"/>
+                        ${t("manage.overview.visibility.warning.deleted")}<#t>
                     <#elseif resource.status == "REGISTERED">
-                        <@s.text name="manage.overview.visibility.warning.registered"/>
+                        ${t("manage.overview.visibility.warning.registered")}<#t>
                     <#elseif resource.identifierStatus?has_content && (resource.identifierStatus == "PUBLIC" || resource.identifierStatus == "UNAVAILABLE")>
-                        <@s.text name="manage.overview.visibility.warning.identifier"/>
+                        ${t("manage.overview.visibility.warning.identifier")}<#t>
                     <#else>
-                        <@s.text name="manage.overview.visibility.warning.general"/>
+                        ${t("manage.overview.visibility.warning.general")}<#t>
                     </#if>
                 </div>
 
                 <div class="modal-footer justify-content-center">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -2577,7 +2575,7 @@
                                         <div class="tabs-scroller tabs-fixed" style="overflow:hidden;margin-bottom:0">
                                             <div class="tabs-flexContainer tabs-centered" role="tablist">
                                                 <button id="tab-source-file" class="sources-tab-root tab-selected" type="button" role="tab">
-                                                    <@s.text name="manage.source.file"/>
+                                                    ${t("manage.source.file")}<#t>
                                                     <span id="tab-indicator-source-file" class="tabs-indicator"></span>
                                                 </button>
                                                 <button id="tab-source-url" class="sources-tab-root" type="button" role="tab">
@@ -2603,7 +2601,7 @@
                                                     </div>
                                                     <div class="simpleCalloutMeta">
                                                         <div class="simpleCalloutMessage">
-                                                            <@s.text name="manage.source.file.multipleUpload"/>
+                                                            ${t("manage.source.file.multipleUpload")}<#t>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -2611,7 +2609,7 @@
                                         </div>
                                     </div>
 
-                                    <a id="chooseFilesButton" href="#" class="btn btn-sm btn-outline-gbif-primary mt-3"><@s.text name="button.chooseFiles"/></a>
+                                    <a id="chooseFilesButton" href="#" class="btn btn-sm btn-outline-gbif-primary mt-3">${t("button.chooseFiles")}</a>
 
                                     <div id="callout-source-exists" class="border rounded px-3 py-1 mt-3" style="display: none;">
                                         <div class="simpleCallout" >
@@ -2622,9 +2620,9 @@
                                                     </div>
                                                     <div class="simpleCalloutMeta">
                                                         <div class="simpleCalloutError">
-                                                            <@s.text name="manage.resource.addSource.sameName.confirm"/>
+                                                            ${t("manage.resource.addSource.sameName.confirm")}<#t>
                                                             <a id="btn-confirm-source-overwrite" class="confirmOverwriteSourceLink custom-link" href="#">
-                                                                <@s.text name="button.confirm"/>
+                                                                ${t("button.confirm")}<#t>
                                                             </a>
                                                         </div>
                                                     </div>
@@ -2634,7 +2632,7 @@
                                     </div>
 
                                     <div id="callout-not-enough-space" class="callout callout-danger text-smaller" style="display: none;">
-                                        <@s.text name="manage.resource.addSource.notEnoughSpace"><@s.param>${freeDiscSpaceReadable}</@s.param></@s.text>
+                                        ${t("manage.resource.addSource.notEnoughSpace", freeDiscSpaceReadable)}
                                     </div>
 
                                     <input id="fileInput" type="file" multiple style="display: none;" />
@@ -2642,15 +2640,15 @@
 
                                     <ul id="field-error-file" class="invalid-feedback list-unstyled field-error my-1">
                                         <li class="text-start">
-                                            <span><@s.text name="manage.overview.source.file.too.big"/></span>
+                                            <span>${t("manage.overview.source.file.too.big")}</span>
                                         </li>
                                     </ul>
 
                                     <div>
-                                        <input type="text" id="sourceName" name="sourceName" class="form-control form-control-sm my-1" placeholder="<@s.text name='source.name'/>" style="display: none">
+                                        <input type="text" id="sourceName" name="sourceName" class="form-control form-control-sm my-1" placeholder="${t('source.name')}" style="display: none">
                                         <ul id="field-error-sourceName" class="invalid-feedback list-unstyled field-error my-1">
                                             <li class="text-start">
-                                                <span><@s.text name="manage.source.name.empty"/></span>
+                                                <span>${t("manage.source.name.empty")}</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -2659,7 +2657,7 @@
                                         <input type="url" id="url" name="url" class="form-control form-control-sm my-1" placeholder="URL" style="display: none">
                                         <ul id="field-error-url" class="invalid-feedback list-unstyled field-error my-1">
                                             <li class="text-start">
-                                                <@s.text name="validation.required"><@s.param><@s.text name="manage.source.url"/></@s.param></@s.text>
+                                                ${t("validation.required", t("manage.source.url"))}<#t>
                                             </li>
                                         </ul>
                                     </div>
@@ -2667,20 +2665,20 @@
                                     <div id="url-source-info-block" style="display: none;">
                                         <div id="url-source-info-block-inner" class="d-flex justify-content-start fs-smaller-2">
                                             <div id="url-source-check-link-wrapper" class="me-3" style="display: none;">
-                                                <a id="check-url-source-link" class="smaller-action-link-button action-link-button-primary" href="#"><@s.text name="manage.source.url.checkUrl"/></a>
+                                                <a id="check-url-source-link" class="smaller-action-link-button action-link-button-primary" href="#">${t("manage.source.url.checkUrl")}</a>
                                             </div>
                                             <div id="url-source-check-status-wrapper" class="me-3" style="display: none;">
                                                 <i id="url-source-check-status-fail" class="bi bi-x-circle-fill text-gbif-danger" style="display: none;"></i>
                                                 <i id="url-source-check-status-success" class="bi bi-check-circle-fill text-gbif-primary" style="display: none;"></i>
                                             </div>
                                             <div id="url-source-size-wrapper" class="me-3" style="display: none;">
-                                                <strong><@s.text name="manage.source.url.checkUrl.size"/>:</strong> <span id="url-source-size">?</span>
+                                                <strong>${t("manage.source.url.checkUrl.size")}:</strong> <span id="url-source-size">?</span>
                                             </div>
                                             <div id="url-source-content-type-wrapper" style="display: none;">
-                                                <strong><@s.text name="manage.source.url.checkUrl.type"/>:</strong> <span id="url-source-content-type">?</span>
+                                                <strong>${t("manage.source.url.checkUrl.type")}:</strong> <span id="url-source-content-type">?</span>
                                             </div>
                                             <div id="url-source-error-message-wrapper" class="text-gbif-danger" style="display: none;">
-                                                <@s.text name="manage.source.url.checkUrl.failed"/>
+                                                ${t("manage.source.url.checkUrl.failed")}<#t>
                                             </div>
                                         </div>
                                     </div>
@@ -2697,11 +2695,11 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <a id="sendButton" href="#" class="btn btn-sm btn-outline-gbif-primary" style="display: none;"><@s.text name="button.upload"/></a>
+                    <a id="sendButton" href="#" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">${t("button.upload")}</a>
                     <input type="submit" form="addSourceForm" value="Add" id="add" name="add" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">
                     <input type="submit" form="addSourceForm" value="Clear" id="clear" name="clear" class="btn btn-sm btn-outline-secondary" style="display: none;">
                     <input type="submit" form="cancelOverwriteForm" value="Cancel" id="clear" name="clear" class="btn btn-sm btn-outline-secondary" style="display: none;">
-                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
+                    <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">${t("button.cancel")}</button>
                 </div>
             </div>
         </div>
@@ -2721,14 +2719,14 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="mapping-modal-title"><@s.text name="manage.mapping.title"/></h5>
+                    <h5 class="modal-title w-100" id="mapping-modal-title">${t("manage.mapping.title")}</h5>
                     <div>
                         <#if (numberOfPotentialCores>0)>
                             <form id="addMappingForm" action='mapping.do' method='post'>
 <@csrfField/>
                                 <input name="r" type="hidden" value="${resource.shortname}"/>
                                 <select name="id" class="form-select my-1" id="rowType" size="1">
-                                    <optgroup label="<@s.text name='manage.overview.DwC.Mappings.cores.select'/>">
+                                    <optgroup label="${t('manage.overview.DwC.Mappings.cores.select')}">
                                         <#list potentialCores as c>
                                             <#if c?has_content>
                                                 <option value="${c.rowType}">${c.title}</option>
@@ -2736,7 +2734,7 @@
                                         </#list>
                                     </optgroup>
                                     <#if (potentialExtensions?size>0)>
-                                        <optgroup label="<@s.text name='manage.overview.DwC.Mappings.extensions.select'/>">
+                                        <optgroup label="${t('manage.overview.DwC.Mappings.extensions.select')}">
                                             <#list potentialExtensions as e>
                                                 <#if e?has_content>
                                                     <option value="${e.rowType}">${e.title}</option>
@@ -2748,9 +2746,9 @@
                             </form>
                         <#else>
                             <#if isDataPackage>
-                                <@s.text name="manage.overview.mappings.cantdo"/>
+                                ${t("manage.overview.mappings.cantdo")}<#t>
                             <#else>
-                                <@s.text name="manage.overview.DwC.Mappings.cantdo"/>
+                                ${t("manage.overview.DwC.Mappings.cantdo")}<#t>
                             </#if>
                         </#if>
                     </div>
@@ -2759,7 +2757,7 @@
                 <div class="modal-footer justify-content-center">
                     <input type="submit" value="Add" id="add" name="add" form="addMappingForm" class="btn btn-sm btn-outline-gbif-primary">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -2773,7 +2771,7 @@
                     <img src="${baseURL}/images/logo-modal-success.png" alt="Success" class="modal-image" />
                 </div>
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="metadata-modal-title"><@s.text name="manage.overview.metadata"/></h5>
+                    <h5 class="modal-title w-100" id="metadata-modal-title">${t("manage.overview.metadata")}</h5>
                     <div>
                         <#if isDataPackage && !isDwcDp>
                             <form id="upload-metadata-form" action='replace-datapackage-metadata.do' method='post' enctype="multipart/form-data">
@@ -2791,7 +2789,7 @@
                                                             </div>
                                                             <div class="simpleCalloutMeta">
                                                                 <div class="simpleCalloutMessage">
-                                                                    <@s.text name="manage.overview.metadata.citation.overridden"/>
+                                                                    ${t("manage.overview.metadata.citation.overridden")}<#t>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2802,7 +2800,7 @@
                                     </#if>
 
                                     <div class="col-12">
-                                        <@s.file name="datapackageMetadataFile" cssClass="form-control form-control-sm my-1"/>
+                                        <input type="file" name="datapackageMetadataFile" id="datapackageMetadataFile" class="form-control form-control-sm my-1"/><#t>
                                     </div>
 
                                     <div id="datapackage-metadata-validate" class="col-12 text-smaller" style="display: none;">
@@ -2816,7 +2814,7 @@
                                 <input name="r" type="hidden" value="${resource.shortname}"/>
                                 <div class="row">
                                     <div class="col-12">
-                                        <@s.file name="emlFile" cssClass="form-control form-control-sm my-1"/>
+                                        <input type="file" name="emlFile" id="emlFile" class="form-control form-control-sm my-1"/><#t>
                                     </div>
                                     <div id="eml-validate" class="col-12" style="display: none;">
                                         <@checkbox name="validateEml" i18nkey="button.validate" />
@@ -2829,10 +2827,10 @@
                 <div class="modal-footer justify-content-center">
                     <#if isDataPackage && !isDwcDp>
                         <input type="submit" form="upload-metadata-form" value="Replace" id="datapackageMetadataReplace" name="datapackageMetadataReplace" class="btn btn-sm btn-outline-gbif-primary confirmDatapackageMetadataReplace" style="">
-                        <button id="datapackageMetadataCancel" type="button" class="btn btn-sm btn-outline-secondary " data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
+                        <button id="datapackageMetadataCancel" type="button" class="btn btn-sm btn-outline-secondary " data-bs-dismiss="modal">${t("button.cancel")}</button>
                     <#else>
                         <input type="submit" form="upload-metadata-form" value="Replace" id="emlReplace" name="emlReplace" class="btn btn-sm btn-outline-gbif-primary confirmEmlReplace" style="display:none;">
-                        <button id="emlCancel" type="button" class="btn btn-sm btn-outline-secondary " data-bs-dismiss="modal"><@s.text name="button.cancel"/></button>
+                        <button id="emlCancel" type="button" class="btn btn-sm btn-outline-secondary " data-bs-dismiss="modal">${t("button.cancel")}</button>
                     </#if>
                 </div>
             </div>
@@ -2847,56 +2845,56 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="publication-modal-title"><@s.text name="manage.overview.published"/></h5>
+                    <h5 class="modal-title w-100" id="publication-modal-title">${t("manage.overview.published")}</h5>
                     <!-- resources cannot be published if it's deleted -->
                     <#if resource.status == "DELETED">
                         <p class="mb-0">
-                            <@s.text name="manage.overview.published.deleted"/>
+                            ${t("manage.overview.published.deleted")}<#t>
                         </p>
 
                         <!-- resources cannot be published if the mandatory metadata is missing -->
                     <#elseif missingBasicMetadata>
                         <p>
-                            <@s.text name="manage.overview.published.missing.metadata"/>
+                            ${t("manage.overview.published.missing.metadata")}<#t>
                         </p>
 
                         <#if !isDataPackage>
                             <p class="mb-0">
-                                <@s.text name="manage.overview.published.metadata.validation.report"/>
+                                ${t("manage.overview.published.metadata.validation.report")}<#t>
                             </p>
                         </#if>
 
                         <!-- resources cannot be published if the metadata is invalid -->
                     <#elseif !validMetadata>
                         <p>
-                            <@s.text name="manage.overview.published.metadata.invalid"/>
+                            ${t("manage.overview.published.metadata.invalid")}<#t>
                         </p>
 
                         <#if !isDataPackage>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.published.metadata.validation.report"/>
+                            ${t("manage.overview.published.metadata.validation.report")}<#t>
                         </p>
                         </#if>
 
                         <!-- DwC-A resources cannot be published if the publishing organization is missing -->
                     <#elseif !isDataPackage && !resource.organisation?has_content>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.published.missing.organisation"/>
+                            ${t("manage.overview.published.missing.organisation")}<#t>
                         </p>
 
                         <p class="mb-0">
-                            <@s.text name="manage.overview.published.missing.organisation.link"/>
+                            ${t("manage.overview.published.missing.organisation.link")}<#t>
                         </p>
 
                       <!-- resources cannot be published if mappings are missing (for DPs) -->
                     <#elseif isDataPackage && dataPackageMappingsMissing>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.published.missing.mappings"/>
+                            ${t("manage.overview.published.missing.mappings")}<#t>
                         </p>
 
                     <#elseif isDataPackage && !allRequiredFieldsMappedDataPackage>
                         <p>
-                            <@s.text name="manage.overview.published.missing.requiredFields"/>
+                            ${t("manage.overview.published.missing.requiredFields")}<#t>
                         </p>
 
                         <p class="mb-0">
@@ -2911,7 +2909,7 @@
                         <!-- resources that are already registered cannot be re-published if they haven't been assigned a GBIF-supported license -->
                     <#elseif resource.isRegistered() && !resource.isAssignedGBIFSupportedLicense()>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.prevented.resource.publishing.noGBIFLicense" />
+                            ${t("manage.overview.prevented.resource.publishing.noGBIFLicense")}<#t>
                         </p>
 
                         <!-- resources with a reserved DOI, existing registered DOI, or registered with GBIF can only be republished by managers with registration rights -->
@@ -2921,8 +2919,8 @@
                         <!-- the user must have registration rights -->
                         <#if !currentUser.hasRegistrationRights()>
                             <p class="mb-0">
-                                <@s.text name="manage.resource.status.publication.forbidden"/>
-                                &nbsp;<@s.text name="manage.resource.role.change"/>
+                                ${t("manage.resource.status.publication.forbidden")}<#t>
+                                &nbsp;${t("manage.resource.role.change")}
                             </p>
 
                             <!-- an organisation with DOI account be activated (if resource has a reserved DOI or existing registered DOI) -->
@@ -2930,7 +2928,7 @@
                         || (resource.identifierStatus == "PUBLIC" && resource.isAlreadyAssignedDoi()))
                         && !organisationWithPrimaryDoiAccount??>
                             <p class="mb-0">
-                                <@s.text name="manage.resource.status.publication.forbidden.account.missing" />
+                                ${t("manage.resource.status.publication.forbidden.account.missing")}<#t>
                             </p>
 
                             <!-- when a DOI is reserved.. -->
@@ -2940,13 +2938,13 @@
                                 <!-- and the resource has never been published before, the first publication is a new major version -->
                                 <#if !resource.lastPublished??>
                                     <p class="mb-0">
-                                        <@s.text name="manage.overview.publishing.doi.register.prevented.notPublic"/>
+                                        ${t("manage.overview.publishing.doi.register.prevented.notPublic")}<#t>
                                     </p>
 
                                     <!-- and the resource has been published before, the next publication is a new minor version -->
                                 <#else>
                                     <p class="mb-0">
-                                        <@s.text name="manage.overview.publishing.doi.register.prevented.notPublic" />
+                                        ${t("manage.overview.publishing.doi.register.prevented.notPublic")}<#t>
                                     </p>
                                 </#if>
 
@@ -2961,7 +2959,7 @@
                                                 </div>
                                                 <div class="simpleCalloutMeta">
                                                     <div class="simpleCalloutMessage">
-                                                        <@s.text name="manage.overview.publishing.doi.register.help"/>
+                                                        ${t("manage.overview.publishing.doi.register.help")}<#t>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2976,7 +2974,7 @@
 
                 <div class="modal-footer justify-content-center">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -2995,29 +2993,29 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="networks-modal-title"><@s.text name="manage.overview.networks.title"/></h5>
+                    <h5 class="modal-title w-100" id="networks-modal-title">${t("manage.overview.networks.title")}</h5>
                     <#if resource.status == "DELETED">
                         <p class="mb-0">
-                            <@s.text name="manage.overview.networks.deleted"/>
+                            ${t("manage.overview.networks.deleted")}<#t>
                         </p>
                     <#elseif !networksAvailable>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.networks.registryAccess"/>
+                            ${t("manage.overview.networks.registryAccess")}<#t>
                         </p>
                     <#elseif (potentialNetworks?size==0)>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.networks.select.empty"/>
+                            ${t("manage.overview.networks.select.empty")}<#t>
                         </p>
                     <#elseif resource.key?has_content>
                         <div>
                             <div id="obis-network-validation-notification" class="callout callout-info text-smaller" style="display: none;">
-                                <@s.text name="manage.overview.networks.obis.notification"/>
+                                ${t("manage.overview.networks.obis.notification")}<#t>
                             </div>
                             <form id="addNetworkForm" action='resource-addNetwork.do' method='post'>
 <@csrfField/>
                                 <input name="r" type="hidden" value="${resource.shortname}"/>
                                 <select name="id" class="form-select my-1" id="network" size="1">
-                                    <option value="" disabled selected><@s.text name='manage.overview.networks.select'/></option>
+                                    <option value="" disabled selected>${t('manage.overview.networks.select')}</option>
                                     <#list potentialNetworks?sort_by("name") as n>
                                         <option value="${n.key}">${n.name}</option>
                                     </#list>
@@ -3026,7 +3024,7 @@
                         </div>
                     <#else>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.networks.not.registered"/>
+                            ${t("manage.overview.networks.not.registered")}<#t>
                         </p>
                     </#if>
                 </div>
@@ -3034,7 +3032,7 @@
                 <div class="modal-footer justify-content-center">
                     <input type="submit" form="addNetworkForm" value="Add" id="add-network" name="add" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -3050,17 +3048,17 @@
                     </div>
 
                     <div class="modal-body">
-                        <h5 class="modal-title w-100" id="dwc-dp-dataset-type-modal-title"><@s.text name="manage.overview.registration.datasetType.change"/></h5>
+                        <h5 class="modal-title w-100" id="dwc-dp-dataset-type-modal-title">${t("manage.overview.registration.datasetType.change")}</h5>
                         <p class="mb-2">
-                            <@s.text name="manage.overview.registration.datasetType.change.confirm"/>
+                            ${t("manage.overview.registration.datasetType.change.confirm")}<#t>
                         </p>
                         <form id="dwcDpDatasetTypeForm" action="resource-updateDwcDpDatasetType.do" method="post">
 <@csrfField/>
                             <input name="r" type="hidden" value="${resource.shortname}"/>
                             <select name="dwcDpDatasetType" class="form-select my-1" id="registeredDwcDpDatasetType" size="1">
-                                <option value="" disabled <#if !resource.dwcDpDatasetType??>selected</#if>><@s.text name="manage.overview.registration.datasetType.select"/></option>
+                                <option value="" disabled <#if !resource.dwcDpDatasetType??>selected</#if>>${t("manage.overview.registration.datasetType.select")}</option>
                                 <#list action.getDwcDpRegistrationDatasetTypes() as datasetType>
-                                    <option value="${datasetType.name()}" <#if resource.dwcDpDatasetType?? && resource.dwcDpDatasetType == datasetType>selected</#if>><@s.text name="portal.resource.type.${datasetType.name()?lower_case?replace('_', '')}"/></option>
+                                    <option value="${datasetType.name()}" <#if resource.dwcDpDatasetType?? && resource.dwcDpDatasetType == datasetType>selected</#if>>${t("portal.resource.type.${datasetType.name()?lower_case?replace('_', '')}")}</option>
                                 </#list>
                             </select>
                         </form>
@@ -3068,9 +3066,9 @@
 
                     <div class="modal-footer justify-content-center">
                         <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                            <@s.text name="button.cancel"/>
+                            ${t("button.cancel")}<#t>
                         </button>
-                        <input type="submit" form="dwcDpDatasetTypeForm" value="<@s.text name="button.update"/>" id="update-dwc-dp-dataset-type" class="btn btn-sm btn-outline-gbif-primary" <#if !resource.dwcDpDatasetType??>style="display: none;"</#if>>
+                        <input type="submit" form="dwcDpDatasetTypeForm" value="${t("button.update")}" id="update-dwc-dp-dataset-type" class="btn btn-sm btn-outline-gbif-primary" <#if !resource.dwcDpDatasetType??>style="display: none;"</#if>>
                     </div>
                 </div>
             </div>
@@ -3087,60 +3085,60 @@
                 <#assign hasToBePublishedFirst=false/>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="registration-modal-title"><@s.text name="manage.overview.registration"/></h5>
+                    <h5 class="modal-title w-100" id="registration-modal-title">${t("manage.overview.registration")}</h5>
 
 <#--                    <#if cfg.devMode() || cfg.getRegistryType()!='PRODUCTION'>-->
 <#--                        <p class="fst-italic">-->
-<#--                            <@s.text name="manage.overview.published.testmode.warning"/>-->
+<#--                            ${t("manage.overview.published.testmode.warning")}<#t>-->
 <#--                        </p>-->
 <#--                    </#if>-->
 
                     <#if resource.status=="DELETED">
                         <!-- Show warning: resource must not be deleted -->
                         <p class="mb-0">
-                            <@s.text name="manage.overview.registration.deleted" />
+                            ${t("manage.overview.registration.deleted")}<#t>
                         </p>
                     <#elseif resource.status=="REGISTERED">
                         <!-- Show warning: resource already registered -->
                         <p class="mb-0">
-                            <@s.text name="manage.overview.registration.registered" />
+                            ${t("manage.overview.registration.registered")}<#t>
                         </p>
                     <#elseif resource.status=="PRIVATE">
                         <!-- Show warning: resource must be public -->
                         <p class="mb-0">
-                            <@s.text name="manage.overview.registration.private" />
+                            ${t("manage.overview.registration.private")}<#t>
                         </p>
                     <#elseif resource.status=="PUBLIC">
                         <#if !currentUser.hasRegistrationRights()>
                             <!-- Show warning: user must have registration rights -->
                             <p class="mb-0">
-                                <@s.text name="manage.resource.status.registration.forbidden"/>&nbsp;<@s.text name="manage.resource.role.change"/>
+                                ${t("manage.resource.status.registration.forbidden")}&nbsp;${t("manage.resource.role.change")}
                             </p>
                         <#elseif resource.dataPackage && resource.coreType != "camtrap-dp" && resource.coreType != "coldp" && resource.coreType != "dwc-dp">
                             <!-- Show warning: registration is not available now -->
                             <p class="mb-0">
-                                <@s.text name="manage.resource.status.registration.forbiddenTypes"/>
+                                ${t("manage.resource.status.registration.forbiddenTypes")}<#t>
                             </p>
                         <#elseif missingValidPublishingOrganisation?string == "true">
                             <!-- Show warning: user must assign valid publishing organisation -->
                             <p class="mb-0">
-                                <@s.text name="manage.overview.visibility.missing.organisation"/>
+                                ${t("manage.overview.visibility.missing.organisation")}<#t>
                             </p>
                         <#elseif missingRegistrationMetadata?string == "true">
                             <!-- Show warning: user must fill in minimum registration metadata -->
                             <p class="mb-0">
-                                <@s.text name="manage.overview.visibility.missing.metadata" />
+                                ${t("manage.overview.visibility.missing.metadata")}<#t>
                             </p>
                         <#elseif !resource.isLastPublishedVersionPublic()>
                             <!-- Show warning: last published version must be publicly available to register -->
                             <p class="mb-0">
-                                <@s.text name="manage.overview.prevented.resource.registration.notPublic" />
+                                ${t("manage.overview.prevented.resource.registration.notPublic")}<#t>
                             </p>
                             <#assign hasToBePublishedFirst=true/>
                         <#elseif !action.isLastPublishedVersionAssignedGBIFSupportedLicense(resource)>
                             <!-- Show warning: resource must be assigned a GBIF-supported license to register if resource has occurrence data -->
                             <p class="mb-0">
-                                <@s.text name="manage.overview.prevented.resource.registration.noGBIFLicense" escapeHtml=true/>
+                                ${t("manage.overview.prevented.resource.registration.noGBIFLicense")?markup_string}<#t>
                             </p>
                         </#if>
                     </#if>
@@ -3149,11 +3147,11 @@
                 <div class="modal-footer justify-content-center">
                     <#if hasToBePublishedFirst>
                         <button id="publish-button" type="button" class="btn btn-sm btn-outline-gbif-primary ${buttonClass!"confirmPublishMinorVersion"}" data-bs-dismiss="modal">
-                            <@s.text name="button.publish"/>
+                            ${t("button.publish")}<#t>
                         </button>
                     </#if>
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -3174,14 +3172,14 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="managers-modal-title"><@s.text name="manage.overview.resource.managers"/></h5>
+                    <h5 class="modal-title w-100" id="managers-modal-title">${t("manage.overview.resource.managers")}</h5>
                     <#if (numberOfPotentialManagers>0)>
                         <div>
                             <form id="addManagerForm" action='resource-addManager.do' method='post'>
 <@csrfField/>
                                 <input name="r" type="hidden" value="${resource.shortname}"/>
                                 <select name="id" class="form-select my-1" id="manager" size="1">
-                                    <option value="" disabled selected><@s.text name='manage.overview.resource.managers.select'/></option>
+                                    <option value="" disabled selected>${t('manage.overview.resource.managers.select')}</option>
                                     <#list potentialManagers?sort_by("name") as u>
                                         <option value="${u.email}">${u.name}</option>
                                     </#list>
@@ -3190,7 +3188,7 @@
                         </div>
                     <#else>
                         <p class="mb-0">
-                            <@s.text name="manage.overview.resource.managers.select.empty"/>
+                            ${t("manage.overview.resource.managers.select.empty")}<#t>
                         </p>
                     </#if>
                 </div>
@@ -3200,7 +3198,7 @@
                     <input type="submit" form="addManagerForm" value="Add" id="add-manager" name="add" class="btn btn-sm btn-outline-gbif-primary" style="display: none;">
                     </#if>
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -3221,15 +3219,15 @@
                 <div class="modal-body">
                     <h5 class="modal-title w-100" id="reserve-doi-modal-title">DOI</h5>
                     <#if !organisationWithPrimaryDoiAccount??>
-                        <@s.text name="manage.overview.publishing.doi.reserve.prevented.noOrganisation" escapeHtml=true/>
+                        ${t("manage.overview.publishing.doi.reserve.prevented.noOrganisation")?markup_string}<#t>
                     <#elseif !currentUser.hasRegistrationRights()>
-                        <@s.text name="manage.resource.status.doi.forbidden"/>&nbsp;<@s.text name="manage.resource.role.change"/>
+                        ${t("manage.resource.status.doi.forbidden")}&nbsp;${t("manage.resource.role.change")}
                     <#elseif resource.identifierStatus == "UNRESERVED">
-                        <@s.text name="manage.overview.publishing.doi.reserve.help" escapeHtml=true/>
+                        ${t("manage.overview.publishing.doi.reserve.help")?markup_string}<#t>
                     <#elseif resource.identifierStatus == "PUBLIC_PENDING_PUBLICATION">
-                        <@s.text name="manage.overview.publishing.doi.delete.help" escapeHtml=true/>
+                        ${t("manage.overview.publishing.doi.delete.help")?markup_string}<#t>
                     <#elseif resource.identifierStatus == "PUBLIC" && resource.isAlreadyAssignedDoi() >
-                        <@s.text name="manage.overview.publishing.doi.reserve.new.help" escapeHtml=true/>
+                        ${t("manage.overview.publishing.doi.reserve.new.help")?markup_string}<#t>
                     </#if>
                 </div>
 
@@ -3238,7 +3236,7 @@
                         <@nextDoiButtonTD/>
                     <#else>
                         <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                            <@s.text name="button.cancel"/>
+                            ${t("button.cancel")}<#t>
                         </button>
                     </#if>
                 </div>
@@ -3254,13 +3252,13 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="delete-resource-modal-title"><@s.text name="manage.overview.resource.delete"/></h5>
-                    <@s.text name="manage.overview.resource.delete.description"/>
+                    <h5 class="modal-title w-100" id="delete-resource-modal-title">${t("manage.overview.resource.delete")}</h5>
+                    ${t("manage.overview.resource.delete.description")}<#t>
                 </div>
 
                 <div class="modal-footer justify-content-center">
-                    <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-ipt" name="delete"><@s.text name="button.delete.fromIpt"/></button>
-                    <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-gbif-and-ipt" name="delete"><@s.text name="button.delete.fromIptAndGbif"/></button>
+                    <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-ipt" name="delete">${t("button.delete.fromIpt")}</button>
+                    <button class="btn btn-sm btn-outline-gbif-danger proxy-button-delete-from-gbif-and-ipt" name="delete">${t("button.delete.fromIptAndGbif")}</button>
                 </div>
             </div>
         </div>
@@ -3274,19 +3272,19 @@
                 </div>
 
                 <div class="modal-body">
-                    <h5 class="modal-title w-100" id="delete-resource-disabled-modal-title"><@s.text name="manage.overview.resource.delete"/></h5>
+                    <h5 class="modal-title w-100" id="delete-resource-disabled-modal-title">${t("manage.overview.resource.delete")}</h5>
                     <#if !currentUser.hasRegistrationRights()>
                         <#if resource.status == "DELETED">
-                            <@s.text name="manage.resource.status.undeletion.forbidden"/>&nbsp;<@s.text name="manage.resource.role.change"/>
+                            ${t("manage.resource.status.undeletion.forbidden")}&nbsp;${t("manage.resource.role.change")}
                         <#elseif resource.isAlreadyAssignedDoi()?string == "true" || resource.status == "REGISTERED">
-                            <@s.text name="manage.resource.status.deletion.forbidden"/>&nbsp;<@s.text name="manage.resource.role.change"/>
+                            ${t("manage.resource.status.deletion.forbidden")}&nbsp;${t("manage.resource.role.change")}
                         </#if>
                     </#if>
                 </div>
 
                 <div class="modal-footer justify-content-center">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -3304,7 +3302,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>
@@ -3326,11 +3324,11 @@
                 </div>
                 <div class="modal-body" style="text-align: left !important;">
                     <h5 class="modal-title w-100 mb-0" id="metadata-validation-result-modal">
-                        <@s.text name="manage.overview.metadata.modal.result"/>:
+                        ${t("manage.overview.metadata.modal.result")}:
                         <#if isMetadataValid>
-                            <span class="text-gbif-primary"><@s.text name="manage.overview.metadata.modal.valid"/></span>
+                            <span class="text-gbif-primary">${t("manage.overview.metadata.modal.valid")}</span>
                         <#else>
-                            <span class="text-gbif-danger"><@s.text name="manage.overview.metadata.modal.invalid"/></span>
+                            <span class="text-gbif-danger">${t("manage.overview.metadata.modal.invalid")}</span>
                         </#if>
                     </h5>
 
@@ -3360,7 +3358,7 @@
                                         <div>
                                             <i class="bi bi-x text-gbif-danger"></i>
                                             <span class="text-gbif-danger me-2">
-                                                <b><@s.text name="submenu.${metadataSections[key]!key}"/></b>
+                                                <b>${t("submenu.${metadataSections[key]!key}")}</b>
                                             </span>
                                             <a class="metadata-action-link custom-link" type="button" href="${baseURL}/manage/metadata-${metadataSections[key]!key}.do?r=${resource.shortname}">
                                                 <span>
@@ -3369,7 +3367,7 @@
                                                     </svg>
                                                 </span>
                                                 <span>
-                                                    <@s.text name="button.edit"/>
+                                                    ${t("button.edit")}<#t>
                                                 </span>
                                             </a>
                                         </div>
@@ -3390,7 +3388,7 @@
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button id="cancel-button" type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
-                        <@s.text name="button.cancel"/>
+                        ${t("button.cancel")}<#t>
                     </button>
                 </div>
             </div>

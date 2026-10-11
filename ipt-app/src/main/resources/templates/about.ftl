@@ -1,6 +1,6 @@
 <#ftl output_format="HTML">
 <#include "/inc/header.ftl">
-<title><@s.text name="menu.about"/></title>
+<title>${t("menu.about")}</title>
 <#assign currentMenu = "about"/>
 
 <#include "/inc/menu.ftl">
@@ -10,7 +10,7 @@
         <div class="container my-3 p-3">
             <div class="text-center">
                 <div class="fs-smaller">
-                    <span><@s.text name="menu.about"/></span>
+                    <span>${t("menu.about")}</span>
                 </div>
 
                 <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
@@ -19,7 +19,7 @@
 
                 <div class="text-smaller text-gbif-primary mb-2">
                     <#if (iptKey)??>
-                        <a href="${portalUrl}/installation/${iptKey}" target="_blank"><@s.text name="about.link"/></a>
+                        <a href="${portalUrl}/installation/${iptKey}" target="_blank">${t("about.link")}</a>
                     <#else>
                         <#assign aDateTime = .now>
                         ${aDateTime?date?string.long}
@@ -38,10 +38,10 @@
                     <#if (iptDescription)??>
                         ${iptDescription?no_esc}
                     <#else>
-                        <@s.text name="about.installation"/> ${hostingOrganisationName}
+                        ${t("about.installation")} ${hostingOrganisationName}
                     </#if>
                 <#else>
-                    <@s.text name="about.notRegistered"/>
+                    ${t("about.notRegistered")}<#t>
                 </#if>
             </span>
         </p>

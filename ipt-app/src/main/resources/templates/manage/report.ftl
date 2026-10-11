@@ -125,7 +125,7 @@
 </#if>
 
 <h5 class="text-gbif-header-2 fw-400 mt-4">
-    <@s.text name='manage.report.title'/>
+    ${t('manage.report.title')}<#t>
 </h5>
 
 <#attempt>
@@ -143,24 +143,24 @@
             <#assign minutes = ((elapsedSec % 3600) / 60)?floor>
             <#assign seconds = (elapsedSec % 60)>
             <div class="small">
-                <@s.text name="manage.report.publication.started"/>
+                ${t("manage.report.publication.started")}<#t>
                 : ${publicationStartTimestamp?number_to_datetime?string.full}
             </div>
             <div class="small">
-                <@s.text name="manage.report.publication.time"/>: ${hours?string["00"]}:${minutes?string["00"]}
+                ${t("manage.report.publication.time")}: ${hours?string["00"]}:${minutes?string["00"]}
                 :${seconds?string["00"]}
             </div>
         </#if>
         <div class="small">
-            <@s.text name="manage.report.publication.status"/>:
+            ${t("manage.report.publication.status")}:
             <#if report.hasException()>
                 <i class="bi bi-x-circle-fill text-gbif-danger"></i>
-                <@s.text name="admin.config.publish.failed"/>
+                ${t("admin.config.publish.failed")}<#t>
             <#elseif report.completed>
                 <i class="bi bi-check-circle-fill text-gbif-primary"></i>
-                <@s.text name="admin.config.publish.completed"/>
+                ${t("admin.config.publish.completed")}<#t>
             <#else>
-                <@s.text name="admin.config.publish.inProgress"/>
+                ${t("admin.config.publish.inProgress")}<#t>
                 <div class="inline-spinner" aria-hidden="true">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -192,38 +192,38 @@
             </#if>
 
             <p>
-                <@s.text name='manage.report.continueTo'><@s.param>${resource.shortname}</@s.param></@s.text>
+                ${t('manage.report.continueTo', resource.shortname)}
                 <#if resource.status=="REGISTERED" && resource.key??>
-                    <@s.text name="manage.report.gbif"><@s.param><a type="button"
+                    <#assign textArg1><a type="button"
                                                                     href="${cfg.portalUrl}/dataset/${resource.key!}">
-                            GBIF.org</a></@s.param></@s.text>
+                            GBIF.org</a></#assign>${t("manage.report.gbif", textArg1)}
                 </#if>
             </p>
             <p>
-                <@s.text name='portal.publication.download.log'/> <a target="_blank"
-                                                                     href="${baseURL}/publicationlog.do?r=${resource.shortname}"><@s.text name='portal.publication.log'/></a>
+                ${t('portal.publication.download.log')} <a target="_blank"
+                                                                     href="${baseURL}/publicationlog.do?r=${resource.shortname}">${t('portal.publication.log')}</a>
             </p>
             <#if isDwcDp>
                 <p>
-                    <@s.text name='portal.publication.validation.report.info'><@s.param><a target="_blank"
-                                                                                           href="${baseURL}/manage/validationReport.do?r=${resource.shortname}"><@s.text name='portal.publication.validation.report'/></a></@s.param></@s.text>
+                    <#assign textArg2><a target="_blank"
+                                                                                           href="${baseURL}/manage/validationReport.do?r=${resource.shortname}">${t('portal.publication.validation.report')}</a></#assign>${t('portal.publication.validation.report.info', textArg2)}
                 </p>
             </#if>
         <#else>
             <p>
-                <@s.text name="manage.locked"><@s.param>${baseURL}/manage/cancel.do?r=${resource.shortname}</@s.param></@s.text>
+                ${t("manage.locked", "${baseURL}/manage/cancel.do?r=${resource.shortname}")}
             </p>
             <div class="alert alert-warning" role="alert">
                 ${report.state?no_esc}
             </div>
             <p>
-                <a data-post="true" href="cancel.do?r=${resource.shortname}"><@s.text name="button.cancel"/></a> <@s.text name="manage.overview.publishing"/>
+                <a data-post="true" href="cancel.do?r=${resource.shortname}">${t("button.cancel")}</a> ${t("manage.overview.publishing")}
                 .
             </p>
         </#if>
 
         <h5 class="text-gbif-header-2 fw-400">
-            <@s.text name='manage.report.logMessage'/>
+            ${t('manage.report.logMessage')}<#t>
         </h5>
         <ul class="list-unstyled">
             <#list report.messages as msg>
@@ -234,7 +234,7 @@
         <#if cfg.debug() && report.hasException()>
             <br/>
             <h5 class="text-gbif-header-2 fw-400">
-                <@s.text name='manage.report.exception'/>
+                ${t('manage.report.exception')}<#t>
             </h5>
             <ul class="simple">
                 <#list report.exceptionStacktrace as msg>
@@ -247,11 +247,11 @@
 
 <#else>
     <h5 class="text-gbif-header fw-400">
-        <@s.text name='manage.report.finished'/>
+        ${t('manage.report.finished')}<#t>
     </h5>
     <#if (resource.shortname)?has_content>
         <p>
-            <@s.text name='manage.report.continueTo'><@s.param>${resource.shortname}</@s.param></@s.text>
+            ${t('manage.report.continueTo', resource.shortname)}
         </p>
     </#if>
 </#if>

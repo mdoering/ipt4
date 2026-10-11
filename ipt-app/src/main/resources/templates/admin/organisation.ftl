@@ -7,10 +7,10 @@
     <script>
         $(document).ready(function(){
             $('.confirm').jConfirmAction({
-                titleQuestion: "<@s.text name="basic.confirm"/>",
-                question: "<@s.text name="admin.organisation.delete.confirmation.message"/>",
-                yesAnswer: "<@s.text name="basic.yes"/>",
-                cancelAnswer: "<@s.text name="basic.no"/>",
+                titleQuestion: "${t("basic.confirm")}",
+                question: "${t("admin.organisation.delete.confirmation.message")}",
+                yesAnswer: "${t("basic.yes")}",
+                cancelAnswer: "${t("basic.no")}",
                 buttonType: "danger",
                 baseUrl: "${baseURL}"
             });
@@ -117,7 +117,7 @@
             $("#save").on("click", displayProcessing);
         });
     </script>
-    <title><@s.text name="title"/></title>
+    <title>${t("title")}</title>
 
     <#assign currentMenu = "admin"/>
     <#include "/inc/menu.ftl">
@@ -134,9 +134,9 @@
                 <div class="text-center fs-smaller">
                     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
                         <ol class="breadcrumb justify-content-center mb-0">
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/"><@s.text name="breadcrumb.admin"/></a></li>
-                            <li class="breadcrumb-item"><a href="${baseURL}/admin/organisations.do"><@s.text name="breadcrumb.admin.organisations"/></a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><@s.text name="breadcrumb.admin.organisations.organisation"/></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/">${t("breadcrumb.admin")}</a></li>
+                            <li class="breadcrumb-item"><a href="${baseURL}/admin/organisations.do">${t("breadcrumb.admin.organisations")}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">${t("breadcrumb.admin.organisations.organisation")}</li>
                         </ol>
                     </nav>
                 </div>
@@ -146,22 +146,22 @@
                         <#if id?has_content>
                             ${organisation.name!}
                         <#else>
-                            <@s.text name="admin.organisation.add.title"/>
+                            ${t("admin.organisation.add.title")}<#t>
                         </#if>
                     </h1>
 
                     <#if organisation.key?has_content>
                         <div class="text-smaller">
-                            <a href="${portalUrl}/publisher/${organisation.key}" target="_blank"><@s.text name="about.link"/></a>
+                            <a href="${portalUrl}/publisher/${organisation.key}" target="_blank">${t("about.link")}</a>
                         </div>
                     </#if>
 
                     <div class="mt-2">
-                        <@s.submit name="save" form="organisationsForm" key="button.save" cssClass="button btn btn-sm btn-outline-gbif-primary top-button"/>
+                        <input type="submit" value="${t("button.save")?markup_string}" id="save" name="save" class="button btn btn-sm btn-outline-gbif-primary top-button" form="organisationsForm"/><#t>
                         <#if id?has_content>
-                            <@s.submit name="deleteFlag" form="organisationsForm" key="button.delete" cssClass="button confirm btn btn-sm btn-outline-gbif-danger top-button"/>
+                            <input type="submit" value="${t("button.delete")?markup_string}" id="deleteFlag" name="deleteFlag" class="button confirm btn btn-sm btn-outline-gbif-danger top-button" form="organisationsForm"/><#t>
                         </#if>
-                        <@s.submit name="cancel" form="organisationsForm" key="button.cancel" cssClass="button btn btn-sm btn-outline-secondary top-button"/>
+                        <input type="submit" value="${t("button.cancel")?markup_string}" id="cancel" name="cancel" class="button btn btn-sm btn-outline-secondary top-button" form="organisationsForm"/><#t>
                     </div>
                 </div>
             </div>
@@ -176,38 +176,38 @@
                     <#if id?has_content>
                         <p>${organisation.description!}</p>
 
-                        <@s.hidden name="organisation.name" id="organisation.name" value=organisation.name! required="true" />
-                        <@s.hidden name="organisation.key" id="organisation.key"  value=organisation.key! required="true" />
-                        <@s.hidden name="id" id="id" required="true" />
+                        <input type="hidden" name="organisation.name" value="${organisation.name!}" id="organisation.name"/><#t>
+                        <input type="hidden" name="organisation.key" value="${organisation.key!}" id="organisation.key"/><#t>
+                        <input type="hidden" name="id" value="${(id)!}" id="id"/><#t>
                         <!-- preserve other fields -->
-                        <@s.hidden name="organisation.nodeName" id="organisation.nodeName" value=organisation.nodeName! />
-                        <@s.hidden name="organisation.nodeKey" id="organisation.nodeKey" value=organisation.nodeKey!  />
-                        <@s.hidden name="organisation.primaryContactPhone" id="organisation.primaryContactPhone" value=organisation.primaryContactPhone!  />
-                        <@s.hidden name="organisation.primaryContactEmail" id="organisation.primaryContactEmail" value=organisation.primaryContactEmail!  />
-                        <@s.hidden name="organisation.primaryContactAddress" id="organisation.primaryContactAddress" value=organisation.primaryContactAddress!  />
-                        <@s.hidden name="organisation.primaryContactDescription" id="organisation.primaryContactDescription" value=organisation.primaryContactDescription!  />
-                        <@s.hidden name="organisation.primaryContactName" id="organisation.primaryContactName" value=organisation.primaryContactName!  />
-                        <@s.hidden name="organisation.primaryContactType" id="organisation.primaryContactType" value=organisation.primaryContactType!  />
-                        <@s.hidden name="organisation.homepageURL" id="organisation.homepageURL" value=organisation.homepageURL!  />
-                        <@s.hidden name="organisation.description" id="organisation.description" value=organisation.description!  />
+                        <input type="hidden" name="organisation.nodeName" value="${organisation.nodeName!}" id="organisation.nodeName"/><#t>
+                        <input type="hidden" name="organisation.nodeKey" value="${organisation.nodeKey!}" id="organisation.nodeKey"/><#t>
+                        <input type="hidden" name="organisation.primaryContactPhone" value="${organisation.primaryContactPhone!}" id="organisation.primaryContactPhone"/><#t>
+                        <input type="hidden" name="organisation.primaryContactEmail" value="${organisation.primaryContactEmail!}" id="organisation.primaryContactEmail"/><#t>
+                        <input type="hidden" name="organisation.primaryContactAddress" value="${organisation.primaryContactAddress!}" id="organisation.primaryContactAddress"/><#t>
+                        <input type="hidden" name="organisation.primaryContactDescription" value="${organisation.primaryContactDescription!}" id="organisation.primaryContactDescription"/><#t>
+                        <input type="hidden" name="organisation.primaryContactName" value="${organisation.primaryContactName!}" id="organisation.primaryContactName"/><#t>
+                        <input type="hidden" name="organisation.primaryContactType" value="${organisation.primaryContactType!}" id="organisation.primaryContactType"/><#t>
+                        <input type="hidden" name="organisation.homepageURL" value="${organisation.homepageURL!}" id="organisation.homepageURL"/><#t>
+                        <input type="hidden" name="organisation.description" value="${organisation.description!}" id="organisation.description"/><#t>
                     <#else>
-                        <@s.hidden name="organisation.name" id="organisation.name" required="true" />
+                        <input type="hidden" name="organisation.name" value="${(organisation.name)!}" id="organisation.name"/><#t>
                         <!-- preserve other fields -->
-                        <@s.hidden name="organisation.nodeName" id="organisation.nodeName" value=organisation.nodeName!  />
-                        <@s.hidden name="organisation.nodeKey" id="organisation.nodeKey" value=organisation.primaryContactPhone!  />
-                        <@s.hidden name="organisation.primaryContactPhone" id="organisation.primaryContactPhone" value=organisation.primaryContactPhone!  />
-                        <@s.hidden name="organisation.primaryContactEmail" id="organisation.primaryContactEmail" value=organisation.primaryContactEmail!  />
-                        <@s.hidden name="organisation.primaryContactAddress" id="organisation.primaryContactAddress" value=organisation.primaryContactAddress!  />
-                        <@s.hidden name="organisation.primaryContactDescription" id="organisation.primaryContactDescription" value=organisation.primaryContactDescription!  />
-                        <@s.hidden name="organisation.primaryContactName" id="organisation.primaryContactName" value=organisation.primaryContactName!  />
-                        <@s.hidden name="organisation.primaryContactType" id="organisation.primaryContactType" value=organisation.primaryContactType!  />
-                        <@s.hidden name="organisation.homepageURL" id="organisation.homepageURL" value=organisation.homepageURL!  />
-                        <@s.hidden name="organisation.description" id="organisation.description" value=organisation.description!  />
+                        <input type="hidden" name="organisation.nodeName" value="${organisation.nodeName!}" id="organisation.nodeName"/><#t>
+                        <input type="hidden" name="organisation.nodeKey" value="${organisation.nodeKey!}" id="organisation.nodeKey"/><#t>
+                        <input type="hidden" name="organisation.primaryContactPhone" value="${organisation.primaryContactPhone!}" id="organisation.primaryContactPhone"/><#t>
+                        <input type="hidden" name="organisation.primaryContactEmail" value="${organisation.primaryContactEmail!}" id="organisation.primaryContactEmail"/><#t>
+                        <input type="hidden" name="organisation.primaryContactAddress" value="${organisation.primaryContactAddress!}" id="organisation.primaryContactAddress"/><#t>
+                        <input type="hidden" name="organisation.primaryContactDescription" value="${organisation.primaryContactDescription!}" id="organisation.primaryContactDescription"/><#t>
+                        <input type="hidden" name="organisation.primaryContactName" value="${organisation.primaryContactName!}" id="organisation.primaryContactName"/><#t>
+                        <input type="hidden" name="organisation.primaryContactType" value="${organisation.primaryContactType!}" id="organisation.primaryContactType"/><#t>
+                        <input type="hidden" name="organisation.homepageURL" value="${organisation.homepageURL!}" id="organisation.homepageURL"/><#t>
+                        <input type="hidden" name="organisation.description" value="${organisation.description!}" id="organisation.description"/><#t>
 
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <#assign selectOrganisationInfo>
-                                    <@s.text name="admin.registration.intro"/>&nbsp;<@s.text name="admin.organisation.add.intro2"/>
+                                    ${t("admin.registration.intro")}&nbsp;${t("admin.organisation.add.intro2")}
                                 </#assign>
                                 <#assign selectOrganisationInfo = selectOrganisationInfo?markup_string>
                                 <div class="d-flex text-smaller">
@@ -220,11 +220,17 @@
                                         <i class="bi bi-info-circle text-gbif-primary"></i>
                                     </a>&nbsp;
                                     <label for="organisation.key" class="form-label">
-                                        <@s.text name="admin.organisation.key"/> <span class="text-gbif-danger">&#42;</span>
+                                        ${t("admin.organisation.key")} <span class="text-gbif-danger">&#42;</span>
                                     </label>
                                 </div>
-                                <@s.select id="organisation.key" cssClass="form-select" name="organisation.key" list="organisations" listKey="key" listValue="name" value="organisation.key" disabled="false"/>
-                                <@s.fielderror id="field-error-organisation.key" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="organisation.key"/>
+                                <select name="organisation.key" id="organisation.key" class="form-select">
+                                    <#assign selectedKey = ((organisation.key)!"")?string>
+                                    <#list (organisations)![] as o>
+                                        <#assign optionKey = ((o.key)!"")?string>
+                                        <option value="${optionKey}"<#if optionKey == selectedKey> selected="selected"</#if>>${(o.name)!}</option>
+                                    </#list>
+                                </select>
+                                <@fieldError id="field-error-organisation.key" cssClass="invalid-feedback list-unstyled field-error my-1" fieldName="organisation.key"/>
                             </div>
                             <div id="requestDetails" class="mt-0 text-smaller"></div>
                         </div>

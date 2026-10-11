@@ -19,18 +19,18 @@
             <div class="container my-3 p-3">
                 <div class="text-center">
                     <div class="text-center fs-smaller">
-                        <span>[@s.text name="admin.config.setup.common.setup"/]</span>
+                        <span>${t("admin.config.setup.common.setup")}</span>
                     </div>
 
                     <h1 class="pb-2 mb-0 pt-2 text-gbif-header fs-2 fw-normal">
-                        [@s.text name="admin.config.setup.common.ipt"/]
+                        ${t("admin.config.setup.common.ipt")}[#t]
                     </h1>
                     <h1 class="pb-2 mb-0 text-gbif-header-light fs-5 fw-normal">
-                        [@s.text name="admin.config.setup.common.tagline"/]
+                        ${t("admin.config.setup.common.tagline")}[#t]
                     </h1>
 
                     <div class="mt-2">
-                        [@s.submit cssClass="btn btn-sm btn-outline-gbif-primary top-button" name="continue" key="button.continue"/]
+                        <input type="submit" value="${t("button.continue")?markup_string}" id="continue" name="continue" class="btn btn-sm btn-outline-gbif-primary top-button"/>[#t]
                     </div>
                 </div>
             </div>
@@ -46,9 +46,9 @@
             <div class="bd-content">
                 <div class="my-3 p-3">
                     [#if warnings?size == 0 && actionErrors?size == 0]
-                        <p>[@s.text name="admin.config.setup3.welcome"/]</p>
+                        <p>${t("admin.config.setup3.welcome")}</p>
                     [#else]
-                        <p>[@s.text name="admin.config.setup3.welcomeWithIssues"/]</p>
+                        <p>${t("admin.config.setup3.welcomeWithIssues")}</p>
                     [/#if]
                 </div>
             </div>
