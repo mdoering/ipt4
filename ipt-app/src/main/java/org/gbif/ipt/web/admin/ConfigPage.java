@@ -36,6 +36,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -90,6 +91,8 @@ public class ConfigPage extends PostActionPage {
   protected Boolean mailSmtpStartTlsEnable;
 
   private final IptLogin iptLogin;
+  /** The base URL a save changes to, applied only once the save succeeded. */
+  private URL newBaseUrl;
 
   @Inject
   public ConfigPage(
@@ -194,34 +197,18 @@ public class ConfigPage extends PostActionPage {
    *
    * @return SUCCESS if it is valid, or failure with a message if the entered configuration is invalid
    */
-  @Override
-  public String save() {
+  /**
+   * Applies the submitted settings to the configuration in memory; INPUT (with the message) at the first invalid one.
+   */
+  private String applySettings() {
     LOG.info("Changing the IPT configuration");
-    boolean baseUrlChanged = false;
     // base URL
     if (!stringEquals(baseUrl, cfg.getBaseUrl())) {
       LOG.info("Changing the installation baseURL from [{}] to [{}]", cfg.getBaseUrl(), baseUrl);
       try {
         URL burl = new URL(baseUrl);
         configManager.setBaseUrl(burl);
-
-        // ensure any public resource URL (alternative identifiers) are updated also
-        updateAllAlternateIdentifiersForIPTURLToResource();
-
-        LOG.info("Installation baseURL successfully changed to[{}]", baseUrl);
-        addActionMessage(getText("admin.config.baseUrl.changed"));
-        addActionMessage(getText("admin.user.login"));
-        addActionMessage(getText("admin.config.baseUrl.changed.reminder"));
-        // IPT 3 removed the user from the session: log in again under the new base URL
-        iptLogin.logout(req);
-        if (URLUtils.isLocalhost(burl)) {
-          addActionWarning(getText("admin.config.error.localhostURL"));
-        } else if (URLUtils.isHostName(burl)) {
-          // warn the base URL is same as machine name so user checks it is visible on the Internet
-          LOG.info("Machine name used in base URL");
-          addActionWarning(getText("admin.config.baseUrl.sameHostName"));
-        }
-        baseUrlChanged = true;
+        newBaseUrl = burl;
       } catch (MalformedURLException e) {
         addActionError(getText("admin.config.error.invalidBaseURL"));
         return INPUT;
@@ -327,17 +314,48 @@ public class ConfigPage extends PostActionPage {
       return INPUT;
     }
 
+    return SUCCESS;
+  }
+
+  /**
+   * IPT 3 applied the settings one by one and kept those before an invalid one, and it rewrote resource metadata and
+   * logged out for a new base URL even when a later setting failed. All settings are applied first; on failure the
+   * previous configuration is put back, and the consequences of a new base URL follow only a successful save.
+   */
+  @Override
+  public String save() {
+    Properties before = cfg.snapshotProperties();
+    newBaseUrl = null;
+    if (!SUCCESS.equals(applySettings())) {
+      cfg.restoreProperties(before);
+      return INPUT;
+    }
     try {
       configManager.saveConfig();
     } catch (InvalidConfigException e) {
       LOG.error("couldnt write config settings", e);
+      cfg.restoreProperties(before);
       addActionError(getText("admin.config.save.error"));
       return INPUT;
     }
-    if (baseUrlChanged) {
+    if (newBaseUrl != null) {
+      // ensure any public resource URL (alternative identifiers) are updated also
+      updateAllAlternateIdentifiersForIPTURLToResource();
+      LOG.info("Installation baseURL successfully changed to[{}]", baseUrl);
+      addActionMessage(getText("admin.config.baseUrl.changed"));
+      addActionMessage(getText("admin.user.login"));
+      addActionMessage(getText("admin.config.baseUrl.changed.reminder"));
+      if (URLUtils.isLocalhost(newBaseUrl)) {
+        addActionWarning(getText("admin.config.error.localhostURL"));
+      } else if (URLUtils.isHostName(newBaseUrl)) {
+        // warn the base URL is same as machine name so user checks it is visible on the Internet
+        LOG.info("Machine name used in base URL");
+        addActionWarning(getText("admin.config.baseUrl.sameHostName"));
+      }
+      // IPT 3 removed the user from the session: log in again under the new base URL
+      iptLogin.logout(req);
       return HOME;
     }
-
     addActionMessage(getText("admin.config.success"));
     return SUCCESS;
   }

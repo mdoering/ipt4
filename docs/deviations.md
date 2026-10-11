@@ -84,3 +84,5 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Publication status JSON (`admin-api/publication-report(s)`) | Included the exception object as serialised by Struts | Its message and stack trace (the properties IPT 3 also had) without the object | Stable, bounded JSON | M5 |
 | Bulk publication log popup | Messages inserted as HTML | Shown as text | Messages carry resource titles | M5 |
 | Vocabulary pages with terms without a language | Template error | The term without the language | Registry vocabularies have such terms | M5 |
+| Rejected configuration save | Settings before the invalid one stayed in effect (and were saved with the next change); a new base URL rewrote resource metadata and logged out even when a later setting failed | Nothing changes until every setting is valid and saved; then the base URL's consequences follow | A rejected form must not change data | M5 |
+| Synchronise organisations button | Its flag was not bound, so the button ran the organisation form's validation and synchronised nothing | Synchronises the associated organisations with the registry | The button works | M5 |

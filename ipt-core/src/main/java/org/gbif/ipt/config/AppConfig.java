@@ -747,6 +747,18 @@ public class AppConfig {
     }
   }
 
+  /** A copy of the settings, to put back with {@link #restoreProperties(Properties)} when a change is abandoned. */
+  public synchronized Properties snapshotProperties() {
+    Properties copy = new Properties();
+    copy.putAll(properties);
+    return copy;
+  }
+
+  public synchronized void restoreProperties(Properties snapshot) {
+    properties.clear();
+    properties.putAll(snapshot);
+  }
+
   public void setProperty(String key, String value) {
     properties.setProperty(key, StringUtils.trimToEmpty(value));
   }

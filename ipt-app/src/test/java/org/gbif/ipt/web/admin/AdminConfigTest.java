@@ -123,6 +123,19 @@ class AdminConfigTest {
     assertThat(iptProperties().get(AppConfig.ADMIN_EMAIL)).isEqualTo("ipt-admin@example.org");
   }
 
+  /** IPT 3 applied the settings before the failing one; nothing changes now, in memory or on disk. */
+  @Test
+  void aRejectedSaveChangesNothing() throws Exception {
+    String adminEmail = cfg.getAdminEmail();
+    Map<String, String> before = iptProperties();
+    MvcResult refused = save("/admin/config.do", "config.do", Map.of("adminEmail", "changed@example.org",
+        "mailSmtpHost", "changed.example.org", "latitude", "95", "longitude", "10"));
+    assertThat(refused.getResponse().getRedirectedUrl()).isNull();
+    assertThat(cfg.getAdminEmail()).isEqualTo(adminEmail);
+    assertThat(cfg.getMailSmtpHost()).isNotEqualTo("changed.example.org");
+    assertThat(iptProperties()).isEqualTo(before);
+  }
+
   @Test
   void anInvalidBaseUrlIsRefused() throws Exception {
     String baseUrl = cfg.getBaseUrl();

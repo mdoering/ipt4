@@ -372,6 +372,8 @@ public class OrganisationsPage extends PostActionPage {
     return cfg.getPortalUrl();
   }
 
+  /** The synchronise button's flag, which skips the organisation form's validation (IPT 3 left it unbindable). */
+  @StrutsParameter
   public void setSynchronise(String synchronise) {
     this.synchronise = StringUtils.trimToNull(synchronise) != null;
   }

@@ -131,8 +131,11 @@ class AdminRegistrationTest {
   @Test
   @Order(4)
   void synchronise() throws Exception {
-    assertThat(send("/admin/organisationsSynchronize.do").getStatus()).isEqualTo(200);
-    assertThat(registrations.get(GBIFS)).isNotNull();
+    registrations.get(GBIFS).setName("Outdated name");
+    MockHttpServletResponse synced = send("/admin/organisationsSynchronize.do", "synchronise", "true");
+    assertThat(synced.getStatus()).isEqualTo(200);
+    // the registry's name again
+    assertThat(registrations.get(GBIFS).getName()).isEqualTo("GBIF Secretariat");
   }
 
   @Test
