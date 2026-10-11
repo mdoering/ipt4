@@ -118,7 +118,7 @@ public class VersionHistoryPage extends ManagerBasePage {
    *
    * @param version version number requested
    */
-  @StrutsParameter
+  // not a request parameter: the version comes from "v", checked in prepare()
   public void setVersion(BigDecimal version) {
     this.version = version;
   }

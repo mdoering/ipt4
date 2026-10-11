@@ -160,6 +160,31 @@ class SourcesTest {
         .isEqualTo(DATA);
   }
 
+  /** IPT 3's declared type for source (the Source interface) has no file; the runtime TextFileSource has. */
+  @Test
+  void sourcesCannotBePointedAtServerFilesToReadOrDeleteThem() throws Exception {
+    Path secret = Files.createTempFile("ipt-secret", ".txt");
+    Files.writeString(secret, "TOPSECRET");
+    addFile("cedars.txt", DATA.getBytes(StandardCharsets.UTF_8));
+    as(ManageFixture.OWNER, post("/manage/source.do").param("r", "res1").param("id", "cedars")
+        .param("source.name", "cedars").param("source.file", secret.toString()).param("save", "Save"));
+    assertThat(((org.gbif.ipt.model.FileSource) resources.get("res1").getSource("cedars")).getFile().toPath())
+        .isNotEqualTo(secret);
+    assertThat(as(ManageFixture.OWNER, get("/manage/peek.do?r=res1&id=cedars")).getContentAsString())
+        .doesNotContain("TOPSECRET");
+    as(ManageFixture.OWNER, post("/manage/delete-source.do").param("r", "res1").param("id", "cedars"));
+    assertThat(secret).exists();
+  }
+
+  @Test
+  void getRequestsBindNothing() throws Exception {
+    addFile("oaks.txt", DATA.getBytes(StandardCharsets.UTF_8));
+    as(ManageFixture.OWNER, get("/manage/source.do?r=res1&id=oaks&source.name=renamed&source.ignoreHeaderLines=7"));
+    assertThat(resources.get("res1").getSource("oaks")).isNotNull();
+    assertThat(((org.gbif.ipt.model.SourceWithHeader) resources.get("res1").getSource("oaks")).getIgnoreHeaderLines())
+        .isNotEqualTo(7);
+  }
+
   @Test
   void deleteASource() throws Exception {
     addFile("todelete.txt", DATA.getBytes(StandardCharsets.UTF_8));

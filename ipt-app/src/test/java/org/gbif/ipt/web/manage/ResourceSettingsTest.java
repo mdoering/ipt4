@@ -107,6 +107,14 @@ class ResourceSettingsTest {
   }
 
   @Test
+  void hugeVersionNumbersAreRefusedOnTheHistoryPage() throws Exception {
+    for (String query : new String[]{"v=1e5000000", "version=1e5000000"}) {
+      MockHttpServletResponse r = as(ManageFixture.OWNER, get("/manage/history.do?r=res1&" + query));
+      assertThat(r.getContentAsByteArray().length).as(query).isLessThan(1_000_000);
+    }
+  }
+
+  @Test
   void versionHistoryAndManagersResourcePage() throws Exception {
     String version = resources.get("res1").getEmlVersion().toPlainString();
     assertThat(as(ManageFixture.OWNER, get("/manage/history.do?r=res1&v=" + version)).getStatus()).isEqualTo(200);

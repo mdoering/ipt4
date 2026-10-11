@@ -190,6 +190,47 @@ class ActionRunnerTest {
     assertThat(page.getMapping().getPath()).isNull();
   }
 
+  /** Struts' depth: each "." and "[" below the annotated property is one level. */
+  @Test
+  void nestingIsLimitedToTheDeclaredDepth() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest("POST", "/x");
+    request.addParameter("user.firstname", "Ann");
+    request.addParameter("user.address", "x");
+    ShallowPage page = new ShallowPage();
+    page.setServletRequest(request);
+    page.setServletResponse(new MockHttpServletResponse());
+    runner().run(page, request, "save", () -> ActionPage.SUCCESS);
+    assertThat(page.getUser().getFirstname()).isEqualTo("Ann");
+    request = new MockHttpServletRequest("POST", "/x");
+    request.addParameter("mappings[0].name", "deep");
+    page = new ShallowPage();
+    page.setServletRequest(request);
+    page.setServletResponse(new MockHttpServletResponse());
+    runner().run(page, request, "save", () -> ActionPage.SUCCESS);
+    assertThat(page.getMappings().get(0).getName()).isNull();
+  }
+
+  public static class ShallowPage extends ActionPage {
+    private final User user = new User();
+    private final List<Mapping> mappings = new ArrayList<>(List.of(new Mapping()));
+
+    ShallowPage() {
+      super(new PageContext(null, Locale.ENGLISH, null, null, "http://localhost", "http://localhost", null,
+          new RequestFeedback(Locale.ENGLISH, null, null)));
+    }
+
+    @StrutsParameter(depth = 1)
+    public User getUser() {
+      return user;
+    }
+
+    /** depth 1 allows mappings[0], not mappings[0].name */
+    @StrutsParameter(depth = 1)
+    public List<Mapping> getMappings() {
+      return mappings;
+    }
+  }
+
   @Test
   void pageOwnedObjectsAndExtraFieldsAreBound() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest("POST", "/x");

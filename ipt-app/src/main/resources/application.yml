@@ -6,7 +6,8 @@ spring:
       # IPT 3: struts.multipart.maxSize; the upload directory is the data dir's tmp/uploads (WebConfig)
       max-file-size: ${ipt.upload.max-size:10GB}
       max-request-size: ${ipt.upload.max-size:10GB}
-      file-size-threshold: 1MB
+      # every part goes to disk: parts held in memory let an anonymous POST fill the heap (CSRF checks parse the body)
+      file-size-threshold: 0
   main:
     banner-mode: off
   web:
@@ -22,9 +23,10 @@ server:
   # X-Forwarded-* headers are applied by TrustedProxyForwardedHeaderFilter, only for ipt.trusted-proxies
   forward-headers-strategy: none
   tomcat:
-    # metadata and mapping forms post thousands of fields (Tomcat's defaults: 1000 parameters, 50 parts, 2 MB)
+    # metadata and mapping forms post thousands of (urlencoded) fields (Tomcat's defaults: 1000 parameters, 2 MB);
+    # the multipart forms (create, uploads) have a handful of parts
     max-parameter-count: 100000
-    max-part-count: 100000
+    max-part-count: 100
     max-http-form-post-size: 50MB
   servlet:
     encoding:

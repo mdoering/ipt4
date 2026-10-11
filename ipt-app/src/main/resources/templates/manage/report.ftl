@@ -217,7 +217,7 @@
                 ${report.state?no_esc}
             </div>
             <p>
-                <a href="cancel.do?r=${resource.shortname}"><@s.text name="button.cancel"/></a> <@s.text name="manage.overview.publishing"/>
+                <a data-post="true" href="cancel.do?r=${resource.shortname}"><@s.text name="button.cancel"/></a> <@s.text name="manage.overview.publishing"/>
                 .
             </p>
         </#if>

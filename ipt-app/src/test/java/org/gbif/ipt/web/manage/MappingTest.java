@@ -63,6 +63,7 @@ class MappingTest {
   @Autowired MockMvc mvc;
   @Autowired UserAccountManager users;
   @Autowired ResourceManager resources;
+  @Autowired org.gbif.ipt.service.admin.ExtensionManager extensions;
 
   @BeforeEach
   void owner() throws Exception {
@@ -132,6 +133,18 @@ class MappingTest {
     assertThat(resources.get("res1").getMappings(OCCURRENCE).get(0)
         .getField("http://rs.tdwg.org/dwc/terms/basisOfRecord").getTranslation())
         .containsValue("HumanObservation");
+  }
+
+  /** A mapping's field terms are the installed extension's properties, shared by every resource. */
+  @Test
+  void installedExtensionsCannotBeChangedThroughAMapping() throws Exception {
+    for (String prefix : new String[]{"fields[0].term", "fields[1].term", "mapping.fields[0].term"}) {
+      as(ManageFixture.OWNER, post("/manage/mapping.do").param("r", "res1").param("id", OCCURRENCE).param("mid", "0")
+          .param(prefix + ".description", "HACKED").param(prefix + ".name", "hacked")
+          .param(prefix + ".required", "true").param("save", "Save"));
+    }
+    assertThat(extensions.get(OCCURRENCE).getProperties())
+        .noneMatch(p -> "HACKED".equals(p.getDescription()) || "hacked".equals(p.getName()));
   }
 
   @Test

@@ -53,3 +53,8 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | `canceloverwrite.do` | Mapped to a method the action did not have (error) | Returns to the resource overview | The overwrite dialog's Cancel button works | M3 |
 | Delete source / delete mapping links | GET links (state change on GET) | The confirmation dialog sends a POST with the CSRF token | No state changes on GET; CSRF protection | M3 |
 | Stale mapping or source index in manage links | Error page (500) | Manage 404 page | A link from another tab should not look like a crash | M3 |
+| Request parameters on GET | Bound like a POST's, nested paths included | A GET binds the page's own top-level parameters only | A GET carries no CSRF token; nested paths reach live objects | M3 |
+| Binding depth | `@StrutsParameter(depth)` limited nesting | Same limit, and paths are also checked against the objects actually there (no files, no shared objects such as installed extensions) | A declared type (Source, Term) can hide a file or an installed extension | M3 |
+| Cancel publication | GET link, no access check | POST (the links send one) for the resource's managers | State change without CSRF protection | M3 |
+| Remove co-manager / network links | GET | POST from the same links | No state changes on GET | M3 |
+| Remembered resource | Used by home and create too | Used only by pages working on a resource; one deleted meanwhile is forgotten | Home showed another resource's lock or error | M3 |

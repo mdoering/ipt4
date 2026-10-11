@@ -556,14 +556,15 @@ public class SourcePage extends ManagerBasePage implements UploadedFilesAware {
   @StrutsParameter
   public void setRdbms(String jdbc) {
     this.rdbms = jdbc;
-    if (source != null && source instanceof SqlSource) {
+    // the live source changes with a POST only (a GET carries no CSRF token)
+    if (isHttpPost() && source != null && source instanceof SqlSource) {
       ((SqlSource) source).setRdbms(jdbcSupport.get(rdbms));
     }
   }
 
   @StrutsParameter
   public void setSqlSourcePassword(String sqlSourcePassword) {
-    if (source != null && source instanceof SqlSource) {
+    if (isHttpPost() && source != null && source instanceof SqlSource) {
       // ignore empty password
       if (StringUtils.isNotBlank(sqlSourcePassword)) {
         ((SqlSource) source).setPassword(sqlSourcePassword);

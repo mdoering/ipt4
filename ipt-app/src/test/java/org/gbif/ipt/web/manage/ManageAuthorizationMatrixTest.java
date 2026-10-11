@@ -83,7 +83,7 @@ class ManageAuthorizationMatrixTest {
         if (!pattern.startsWith("/manage") && !pattern.startsWith("/manager-api")) {
           continue;
         }
-        String path = pattern.replace("{method}", "makePrivate");
+        String path = pattern.replace("{method}", "makePrivate").replace("{section}", "basic");
         Set<RequestMethod> methods = info.getMethodsCondition().getMethods();
         endpoints.add(new Endpoint(path, methods.isEmpty() || methods.contains(RequestMethod.GET)
             ? RequestMethod.GET : RequestMethod.POST));

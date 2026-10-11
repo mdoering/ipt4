@@ -102,6 +102,19 @@ class ManageGuardTest {
     assertThat(probe("", OWNER, session).getStatus()).isEqualTo(404);
   }
 
+  /** Pages without a resource (home, create) ignore the remembered one; a resource gone since is forgotten. */
+  @Test
+  void theRememberedResourceOnlyMattersToResourcePages() throws Exception {
+    MockHttpSession session = new MockHttpSession();
+    assertThat(probe("?r=res1", OWNER, session).getRedirectedUrl()).startsWith("/manage/_ok");
+    resources.get("res1").getManagers().removeIf(m -> OWNER.equals(m.getEmail()));
+    assertThat(mvc.perform(get("/manage/home.do").session(session).with(user(OWNER))).andReturn().getResponse()
+        .getStatus()).isEqualTo(200);
+    session.setAttribute(org.gbif.ipt.config.Constants.SESSION_RESOURCE, "deleted-meanwhile");
+    probe("", OWNER, session);
+    assertThat(session.getAttribute(org.gbif.ipt.config.Constants.SESSION_RESOURCE)).isNull();
+  }
+
   @Test
   void aRefusedResourceIsNotRemembered() throws Exception {
     MockHttpSession session = new MockHttpSession();

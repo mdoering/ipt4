@@ -107,7 +107,7 @@ public class ManageHomeController extends ManagePageController {
   /** The manager stack of IPT 3's JSON package: the guard's result, else the page's. */
   private String guarded(HttpServletRequest request, ActionPage page, String methodName,
                          ActionRunner.ActionMethod method) throws Exception {
-    String blocked = guard.check(request, currentUser.get(), false);
+    String blocked = guard.check(request, currentUser.get(), false, false);
     return blocked != null ? blocked : runner.run(page, request, methodName, method);
   }
 

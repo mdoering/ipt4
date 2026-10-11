@@ -61,6 +61,7 @@ class OverviewTest {
     dataDir = ManageFixture.create();
     // a copy of res1 that can be made slow to publish
     FileUtils.copyDirectory(dataDir.resolve("resources/res1").toFile(), dataDir.resolve("resources/big1").toFile());
+    FileUtils.copyDirectory(dataDir.resolve("resources/res1").toFile(), dataDir.resolve("resources/fail1").toFile());
     registry.add("ipt.data-dir", dataDir::toString);
   }
 
@@ -74,7 +75,7 @@ class OverviewTest {
   void owner() throws Exception {
     User owner = ManageFixture.user(users, ManageFixture.OWNER, User.Role.Manager);
     ManageFixture.user(users, ManageFixture.OTHER, User.Role.Manager);
-    for (String shortname : new String[]{"res1", "big1"}) {
+    for (String shortname : new String[]{"res1", "big1", "fail1"}) {
       Resource r = resources.get(shortname);
       if (!r.getManagers().contains(owner)) {
         r.addManager(owner);
@@ -101,7 +102,9 @@ class OverviewTest {
     assertThat(owner.getContentAsString()).contains("res1").doesNotContain("FreeMarker template error");
     assertThat(as(ManageFixture.OTHER, get("/manage/resource.do?r=res1")).getStatus()).isEqualTo(401);
     assertThat(as(ManageFixture.OWNER, get("/manage/resource.do?r=nothing")).getStatus()).isEqualTo(404);
-    for (String url : new String[]{"/manage/report.do?r=res1", "/manage/cancel.do?r=res1",
+    assertThat(as(ManageFixture.OTHER, post("/manage/cancel.do").param("r", "res1")).getStatus()).isEqualTo(401);
+    assertThat(as(ManageFixture.OWNER, get("/manage/cancel.do?r=res1")).getStatus()).isEqualTo(405);
+    for (String url : new String[]{"/manage/report.do?r=res1",
         "/manage/mappingPeek.do?r=res1", "/manage/eml.do?r=res1", "/manage/locked.do?r=res1"}) {
       assertThat(as(ManageFixture.OTHER, get(url)).getStatus()).as(url).isEqualTo(401);
     }
@@ -151,6 +154,47 @@ class OverviewTest {
     assertThat(archive.getHeader("Content-Disposition")).contains("v" + published.toPlainString());
   }
 
+  /** IPT 3 bound the live resource to depth 8 on every manage page. */
+  @Test
+  void resourceInternalsAreNotBindable() throws Exception {
+    Resource before = resources.get("res1");
+    PublicationStatus status = before.getStatus();
+    String creatorEmail = before.getCreator() == null ? null : before.getCreator().getEmail();
+    for (String url : new String[]{"/manage/resource.do", "/manage/publication-settings.do", "/manage/source.do",
+        "/manage/mapping.do", "/manage/auto-publish.do", "/manage/resource-makePrivate.do"}) {
+      as(ManageFixture.OWNER, post(url).param("r", "res1").param("resource.status", "REGISTERED")
+          .param("resource.key", "11111111-1111-1111-1111-111111111111")
+          .param("resource.creator.role", "Admin").param("resource.managers[0].role", "Admin")
+          .param("resource.managers[0].email", "x@example.org").param("save", "Save"));
+    }
+    Resource after = resources.get("res1");
+    assertThat(after.getStatus()).isEqualTo(status);
+    assertThat(after.getKey()).isNull();
+    assertThat(users.get(ManageFixture.OWNER).getRole()).isEqualTo(User.Role.Manager);
+    assertThat(after.getManagers()).noneMatch(m -> "x@example.org".equals(m.getEmail()));
+    if (creatorEmail != null) {
+      assertThat(users.get(creatorEmail) == null || users.get(creatorEmail).getRole() != User.Role.Admin
+          || creatorEmail.equals(org.gbif.ipt.app.PortalFixture.ADMIN)).isTrue();
+    }
+  }
+
+  @Test
+  void aFailedPublicationKeepsThePreviousVersion() throws Exception {
+    as(ManageFixture.OWNER, post("/manage/publish.do").param("r", "fail1").param("publish", "Publish"));
+    awaitPublication("fail1");
+    BigDecimal published = resources.get("fail1").getEmlVersion();
+    assertThat(resources.get("fail1").getLastPublished()).isNotNull();
+
+    // the source file disappears: the next publication fails
+    Files.delete(dataDir.resolve("resources/fail1/sources/occurrence.txt"));
+    as(ManageFixture.OWNER, post("/manage/publish.do").param("r", "fail1").param("publish", "Publish"));
+    awaitPublication("fail1");
+    assertThat(resources.get("fail1").getEmlVersion()).isEqualTo(published);
+    MockHttpServletResponse archive = as(ManageFixture.OWNER, get("/archive.do?r=fail1"));
+    assertThat(archive.getStatus()).isEqualTo(200);
+    assertThat(archive.getHeader("Content-Disposition")).contains("v" + published.toPlainString());
+  }
+
   /** Visibility changes are pending until the next publication, as in IPT 3. */
   @Test
   void visibility() throws Exception {
@@ -171,6 +215,9 @@ class OverviewTest {
   void coManagers() throws Exception {
     as(ManageFixture.OWNER, post("/manage/resource-addManager.do").param("r", "res1").param("id", ManageFixture.OTHER));
     assertThat(as(ManageFixture.OTHER, get("/manage/resource.do?r=res1")).getStatus()).isEqualTo(200);
+    // the remove link posts (csrf.js), the endpoint takes POSTs only
+    assertThat(as(ManageFixture.OWNER, get("/manage/resource.do?r=res1")).getContentAsString())
+        .containsPattern("<a data-post=\"true\"[^>]*href=\"resource-deleteManager\\.do\\?r=res1&(amp;)?id=");
     as(ManageFixture.OWNER, post("/manage/resource-deleteManager.do").param("r", "res1")
         .param("id", ManageFixture.OTHER));
     assertThat(as(ManageFixture.OTHER, get("/manage/resource.do?r=res1")).getStatus()).isEqualTo(401);

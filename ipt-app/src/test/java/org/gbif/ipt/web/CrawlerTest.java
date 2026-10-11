@@ -160,7 +160,7 @@ class CrawlerTest {
         }
       }
       // links IPT4 sends as POST forms (csrf.js iptPostLink)
-      for (Element a : doc.select("a[href]:not([data-method=post])")) {
+      for (Element a : doc.select("a[href]:not([data-method=post]):not([data-post]):not([href*=/manage/cancel.do])")) {
         enqueue(queue, seen, local(a.attr("href"), url));
       }
       for (Element form : doc.select("form")) {

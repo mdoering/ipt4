@@ -14,6 +14,7 @@
 package org.gbif.ipt.web.manage;
 
 import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.web.portal.PortalBasePage;
 import org.gbif.ipt.web.support.CurrentUser;
 import org.gbif.ipt.web.support.action.ActionPage;
 import org.gbif.ipt.web.support.action.ActionResults;
@@ -57,7 +58,8 @@ public abstract class ManagePageController extends PageController {
   protected ModelAndView manage(HttpServletRequest request, ActionPage page, String methodName,
                                 ActionRunner.ActionMethod method, Map<String, String> results,
                                 boolean lockedRedirect) throws Exception {
-    String blocked = guard.check(request, currentUser.get(), lockedRedirect);
+    boolean resourcePage = page instanceof ManagerBasePage || page instanceof PortalBasePage;
+    String blocked = guard.check(request, currentUser.get(), lockedRedirect, resourcePage);
     // a page without a form of its own goes back to the overview with its errors (Struts had no result: 500)
     Map<String, String> all = ActionResults.results(ActionResults.MANAGE,
         Map.of(ActionPage.INPUT, "redirect:/manage/resource.do?r={r}"), results);

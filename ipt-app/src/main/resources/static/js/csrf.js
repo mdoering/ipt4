@@ -68,6 +68,12 @@
         document.body.appendChild(form);
         form.submit();
       };
+      // links that change state without a confirmation dialog, and the cancel link of the publication status
+      // (inside a translated message)
+      $(document).on('click', 'a[data-post], a[href*="/manage/cancel.do?"]', function (event) {
+        event.preventDefault();
+        root.iptPostLink(this.getAttribute('href'));
+      });
     });
   }
 })(this);

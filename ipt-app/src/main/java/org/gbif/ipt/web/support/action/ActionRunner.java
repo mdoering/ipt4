@@ -37,12 +37,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.ResolvableType;
@@ -84,7 +88,8 @@ public class ActionRunner {
       DataPackageTableSchema.class, DataPackageField.class, Resource.class, Ipt.class, Network.class, Source.class);
   private static final Pattern INDEX = Pattern.compile("\\[[^]]*]");
 
-  private final Map<Class<?>, String[]> allowedFields = new ConcurrentHashMap<>();
+  private final Map<Class<?>, Rules> rules = new ConcurrentHashMap<>();
+  private static final Set<String> SAFE_METHODS = Set.of("GET", "HEAD", "OPTIONS");
   private final UploadStore uploads;
 
   public ActionRunner(UploadStore uploads) {
@@ -95,13 +100,16 @@ public class ActionRunner {
       throws Exception {
     page.setInvokedMethod(methodName);
     page.prepare();
-    // IPT 3's SetupAndCancelInterceptor: any cancel parameter cancels
-    if (request.getParameterMap().containsKey(ActionPage.CANCEL)) {
+    boolean changing = !SAFE_METHODS.contains(request.getMethod());
+    // IPT 3's SetupAndCancelInterceptor: any cancel parameter cancels (here only a POST's: cancelling changes state)
+    if (changing && request.getParameterMap().containsKey(ActionPage.CANCEL)) {
       page.setCancel("true");
     }
     List<UploadedFile> files = upload(page, request);
     try {
-      bind(page, request);
+      // a GET binds the page's own top-level parameters (mid, v, ...) only: nested paths reach live objects, and a
+      // GET carries no CSRF token
+      bind(page, request, !changing);
       // IPT 3's XssFieldErrorInterceptor: what SanitizeHtmlFilter had to clean is a field error, the form returns
       if (request.getAttribute(SanitizeHtmlFilter.XSS_FLAGGED_FIELDS_ATTR) instanceof Map<?, ?> flagged
           && !flagged.isEmpty()) {
@@ -142,16 +150,16 @@ public class ActionRunner {
     return files;
   }
 
-  void bind(ActionPage page, HttpServletRequest request) {
-    Class<?> pageType = page.getClass();
+  void bind(ActionPage page, HttpServletRequest request, boolean topLevelOnly) {
+    Rules rules = this.rules.computeIfAbsent(page.getClass(), type -> rules(type, page.extraAllowedFields()));
     ServletRequestDataBinder binder = new ServletRequestDataBinder(page) {
       @Override
       protected boolean isAllowed(String field) {
-        return super.isAllowed(field) && !forbidden(pageType, field);
+        return super.isAllowed(field) && !(topLevelOnly && (field.contains(".") || field.contains("[")))
+            && rules.withinDepth(field) && !forbidden(page, field);
       }
     };
-    binder.setAllowedFields(
-        allowedFields.computeIfAbsent(pageType, type -> allowed(type, page.extraAllowedFields())));
+    binder.setAllowedFields(rules.patterns());
     binder.setFieldMarkerPrefix("__checkbox_");
     // IPT 3's *-conversion.properties
     binder.setConversionService(StrutsConversions.SERVICE);
@@ -164,6 +172,7 @@ public class ActionRunner {
     }
   }
 
+
   /**
    * Local files are never set from requests (Spring, unlike Struts, converts strings to files, so a source could be
    * pointed at any file on the server).
@@ -171,33 +180,87 @@ public class ActionRunner {
   private static final Set<Class<?>> NEVER_BOUND = Set.of(File.class, Path.class);
 
   /**
-   * Whether the path leads into (or replaces) a shared object below the page's own properties, or sets a file, judged
-   * by declared types.
+   * Whether the path is refused: it cannot be followed on the page's objects, or it reaches a file or path, or below
+   * the page's own properties a shared object, judged by the declared types (getter and setter) and by the objects
+   * actually there (a property declared as {@code Source} or {@code Term} holds a {@code TextFileSource} or a shared
+   * {@code ExtensionProperty}).
    */
-  static boolean forbidden(Class<?> pageType, String field) {
+  static boolean forbidden(Object page, String field) {
     String[] segments = field.split("\\.");
-    ResolvableType type = ResolvableType.forClass(pageType);
+    Object current = page;
+    ResolvableType declared = ResolvableType.forClass(page.getClass());
     for (int i = 0; i < segments.length; i++) {
       String name = INDEX.matcher(segments[i]).replaceAll("");
-      Class<?> owner = type.resolve();
+      Class<?> owner = current != null ? current.getClass() : declared.resolve();
       PropertyDescriptor pd = owner == null ? null : BeanUtils.getPropertyDescriptor(owner, name);
-      if (pd == null || pd.getReadMethod() == null) {
-        return false;
+      if (pd == null || (pd.getReadMethod() == null && pd.getWriteMethod() == null)) {
+        return true;
       }
-      type = ResolvableType.forMethodReturnType(pd.getReadMethod(), owner);
-      long indices = segments[i].chars().filter(c -> c == '[').count();
-      for (long n = 0; n < indices; n++) {
+      List<Class<?>> types = new ArrayList<>();
+      types.add(pd.getPropertyType());
+      if (pd.getWriteMethod() != null) {
+        types.add(pd.getWriteMethod().getParameterTypes()[0]);
+      }
+      ResolvableType type = pd.getReadMethod() != null
+          ? ResolvableType.forMethodReturnType(pd.getReadMethod(), owner)
+          : ResolvableType.forMethodParameter(pd.getWriteMethod(), 0, owner);
+      Object value = current != null && pd.getReadMethod() != null ? read(pd.getReadMethod(), current) : null;
+      Matcher index = INDEX.matcher(segments[i]);
+      while (index.find()) {
         type = elementType(type);
+        value = element(value, index.group());
+        types.add(type.resolve());
       }
-      Class<?> resolved = type.resolve();
-      if (resolved != null && NEVER_BOUND.stream().anyMatch(never -> never.isAssignableFrom(resolved))) {
-        return true;
+      types.add(type.resolve());
+      if (value != null) {
+        types.add(value.getClass());
       }
-      if (i > 0 && resolved != null && SHARED.stream().anyMatch(shared -> shared.isAssignableFrom(resolved))) {
-        return true;
+      for (Class<?> t : types) {
+        if (t == null) {
+          continue;
+        }
+        if (NEVER_BOUND.stream().anyMatch(never -> never.isAssignableFrom(t))) {
+          return true;
+        }
+        if (i > 0 && SHARED.stream().anyMatch(shared -> shared.isAssignableFrom(t))) {
+          return true;
+        }
       }
+      current = value;
+      declared = type;
     }
     return false;
+  }
+
+  @Nullable
+  private static Object read(Method getter, Object owner) {
+    try {
+      return getter.invoke(owner);
+    } catch (ReflectiveOperationException | RuntimeException e) {
+      return null;
+    }
+  }
+
+  /** The element an index ([3], ['key']) selects, or null where there is none (yet). */
+  @Nullable
+  private static Object element(@Nullable Object container, String index) {
+    String key = index.substring(1, index.length() - 1).replaceAll("^['\"]|['\"]$", "");
+    try {
+      if (container instanceof Map<?, ?> map) {
+        return map.get(key);
+      }
+      int position = Integer.parseInt(key);
+      if (container instanceof List<?> list) {
+        return position < list.size() ? list.get(position) : null;
+      }
+      if (container != null && container.getClass().isArray()) {
+        return position < java.lang.reflect.Array.getLength(container)
+            ? java.lang.reflect.Array.get(container, position) : null;
+      }
+    } catch (NumberFormatException e) {
+      return null;
+    }
+    return null;
   }
 
   private static ResolvableType elementType(ResolvableType type) {
@@ -207,9 +270,27 @@ public class ActionRunner {
     return type.asMap() != ResolvableType.NONE ? type.asMap().getGeneric(1) : type.asCollection().getGeneric();
   }
 
+  /** The binding rules of a page class: allowed patterns, and the depth of each annotated getter (Struts). */
+  record Rules(String[] patterns, Map<String, Integer> depths, Set<String> exact) {
+
+    /** Struts counts each "." and "[" below the annotated property as one level. */
+    boolean withinDepth(String field) {
+      if (exact.contains(field)) {
+        return true;
+      }
+      int end = 0;
+      while (end < field.length() && field.charAt(end) != '.' && field.charAt(end) != '[') {
+        end++;
+      }
+      long levels = field.chars().filter(c -> c == '.' || c == '[').count();
+      return levels <= depths.getOrDefault(field.substring(0, end), 0);
+    }
+  }
+
   /** Property patterns for the setters, getters and fields annotated with {@link StrutsParameter}. */
-  static String[] allowed(Class<?> type, List<String> extra) {
+  static Rules rules(Class<?> type, List<String> extra) {
     Set<String> patterns = new LinkedHashSet<>(extra);
+    Map<String, Integer> depths = new HashMap<>();
     for (Method m : type.getMethods()) {
       StrutsParameter p = m.getAnnotation(StrutsParameter.class);
       if (p == null) {
@@ -221,6 +302,7 @@ public class ActionRunner {
       } else if ((name.startsWith("get") || name.startsWith("is")) && m.getParameterCount() == 0) {
         String property = Introspector.decapitalize(name.substring(name.startsWith("get") ? 3 : 2));
         addNested(patterns, property, p.depth());
+        depths.merge(property, p.depth(), Math::max);
       }
     }
     for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
@@ -229,10 +311,11 @@ public class ActionRunner {
         if (p != null && !Modifier.isStatic(f.getModifiers())) {
           patterns.add(f.getName());
           addNested(patterns, f.getName(), p.depth());
+          depths.merge(f.getName(), p.depth(), Math::max);
         }
       }
     }
-    return patterns.toArray(String[]::new);
+    return new Rules(patterns.toArray(String[]::new), Map.copyOf(depths), Set.copyOf(extra));
   }
 
   private static void addNested(Set<String> patterns, String property, int depth) {

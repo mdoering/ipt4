@@ -53,7 +53,20 @@ public class ManageGuard {
    */
   @Nullable
   public String check(HttpServletRequest request, @Nullable User user, boolean lockedRedirect) {
+    return check(request, user, lockedRedirect, true);
+  }
+
+  /**
+   * @param usesRememberedResource whether the page works on the remembered resource when there is no {@code r}
+   *                               (resource pages do; home, create and the manager API do not)
+   */
+  @Nullable
+  public String check(HttpServletRequest request, @Nullable User user, boolean lockedRedirect,
+                      boolean usesRememberedResource) {
     boolean fromParameter = request.getParameterMap().containsKey(Constants.REQ_PARAM_RESOURCE);
+    if (!fromParameter && !usesRememberedResource) {
+      return null;
+    }
     HttpSession session = request.getSession(false);
     String requested = fromParameter
         ? StringUtils.trimToNull(request.getParameter(Constants.REQ_PARAM_RESOURCE))
@@ -62,6 +75,11 @@ public class ManageGuard {
       return fromParameter ? ActionPage.NOT_FOUND : null;
     }
     Resource resource = resourceManager.get(requested);
+    if (resource == null && !fromParameter) {
+      // deleted since: forget it; the page finds no resource of its own
+      session.removeAttribute(Constants.SESSION_RESOURCE);
+      return null;
+    }
     if (resource == null || !ResourceAccessPolicy.canManage(user, resource)) {
       if (!fromParameter && session != null) {
         session.removeAttribute(Constants.SESSION_RESOURCE);

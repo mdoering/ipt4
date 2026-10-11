@@ -71,8 +71,8 @@ public class OverviewController extends ManagePageController {
         ActionPage.SUCCESS, OVERVIEW, ActionPage.INPUT, OVERVIEW, ActionPage.ERROR, OVERVIEW));
   }
 
-  /** IPT 3 ran this without any access check (ajaxStack). */
-  @RequestMapping(path = "/manage/cancel", method = {RequestMethod.GET, RequestMethod.POST})
+  /** IPT 3 ran this without any access check (ajaxStack), and on GET; it stops a publication, so it is a POST. */
+  @PostMapping("/manage/cancel")
   public ModelAndView cancel(HttpServletRequest request) throws Exception {
     OverviewPage page = pages.getObject();
     return manage(request, page, "cancel", page::cancel,
