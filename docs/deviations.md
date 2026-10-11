@@ -91,3 +91,4 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Failed publication | Kept the failed archive's checksum, so "skip if not changed" later skipped data that was never published | The previous publication's checksum and record counts are kept | Auto-publishing publishes changed data after an outage | M6 |
 | Organisation form, node key | The hidden node key field was filled with the contact phone number | Filled with the node key | Bug fix | M7 |
 | Mapping: use the resource DOI as datasetID | The checkbox's value was not bound, so the choice was never saved | Saved when ticked and when unticked | Bug fix | M7 |
+| Web font | Roboto loaded from Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`) | Roboto served by the IPT itself (the same variable-font files, from `@fontsource-variable/roboto`) | Visitors' browsers make no requests to Google (privacy); works on networks without Internet access | M7 |

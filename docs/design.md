@@ -277,7 +277,7 @@ Keep the `inc/header`, `menu` and `footer` includes for now. A layout macro is a
 - Logout is a POST (a small form in the menu).
 - Former state-changing GET links become POST buttons.
 - No WAR or RPM; jar and Docker only.
-- M7: Bootstrap 5.0.1 → 5.3.8 (done; `main.css` keeps 5.0's table colours and grey read-only fields); still open: self-hosted Roboto, optionally a layout macro.
+- M7: Bootstrap 5.0.1 → 5.3.8 (done; `main.css` keeps 5.0's table colours and grey read-only fields); Roboto self-hosted under `static/styles/fonts/roboto` (done; setup pages, which never loaded it in IPT 3, are unchanged); still open: optionally a layout macro.
 
 ## 6. MDT readiness seams (design only, no MDT code)
 
