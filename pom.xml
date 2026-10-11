@@ -67,8 +67,9 @@
     <!-- motherpom 61 plugin versions predate JDK 25 -->
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
-    <!-- tests that reach GBIF services run only on request: mvn test -DexcludedGroups= -Dgroups=network -->
-    <excludedGroups>network</excludedGroups>
+    <!-- tests that reach GBIF services run only on request: mvn test -DexcludedGroups= -Dgroups=network (reads public
+         registry data) or -Dgroups=uat (registers and publishes in GBIF UAT and DataCite test, see README) -->
+    <excludedGroups>network,uat</excludedGroups>
     <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
     <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
     <extra-enforcer-rules.version>1.12.1</extra-enforcer-rules.version>
