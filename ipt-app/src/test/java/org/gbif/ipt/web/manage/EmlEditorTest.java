@@ -183,6 +183,30 @@ class EmlEditorTest {
   }
 
   @Test
+  void logoUpload() throws Exception {
+    byte[] png = java.util.Base64.getDecoder().decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==");
+    MockHttpServletResponse uploaded = mvc.perform(multipart("/manage/uploadlogo.do")
+        .file(new MockMultipartFile("file", "../../logo.png", "image/png", png)).param("r", "eml1")
+        .with(user(ManageFixture.OWNER)).with(csrf())).andReturn().getResponse();
+    assertThat(uploaded.getRedirectedUrl()).isEqualTo("/manage/metadata-additional.do?r=eml1");
+    MockHttpServletResponse logo = mvc.perform(get("/logo.do?r=eml1").with(user(ManageFixture.OWNER))).andReturn()
+        .getResponse();
+    assertThat(logo.getContentType()).startsWith("image/png");
+    assertThat(logo.getContentAsByteArray()).isEqualTo(png);
+
+    org.springframework.test.web.servlet.MvcResult refused = mvc.perform(multipart("/manage/uploadlogo.do")
+        .file(new MockMultipartFile("file", "logo.html", "text/html", "<script>x</script>".getBytes()))
+        .param("r", "eml1").with(user(ManageFixture.OWNER)).with(csrf())).andReturn();
+    assertThat(refused.getResponse().getRedirectedUrl()).isEqualTo("/manage/metadata-additional.do?r=eml1");
+    assertThat(String.valueOf(refused.getFlashMap().get("actionErrors"))).contains("JPEG, GIF, PNG");
+    try (java.util.stream.Stream<Path> files = Files.list(dataDir.resolve("resources/eml1"))) {
+      assertThat(files.map(f -> f.getFileName().toString()).filter(n -> n.startsWith("logo")))
+          .containsExactly("logo.png");
+    }
+  }
+
+  @Test
   void unknownSectionsAreNotFound() throws Exception {
     assertThat(as(get("/manage/metadata-nothing.do?r=eml1")).getStatus()).isEqualTo(404);
   }
