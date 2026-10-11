@@ -111,6 +111,9 @@ public final class PortalFixture {
     FileUtils.copyDirectory(ipt4.resolve("resources/res1").toFile(), dir.toFile());
     Path json = dir.resolve("resource.json");
     Files.writeString(json, Files.readString(json).replace("\"status\" : \"PUBLIC\"", "\"status\" : \"" + status + "\""));
+    // the copied version history lists IPT 3's version 3.0, whose files the fixture does not include
+    Files.copy(dir.resolve("eml.xml"), dir.resolve("eml-3.0.xml"), StandardCopyOption.REPLACE_EXISTING);
+    Files.writeString(dir.resolve(shortname + "-3.0.rtf"), "{\\rtf1 " + shortname + "}");
   }
 
   private static void copy(String from, Path target) throws IOException {

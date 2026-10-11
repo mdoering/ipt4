@@ -123,7 +123,12 @@
 
                     yesButton.on("click", function () {
                         if (thisHref != null) {
-                            window.location = thisHref;
+                            // IPT4: state-changing links are POSTs (csrf.js)
+                            if (submitBtn.data('method') === 'post' && window.iptPostLink) {
+                                window.iptPostLink(thisHref);
+                            } else {
+                                window.location = thisHref;
+                            }
                         } else {
                             submitBtn.attr("jconfirmed", true);
                             var selected = $("#dialogSummary").val();

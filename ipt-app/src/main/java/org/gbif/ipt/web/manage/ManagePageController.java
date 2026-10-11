@@ -58,8 +58,16 @@ public abstract class ManagePageController extends PageController {
                                 ActionRunner.ActionMethod method, Map<String, String> results,
                                 boolean lockedRedirect) throws Exception {
     String blocked = guard.check(request, currentUser.get(), lockedRedirect);
-    Map<String, String> all = ActionResults.results(ActionResults.MANAGE, results);
-    String result = blocked != null ? blocked : runner.run(page, request, methodName, method);
+    // a page without a form of its own goes back to the overview with its errors (Struts had no result: 500)
+    Map<String, String> all = ActionResults.results(ActionResults.MANAGE,
+        Map.of(ActionPage.INPUT, "redirect:/manage/resource.do?r={r}"), results);
+    String result;
+    try {
+      result = blocked != null ? blocked : runner.run(page, request, methodName, method);
+    } catch (IndexOutOfBoundsException | NumberFormatException e) {
+      // a mapping or source index (mid, id) that does not exist (any more), e.g. a link from another tab
+      result = ActionPage.NOT_FOUND;
+    }
     ModelAndView mav = render(page, result, all);
     if (mav.getViewName() != null && mav.getViewName().startsWith("redirect:")) {
       mav.setViewName(fill(mav.getViewName(), page, request));

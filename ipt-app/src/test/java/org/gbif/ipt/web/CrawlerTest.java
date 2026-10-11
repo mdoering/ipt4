@@ -53,7 +53,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Follows every link and GET form within the IPT from the home page, logged out and as admin: no errors, no template
- * code in the HTML. The manage and admin areas arrive with M3 and M5 and are not followed yet.
+ * code in the HTML. The admin area (M5) and the metadata editors (M4) are not followed yet.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,7 +61,9 @@ class CrawlerTest {
 
   private static final String BASE = "http://localhost:8080";
   private static final String ADMIN = "crawler.admin@example.org";
-  private static final List<String> NOT_YET = List.of("/manage", "/admin", "/logout");
+  /** The admin area (M5), the metadata editors (M4) and logout (a POST). */
+  private static final List<String> NOT_YET = List.of("/admin", "/logout", "/manage/metadata-",
+      "/manage/camtrap-metadata-", "/manage/datapackage-metadata-", "/manage/uploadlogo");
   private static final List<String> TEMPLATE_CODE = List.of("${", "<@s", "[@s", "<#", "[#", "FreeMarker template error");
   private static final int MAX_PAGES = 400;
 
@@ -69,7 +71,7 @@ class CrawlerTest {
 
   @DynamicPropertySource
   static void dataDir(DynamicPropertyRegistry registry) throws Exception {
-    dataDir = PortalFixture.create();
+    dataDir = org.gbif.ipt.app.ManageFixture.create();
     registry.add("ipt.data-dir", dataDir::toString);
   }
 
@@ -108,6 +110,10 @@ class CrawlerTest {
     Set<String> seen = new LinkedHashSet<>();
     // the home page loads its resource table with JavaScript from api/resources
     Deque<String> queue = new ArrayDeque<>(List.of("/", "/api/resources?start=0&length=100"));
+    if (admin) {
+      // the manage home loads its table with JavaScript too
+      queue.addAll(List.of("/manage/", "/manager-api/resources?start=0&length=100"));
+    }
     List<String> problems = new ArrayList<>();
     while (!queue.isEmpty() && seen.size() < MAX_PAGES) {
       String url = queue.poll();
@@ -131,7 +137,8 @@ class CrawlerTest {
         continue;
       }
       String type = response.getContentType();
-      if (type != null && type.startsWith("application/json") && url.startsWith("/api/resources")) {
+      if (type != null && type.startsWith("application/json")
+          && (url.startsWith("/api/resources") || url.startsWith("/manager-api/resources"))) {
         for (JsonNode row : JsonMapper.shared().readTree(response.getContentAsString()).get("aaData")) {
           for (JsonNode cell : row) {
             for (Element a : Jsoup.parse(cell.asString(), BASE + url).select("a[href]")) {
@@ -152,7 +159,8 @@ class CrawlerTest {
           problems.add("template code " + code + " in " + url);
         }
       }
-      for (Element a : doc.select("a[href]")) {
+      // links IPT4 sends as POST forms (csrf.js iptPostLink)
+      for (Element a : doc.select("a[href]:not([data-method=post])")) {
         enqueue(queue, seen, local(a.attr("href"), url));
       }
       for (Element form : doc.select("form")) {

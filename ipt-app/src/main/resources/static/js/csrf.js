@@ -14,6 +14,8 @@
 /*
  * IPT4: adds the Spring Security CSRF token (meta tags in inc/header.ftl) to same-origin, state-changing jQuery AJAX
  * requests. Cross-origin requests, such as the api.gbif.org lookups on the admin pages, never see the token.
+ * iptPostLink(href) sends a link as a POST form with the token: IPT 3's state-changing GET links (delete source,
+ * delete mapping) are POSTs in IPT4.
  */
 (function (root) {
   'use strict';
@@ -28,8 +30,31 @@
     };
   }
 
+  /** A hidden POST form for a link: the link's path as action, its query parameters and the token as fields. */
+  function postLinkForm(doc, href, parameterName, token) {
+    var url = new URL(href, doc.baseURI);
+    var form = doc.createElement('form');
+    form.method = 'post';
+    form.action = url.origin + url.pathname;
+    var fields = [];
+    url.searchParams.forEach(function (value, name) {
+      fields.push([name, value]);
+    });
+    if (parameterName && token) {
+      fields.push([parameterName, token]);
+    }
+    fields.forEach(function (field) {
+      var input = doc.createElement('input');
+      input.type = 'hidden';
+      input.name = field[0];
+      input.value = field[1];
+      form.appendChild(input);
+    });
+    return form;
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { csrfPrefilter: csrfPrefilter };
+    module.exports = { csrfPrefilter: csrfPrefilter, postLinkForm: postLinkForm };
   } else if (root.jQuery) {
     root.jQuery(function ($) {
       var token = $('meta[name="_csrf"]').attr('content');
@@ -37,6 +62,12 @@
       if (token && header) {
         $.ajaxPrefilter(csrfPrefilter(header, token));
       }
+      root.iptPostLink = function (href) {
+        var form = postLinkForm(document, href, $('meta[name="_csrf_parameter"]').attr('content'), token);
+        form.style.display = 'none';
+        document.body.appendChild(form);
+        form.submit();
+      };
     });
   }
 })(this);

@@ -51,3 +51,5 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Binding of manage forms | The live resource was bindable to depth 8 (`resource.creator.role=Admin` and the like were postable) | Only the fields a page lists; never into users, organisations, extensions, vocabularies, schemas or resources through another object | Privilege escalation through form fields | M3 |
 | Remembered resource in the manage area | Remembered before the access check; pages without `r` used it unchecked | Checked like `r`, remembered only once access is granted | A manager could reach another manager's resource | M3 |
 | `canceloverwrite.do` | Mapped to a method the action did not have (error) | Returns to the resource overview | The overwrite dialog's Cancel button works | M3 |
+| Delete source / delete mapping links | GET links (state change on GET) | The confirmation dialog sends a POST with the CSRF token | No state changes on GET; CSRF protection | M3 |
+| Stale mapping or source index in manage links | Error page (500) | Manage 404 page | A link from another tab should not look like a crash | M3 |
