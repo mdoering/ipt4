@@ -1,0 +1,36 @@
+= Installation
+
+IPT 4 needs Java 25 (or Docker) and a data directory it can write to.
+
+== Docker
+
+[source,bash]
+----
+docker run -d --name ipt -p 8080:8080 -v ipt-data:/srv/ipt gbif/ipt:4
+----
+
+The image runs as the non-root user `ipt`, keeps its data in the volume `/srv/ipt` (`IPT_DATA_DIR`) and reports its
+health at `/actuator/health`. Open `http://localhost:8080/` to start the setup: the first administrator, the
+registry mode (test or production) and the public URL.
+
+== Executable jar
+
+[source,bash]
+----
+IPT_DATA_DIR=/var/lib/ipt java -jar ipt-4.0.0.jar
+----
+
+The IPT listens on port 8080 (`--server.port=…` changes it). Run it as a service with your system's tools, for
+example a systemd unit with `Environment=IPT_DATA_DIR=/var/lib/ipt` and `User=ipt`.
+
+== Behind a reverse proxy
+
+Publish the IPT under its public URL (for example `https://ipt.example.org/ipt`) and set that URL in the setup or in
+*Administration › Configuration*. When the public URL is left out, the IPT derives it from each request, using the
+`X-Forwarded-*` headers of trusted proxies only (`ipt.trusted-proxies`, by default loopback and private networks).
+Uploads can be large: allow request bodies up to `ipt.upload.max-size` (10 GB by default) in the proxy.
+
+== Upgrading
+
+Stop the IPT, back up the data directory, and start the new version on the same directory. The data directory
+records the format version that wrote it (`ipt-datadir.json`); a version that cannot read it refuses to start.

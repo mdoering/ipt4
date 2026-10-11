@@ -1,0 +1,5 @@
+name: ipt
+title: GBIF IPT 4
+version: '4.0'
+nav:
+- modules/ROOT/nav.adoc

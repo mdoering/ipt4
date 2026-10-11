@@ -1,0 +1,60 @@
+= Configuration
+
+Settings an administrator edits in the IPT (public URL, proxy, e-mail, archival mode, languages, colours) are kept in
+the data directory, in `config/ipt.properties`. Deployment settings come from the environment, from system
+properties (`-Dipt.data-dir=…`) or from an `application.yml` next to the jar.
+
+[cols="2,1,4",options="header"]
+|===
+|Setting |Default |Meaning
+
+|`IPT_DATA_DIR` / `ipt.data-dir`
+|none
+|The data directory. Required: IPT 4 does not start without it. An empty or missing directory is set up on first
+start; an IPT 3 data directory is refused (convert it with xref:migration.adoc[the `migrate` command]).
+
+|`IPT_LOG_DIR` / `ipt.log-dir`
+|`<data dir>/logs`
+|Where `debug.log` and `admin.log` are written (the administration log page reads `admin.log`).
+
+|`IPT_SECRET_KEY`
+|`config/.secret.key`
+|The key (32 bytes, Base64) that encrypts stored passwords. Without the variable, the IPT creates and uses
+`config/.secret.key`; keep that file with the data directory.
+
+|`ipt.base-url`
+|derived from requests
+|Public base URL, if not set in the administration pages.
+
+|`ipt.trusted-proxies`
+|loopback and private networks
+|Regular expression of proxy addresses whose `X-Forwarded-*` headers are used.
+
+|`ipt.upload.max-size`
+|`10GB`
+|Largest file upload (sources, metadata, logos).
+
+|`ipt.default-locale`
+|`en`
+|Language before a visitor chooses one.
+
+|`ipt.defaults["dev.registry.url"]` and other keys of `ipt-defaults.properties`
+|GBIF's services
+|Overrides of built-in endpoints (registry, DataCite), for development installations only.
+
+|`server.port`
+|`8080`
+|HTTP port.
+|===
+
+== Logs
+
+`debug.log` and `admin.log` in the log directory, rolled over by size as in IPT 3. Passwords are never written to the
+logs.
+
+== Security notes
+
+* Administration and management pages need a login; every form is protected against cross-site request forgery.
+* The session cookie is `HttpOnly` and `SameSite=Lax`; serve the IPT over HTTPS so it is also `Secure`.
+* Passwords of GBIF organisations, DOI agency accounts and SQL sources are encrypted in the data directory and never
+shown in pages.

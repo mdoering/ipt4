@@ -1,0 +1,24 @@
+= Running the tests
+
+[source,bash]
+----
+mvn -B verify                                   # all offline tests
+node --test 'ipt-app/src/test/js/*.test.js'     # JavaScript tests
+tools/docker-smoke.sh                           # build the image and check it starts
+----
+
+Tests that reach outside services are excluded by default:
+
+[cols="1,3",options="header"]
+|===
+|Tag |What it does
+
+|`network`
+|Reads public data from the GBIF registry and rs.gbif.org (installing and updating extensions).
+`mvn test -pl ipt-app -DexcludedGroups= -Dgroups=network`
+
+|`uat`
+|Registers a test IPT and resource in GBIF UAT and reserves, registers and deactivates a DOI on DataCite test, then
+cleans up. It creates real records, so run it on purpose, with the credentials in the environment variables named in
+`UatRegistrationTest`. `mvn test -pl ipt-app -DexcludedGroups= -Dgroups=uat -Dtest=UatRegistrationTest`
+|===

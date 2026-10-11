@@ -1,0 +1,6 @@
+* xref:index.adoc[About IPT 4]
+* xref:installation.adoc[Installation]
+* xref:configuration.adoc[Configuration]
+* xref:migration.adoc[Migrating from IPT 3]
+* xref:deviations.adoc[Differences from IPT 3]
+* xref:testing.adoc[Running the tests]

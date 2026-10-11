@@ -1,0 +1,48 @@
+= Migrating from IPT 3
+
+IPT 4 stores its configuration as JSON and encrypts passwords with its own key, so an IPT 3 data directory is
+converted once. The conversion only reads the IPT 3 directory: IPT 3 can keep running until IPT 4 takes over.
+
+== Steps
+
+. Stop publishing on IPT 3 (or stop it) so the data does not change during the conversion.
+. Convert a copy, or the directory itself (it is not modified):
++
+[source,bash]
+----
+java -jar ipt-4.0.0.jar migrate --from /var/lib/ipt3 --to /var/lib/ipt4 --dry-run   # check first
+java -jar ipt-4.0.0.jar migrate --from /var/lib/ipt3 --to /var/lib/ipt4
+----
++
+With Docker:
++
+[source,bash]
+----
+docker run --rm -v /var/lib/ipt3:/old:ro -v ipt-data:/srv/ipt gbif/ipt:4 migrate --from /old --to /srv/ipt
+----
+. Read `migration-report.txt` in the new directory: resources, users and organisations converted, and anything that
+needs attention.
+. Start IPT 4 with `IPT_DATA_DIR` set to the new directory and the same public URL as before. Registered resources,
+DOIs and published versions keep their identifiers and URLs.
+
+== Options
+
+[cols="1,3",options="header"]
+|===
+|Option |Meaning
+
+|`--dry-run`
+|Read and check everything, write nothing.
+
+|`--link-artifacts`
+|Hard-link published archives and versioned metadata instead of copying them (same file system only; they never
+change after publication).
+
+|`--include-logs`
+|Copy the logs folder too.
+|===
+
+== Going back
+
+IPT 3's directory is untouched: stop IPT 4 and start IPT 3 again. Changes made in IPT 4 in the meantime stay in the
+IPT 4 directory.

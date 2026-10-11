@@ -1,0 +1,13 @@
+= About IPT 4
+
+IPT 4 is the GBIF Integrated Publishing Toolkit rebuilt on Spring Boot 4 and Java 25. It publishes the same data
+(Darwin Core Archives, data packages, EML, DOIs, GBIF registration) through the same pages and URLs as IPT 3, so
+publishers, the GBIF registry and harvesters see no change.
+
+What changes for administrators:
+
+* IPT 4 runs as an executable jar or a Docker image; there is no WAR.
+* The data directory is set with `IPT_DATA_DIR`; an IPT 3 data directory is converted once with the `migrate` command.
+* Stored passwords are encrypted with a key kept in the data directory.
+
+The full list of intentional differences is in xref:deviations.adoc[].
