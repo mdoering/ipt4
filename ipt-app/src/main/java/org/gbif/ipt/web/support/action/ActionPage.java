@@ -214,4 +214,8 @@ public class ActionPage extends PageSupport implements Feedback {
   public void clearErrors() {
     context().feedback().clearErrors();
   }
+
+  public void clearMessages() {
+    context().feedback().clearMessages();
+  }
 }

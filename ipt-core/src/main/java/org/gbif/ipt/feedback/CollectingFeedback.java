@@ -134,6 +134,11 @@ public class CollectingFeedback implements Feedback {
     fieldErrors.clear();
   }
 
+  /** Forgets the action messages (Struts' clearMessages). */
+  public void clearMessages() {
+    messages.clear();
+  }
+
   public List<String> getActionMessages() {
     return Collections.unmodifiableList(messages);
   }

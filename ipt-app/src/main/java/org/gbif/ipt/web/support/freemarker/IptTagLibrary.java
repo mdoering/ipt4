@@ -38,7 +38,8 @@ public final class IptTagLibrary implements TemplateHashModel {
         "fielderror", new FieldErrorDirective(),
         "select", new SelectDirective(),
         "checkbox", new CheckboxDirective(),
-        "file", new FileDirective());
+        "file", new FileDirective(),
+        "hidden", new HiddenDirective());
   }
 
   @Override

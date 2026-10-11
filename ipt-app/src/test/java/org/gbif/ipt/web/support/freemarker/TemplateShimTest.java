@@ -82,7 +82,12 @@ class TemplateShimTest {
         .contains("P5:y||")
         // Struts 7 simple theme file.ftl
         .contains("U1:<input type=\"file\" name=\"file\" id=\"file\" class=\"form-control\"/>")
-        .contains("U2:<input type=\"file\" name=\"\" id=\"custom-data-input\" class=\"d-none\"/>");
+        .contains("U2:<input type=\"file\" name=\"\" id=\"custom-data-input\" class=\"d-none\"/>")
+        // Struts 7 simple theme hidden.ftl: the value from the page when the tag has none
+        .contains("H1:<input type=\"hidden\" name=\"page.title\" value=\"From page\" id=\"page.title\"/>")
+        .contains("H2:<input type=\"hidden\" name=\"removeLogo\" value=\"false\" id=\"removeLogo\"/>")
+        .contains("H3:<input type=\"hidden\" name=\"html\" value=\"&lt;b&gt;bold&lt;/b&gt;\" id=\"html\"/>")
+        .contains("H4:<input type=\"hidden\" name=\"no.such.thing\" id=\"no_such_thing\"/>");
   }
 
   @Test

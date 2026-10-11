@@ -1,0 +1,63 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.admin;
+
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.support.action.ActionPage;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.service.manage.ResourcePublicationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+
+import jakarta.inject.Inject;
+
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Getter;
+
+@PageBean
+public class BulkPublicationPage extends ActionPage {
+
+  @Serial
+  private static final long serialVersionUID = -8016332755710954222L;
+
+  private final ResourceManager resourceManager;
+  private final ResourcePublicationManager resourcePublicationManager;
+
+  @Getter
+  private List<Resource> resources = new ArrayList<>();
+
+  @Inject
+  public BulkPublicationPage(
+      PageContext ctx,
+      ResourceManager resourceManager,
+      ResourcePublicationManager resourcePublicationManager) {
+    super(ctx);
+    this.resourceManager = resourceManager;
+    this.resourcePublicationManager = resourcePublicationManager;
+  }
+
+  @Override
+  public String execute() throws Exception {
+    resourcePublicationManager.clearProcessReports();
+    resources = resourceManager.list();
+
+    return SUCCESS;
+  }
+}

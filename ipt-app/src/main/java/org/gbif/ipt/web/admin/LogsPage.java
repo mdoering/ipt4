@@ -1,0 +1,91 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.admin;
+
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.support.action.ActionPage;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.DataDir;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+
+import jakarta.inject.Inject;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serial;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.gbif.ipt.web.support.action.StrutsParameter;
+
+import lombok.Getter;
+
+/**
+ * The Action responsible for showing IPT logs to the admin.
+ */
+@PageBean
+public class LogsPage extends ActionPage {
+
+  @Serial
+  private static final long serialVersionUID = -5038153790552063249L;
+
+  private static final Logger LOG = LogManager.getLogger(LogsPage.class);
+
+  private final DataDir dataDir;
+  @Getter
+  private InputStream inputStream;
+  @Getter
+  private File logFile;
+  @Getter
+  private String log;
+
+  @Inject
+  public LogsPage(
+      PageContext ctx,
+      DataDir dataDir) {
+    super(ctx);
+    this.dataDir = dataDir;
+  }
+
+  @Override
+  public String execute() {
+    return SUCCESS;
+  }
+
+  public String logfile() throws IOException {
+    // server file as set in prepare method
+    // the log names the logs page links to; nothing with path parts
+    if (log == null || !log.matches("[A-Za-z0-9_-]+")) {
+      return NOT_FOUND;
+    }
+    logFile = dataDir.loggingFile(log + ".log");
+    // Log file must exist and be a file inside the ipt data directory/log
+    if (logFile.exists() && dataDir.loggingDir().equals(logFile.getParentFile())) {
+      LOG.debug("Serving logfile {}", logFile.getAbsolutePath());
+      inputStream = new FileInputStream(logFile);
+      return SUCCESS;
+    } else {
+      return NOT_FOUND;
+    }
+  }
+
+  @StrutsParameter
+  public void setLog(String log) {
+    this.log = log;
+  }
+
+}

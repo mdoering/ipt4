@@ -54,6 +54,10 @@ public final class ActionResults {
       ActionPage.HOME, "redirect:/manage/home.do",
       ActionPage.LOCKED, "redirect:/manage/locked.do");
 
+  /** The admin package's global results in IPT 3. */
+  public static final Map<String, String> ADMIN = Map.of(
+      ActionPage.CANCEL, "redirect:/home.do");
+
   private ActionResults() {
   }
 

@@ -1,0 +1,69 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.admin;
+
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.support.action.ActionPage;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.manage.ResourcePublicationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+import org.gbif.ipt.task.StatusReport;
+
+import jakarta.inject.Inject;
+
+import java.io.Serial;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import lombok.Getter;
+
+@PageBean
+public class PublishingStatusPage extends ActionPage {
+
+  @Serial
+  private static final long serialVersionUID = -3984381818825518246L;
+
+  private final ResourcePublicationManager resourcePublicationManager;
+
+  @Getter
+  private Map<String, StatusReport> runningPublications = new HashMap<>();
+  @Getter
+  private Map<String, StatusReport> completedPublications = new HashMap<>();
+
+  @Inject
+  public PublishingStatusPage(
+      PageContext ctx,
+                                ResourcePublicationManager resourcePublicationManager) {
+    super(ctx);
+    this.resourcePublicationManager = resourcePublicationManager;
+  }
+
+  @Override
+  public String execute() {
+    Map<String, StatusReport> allReports = resourcePublicationManager.getProcessReports();
+
+    completedPublications = allReports.entrySet().stream()
+        .filter(entry -> entry.getValue().isCompleted())
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    runningPublications = allReports.entrySet().stream()
+        .filter(entry -> !entry.getValue().isCompleted())
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    return SUCCESS;
+  }
+}

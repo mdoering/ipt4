@@ -52,8 +52,17 @@ final class PropertyDirective implements TemplateDirectiveModel {
     if (path.startsWith("%{") && path.endsWith("}")) {
       path = path.substring(2, path.length() - 1).trim();
     }
+    String text = lookup(env, path);
+    if (text == null) {
+      return;
+    }
+    boolean escape = params.get("escapeHtml") == null || TemplateParams.bool(params, "escapeHtml");
+    env.getOut().write(escape ? HtmlTag.escape(text) : text);
+  }
+
+  /** The value of an OGNL-style path (names, {@code [index]}, {@code ['key']}) as text, or null when missing. */
+  static String lookup(Environment env, String path) throws TemplateException {
     TemplateModel value = null;
-    // OGNL-style path: names, [index] and ['key']
     Matcher step = STEP.matcher(path);
     boolean first = true;
     while (step.find()) {
@@ -70,15 +79,10 @@ final class PropertyDirective implements TemplateDirectiveModel {
       }
       first = false;
       if (value == null) {
-        return;
+        return null;
       }
     }
-    if (first) {
-      return;
-    }
-    boolean escape = params.get("escapeHtml") == null || TemplateParams.bool(params, "escapeHtml");
-    String text = asString(value);
-    env.getOut().write(escape ? HtmlTag.escape(text) : text);
+    return first ? null : asString(value);
   }
 
   private static String asString(TemplateModel value) throws TemplateException {

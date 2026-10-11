@@ -14,3 +14,7 @@ U1:<@s.file name="file" cssClass="form-control" key="manage.resource.create.file
 U2:<@s.file id="custom-data-input" cssClass="d-none" />
 P4:<@s.property value="beans[1].label"/>
 P5:<@s.property value="stringKeyed['b']"/>|<@s.property value="beans[9].label"/>|
+H1:<@s.hidden name="page.title" id="page.title"/>
+H2:<@s.hidden name="removeLogo" id="removeLogo" value="false" required="true"/>
+H3:<@s.hidden name="html"/>
+H4:<@s.hidden name="no.such.thing"/>

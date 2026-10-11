@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /** Logs a user in without a password (IPT 3: putting the user into the session), with a new session id. */
 @Component
@@ -37,5 +38,14 @@ public class IptLogin {
     request.getSession(true);
     request.changeSessionId();
     repository.saveContext(context, request, response);
+  }
+
+  /** Logs the current user out but keeps the session (and so the messages for the next page). */
+  public void logout(HttpServletRequest request) {
+    SecurityContextHolder.clearContext();
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.removeAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
+    }
   }
 }

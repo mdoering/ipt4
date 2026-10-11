@@ -20,6 +20,7 @@ import org.gbif.ipt.model.datapackage.metadata.FrictionlessMetadata;
 import org.gbif.ipt.model.voc.CamtrapMetadataSection;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.web.BrowserForms;
 
 import java.io.InputStream;
 import java.nio.file.Files;

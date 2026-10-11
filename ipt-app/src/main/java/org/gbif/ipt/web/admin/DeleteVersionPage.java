@@ -1,0 +1,75 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gbif.ipt.web.admin;
+
+import org.gbif.ipt.web.support.action.PageBean;
+import org.gbif.ipt.web.support.page.PageContext;
+import org.gbif.ipt.web.support.action.PostActionPage;
+import org.gbif.ipt.config.AppConfig;
+import org.gbif.ipt.config.Constants;
+import org.gbif.ipt.model.Resource;
+import org.gbif.ipt.service.admin.RegistrationManager;
+import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.service.manage.ResourcePublicationManager;
+import org.gbif.ipt.i18n.SimpleTextProvider;
+
+import jakarta.inject.Inject;
+
+import java.io.Serial;
+import java.math.BigDecimal;
+
+import org.apache.commons.lang3.StringUtils;
+
+@PageBean
+public class DeleteVersionPage extends PostActionPage {
+
+  @Serial
+  private static final long serialVersionUID = 5720945348362679742L;
+
+  protected final ResourceManager resourceManager;
+  protected final ResourcePublicationManager resourcePublicationManager;
+  protected Resource resource;
+  protected String version;
+
+  @Inject
+  public DeleteVersionPage(
+      PageContext ctx,
+      ResourceManager resourceManager,
+      ResourcePublicationManager resourcePublicationManager) {
+    super(ctx);
+    this.resourceManager = resourceManager;
+    this.resourcePublicationManager = resourcePublicationManager;
+  }
+
+  @Override
+  public void prepare() {
+    super.prepare();
+    // look for resource parameter
+    String res = StringUtils.trimToNull(req.getParameter(Constants.REQ_PARAM_RESOURCE));
+    resource = resourceManager.get(res);
+    if (resource == null) {
+      notFound = true;
+    }
+    version = StringUtils.trimToNull(req.getParameter(Constants.REQ_PARAM_VERSION));
+    if (version == null) {
+      notFound = true;
+    }
+  }
+
+  @Override
+  public String execute() {
+    resourcePublicationManager.removeVersion(resource, new BigDecimal(version));
+    return SUCCESS;
+  }
+}

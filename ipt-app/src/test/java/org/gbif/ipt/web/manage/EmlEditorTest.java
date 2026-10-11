@@ -18,6 +18,7 @@ import org.gbif.ipt.model.User;
 import org.gbif.ipt.model.voc.MetadataSection;
 import org.gbif.ipt.service.admin.UserAccountManager;
 import org.gbif.ipt.service.manage.ResourceManager;
+import org.gbif.ipt.web.BrowserForms;
 
 import java.io.InputStream;
 import java.nio.file.Files;
