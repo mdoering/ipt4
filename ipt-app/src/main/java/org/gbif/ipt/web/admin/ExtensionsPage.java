@@ -35,6 +35,7 @@ import org.gbif.ipt.i18n.SimpleTextProvider;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.io.Serial;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -179,7 +180,8 @@ public class ExtensionsPage extends PostActionPage {
    * @return struts2 result
    */
   public String list() {
-    if (synchronise) {
+    // the page's synchronise button posts (IPT 3 also synchronised on a GET)
+    if (synchronise && isHttpPost()) {
       try {
         synchronise();
         addActionMessage(getText("admin.extensions.synchronise.success"));
@@ -393,6 +395,10 @@ public class ExtensionsPage extends PostActionPage {
   @Override
   public String save() {
     try {
+      // registry links are web links (a file: URL would read a local file)
+      if (url == null || !url.matches("(?i)https?://.+")) {
+        throw new MalformedURLException("Not a web link: " + url);
+      }
       extensionManager.install(new URL(url));
       addActionMessage(getText("admin.extension.install.success", new String[]{url}));
     } catch (Exception e) {

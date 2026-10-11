@@ -216,7 +216,12 @@ public class DataPackageSchemaPage extends PostActionPage {
 
     if (id != null) {
       dataPackageSchema = schemaManager.get(id);
-      dataPackageSchemaRawData = schemaManager.getRawData(dataPackageSchema.getName());
+      if (dataPackageSchema != null) {
+        dataPackageSchemaRawData = schemaManager.getRawData(dataPackageSchema.getName());
+      } else if (!isHttpPost()) {
+        // IPT 3 failed with a NullPointerException
+        notFound = true;
+      }
     }
   }
 

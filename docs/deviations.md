@@ -72,3 +72,7 @@ Each entry says what changed and why. Keep this list current: it becomes the IPT
 | Admin configuration saved | Redirected to `/config.do`, which the portal answered with the home page | Back to the configuration page with its message | The admin sees what was saved | M5 |
 | UI management logo upload | Any file type, stored under the type the browser declared | JPEG, GIF or PNG only | Only images are logos | M5 |
 | Editing a user account | A request could change the account's email or store a plain password (the form posts neither) | Email and password stay; passwords change only by reset or the account page | One account cannot overwrite another | M5 |
+| Remove an installed extension | The button posted `delete`, which the action did not read: it tried to install a missing URL instead and removed nothing | Removes the extension (unless a resource maps it) | The button works | M5 |
+| Synchronise extensions and vocabularies | Also on a GET with `?synchronise=true` | Only from the page's button (POST) | No state changes on GET | M5 |
+| Install an extension by URL | Any URL, including `file:` | Web links (http, https) only | A file URL read a local file | M5 |
+| Unknown data package schema page | Error page (500) | 404 | An old link should not look like a crash | M5 |
