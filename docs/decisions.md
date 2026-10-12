@@ -193,7 +193,7 @@ reported at the time. The code and `docs/deviations.md` are the current state; t
 - Task 3: the uat test is written and compiled but not run — it creates records in GBIF UAT and DataCite test (user's instruction: no outward-facing actions) — cost if wrong: an integration difference stays unnoticed until the user runs it.
 - Task 4: session cookie SameSite=Lax and HttpOnly set explicitly (Secure follows HTTPS at the proxy/Tomcat) — cost if wrong: none for same-site use; cross-site links still carry the cookie (Lax allows top-level GETs).
 - Task 5: docs say what exists (size-based log rolling; no data-dir upgrader yet, only the version marker refusing newer formats) — cost if wrong: none.
-- Task 6: release pipeline prepared but not triggered; Jenkins credential id (gbif-dockerhub; docker.gbif.org dropped since, images go to Docker Hub only) and tool names are assumptions to check — cost if wrong: the first Jenkins release fails until adjusted.
+- Task 6: release pipeline prepared but not triggered; Jenkins credential id (gbif-dockerhub; since then docker.gbif.org dropped and the Docker Hub push disabled — releases go to ghcr.io/mdoering/ipt4 until GBIF approves IPT4) and tool names are assumptions to check — cost if wrong: the first Jenkins release fails until adjusted.
 - I-1 DataCite failing part-way (new major version, deleting a registered resource with DOIs) not fixed — inherited from IPT 3, needs compensating steps designed with the user; listed as open in docs/parity-checklist.md — cost if wrong: IPT, GBIF and DataCite out of step after a DataCite outage during those two operations, as in IPT 3.
 
 ### Deferred minor findings

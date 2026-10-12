@@ -27,9 +27,9 @@ Each IPT 3 feature area, the tests that cover it on IPT4, and what is left. Inte
 - **GBIF UAT and DataCite test round trip:** `UatRegistrationTest` (`-Dgroups=uat`, credentials in environment
   variables). It registers a test IPT and resource in UAT and reserves, registers and deactivates a DOI on DataCite
   test, so it creates real records.
-- **Release:** pushing the tag `v4.0.0-RC1` runs the `release` GitHub workflow, which pushes `gbif/ipt` to
-  Docker Hub (a final version is also tagged `latest`); the `Jenkinsfile` does the same by hand. Set the secrets
-  `DOCKERHUB_USER` and `DOCKERHUB_TOKEN` on the GitHub repository, or check the Jenkins credential id, first.
+- **Release:** pushing the tag `v4.0.0-RC1` runs the `release` GitHub workflow, which pushes
+  `ghcr.io/mdoering/ipt4` (a final version is also tagged `latest`); no secrets needed. Docker Hub (`gbif/ipt`) is off
+  until GBIF approves IPT4: the `Jenkinsfile` push stage is disabled; check its credential id before turning it on.
 - **Visual review:** a person compares key pages with IPT 3 (design §8). Not automated.
 
 ## Open before 4.0 (inherited from IPT 3)

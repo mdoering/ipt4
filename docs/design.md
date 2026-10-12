@@ -351,7 +351,7 @@ Each milestone exits with the app running on a migrated copy of a real IPT3 data
   - IPT installation registration.
   - Authz matrix and CSRF review; load test.
   - Antora docs (install, configuration, migration, deviations).
-  - Docker release to Docker Hub `gbif/ipt:4` (not docker.gbif.org).
+  - Docker release to `ghcr.io/mdoering/ipt4` while IPT4 is experimental; Docker Hub `gbif/ipt:4` once GBIF approves it (not docker.gbif.org).
 - **Exit:** parity checklist signed off; 4.0.0-RC.
 
 ### M7 (optional, after parity)

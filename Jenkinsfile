@@ -1,5 +1,6 @@
 // GBIF's release job for IPT4: builds, tests and pushes the image of the given version to Docker Hub as gbif/ipt.
-// Run by hand from Jenkins.
+// Run by hand from Jenkins. The push is off while IPT4 is experimental and not approved by GBIF; releases go to
+// ghcr.io/mdoering/ipt4 through the GitHub release workflow instead.
 // The GitHub release workflow (.github/workflows/release.yml, started by pushing a tag v<version>) does the same;
 // a final version (no suffix) is also tagged latest. The credential ids are those of GBIF's Jenkins; check them
 // before the first release.
@@ -30,6 +31,7 @@ pipeline {
       }
     }
     stage('Push') {
+      when { expression { false } }
       steps {
         withDockerRegistry([credentialsId: 'gbif-dockerhub']) {
           sh 'tools/push-image.sh gbif/ipt "$VERSION"'
