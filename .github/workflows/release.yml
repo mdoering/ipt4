@@ -1,17 +1,18 @@
 name: release
 
-# Started by hand only. Builds and tests the given version and pushes the image to docker.gbif.org and Docker Hub.
+# Pushing a tag v<version> releases that version:  git tag v4.0.0-RC1 && git push origin v4.0.0-RC1
+# The workflow builds and tests the tagged commit with the version taken from the tag and pushes the image to
+# docker.gbif.org and Docker Hub. A final version (no suffix, e.g. v4.0.0) is also tagged latest.
+# Started by hand (Actions tab or `gh workflow run release.yml`) it is a dry run: build, tests and image smoke test,
+# nothing pushed.
 # Needs the repository secrets GBIF_DOCKER_USER/GBIF_DOCKER_PASSWORD and DOCKERHUB_USER/DOCKERHUB_TOKEN.
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
-    inputs:
-      version:
-        description: Release version, e.g. 4.0.0-RC1
-        required: true
-      latest:
-        description: Also tag the image as latest (final releases only)
-        type: boolean
-        default: false
+
+permissions:
+  contents: read
 
 jobs:
   release:
@@ -26,29 +27,33 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Set the version
-        run: mvn -B versions:set -DnewVersion=${{ inputs.version }} -DgenerateBackupPoms=false
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            version="${GITHUB_REF_NAME#v}"
+            tools/set-version.sh "$version"
+          else
+            version=dry-run
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
       - name: Build and test
         run: mvn -B verify
       - name: JavaScript tests
         run: node --test 'ipt-app/src/test/js/*.test.js'
       - name: Image smoke test
-        run: tools/docker-smoke.sh gbif/ipt:${{ inputs.version }}
+        run: tools/docker-smoke.sh "gbif/ipt:$VERSION"
       - uses: docker/login-action@v4
+        if: github.ref_type == 'tag'
         with:
           registry: docker.gbif.org
           username: ${{ secrets.GBIF_DOCKER_USER }}
           password: ${{ secrets.GBIF_DOCKER_PASSWORD }}
       - uses: docker/login-action@v4
+        if: github.ref_type == 'tag'
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push the image
+        if: github.ref_type == 'tag'
         run: |
-          for repo in docker.gbif.org/ipt gbif/ipt; do
-            docker tag gbif/ipt:${{ inputs.version }} $repo:${{ inputs.version }}
-            docker push $repo:${{ inputs.version }}
-            if [ "${{ inputs.latest }}" = "true" ]; then
-              docker tag gbif/ipt:${{ inputs.version }} $repo:latest
-              docker push $repo:latest
-            fi
-          done
+          tools/push-image.sh docker.gbif.org/ipt "$VERSION"
+          tools/push-image.sh gbif/ipt "$VERSION"

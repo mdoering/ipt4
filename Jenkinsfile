@@ -1,10 +1,11 @@
 // GBIF's release job for IPT4: builds, tests and pushes the image of the given version. Run by hand from Jenkins.
-// The credential ids are those of GBIF's Jenkins; check them before the first release.
+// The GitHub release workflow (.github/workflows/release.yml, started by pushing a tag v<version>) does the same;
+// a final version (no suffix) is also tagged latest. The credential ids are those of GBIF's Jenkins; check them
+// before the first release.
 pipeline {
   agent any
   parameters {
     string(name: 'VERSION', description: 'Release version, e.g. 4.0.0-RC1')
-    booleanParam(name: 'LATEST', defaultValue: false, description: 'Also tag the image as latest')
   }
   tools {
     jdk 'OpenJDK25'
@@ -13,7 +14,7 @@ pipeline {
   stages {
     stage('Version') {
       steps {
-        sh "mvn -B versions:set -DnewVersion=${params.VERSION} -DgenerateBackupPoms=false"
+        sh 'tools/set-version.sh "$VERSION"'
       }
     }
     stage('Build and test') {
@@ -24,21 +25,16 @@ pipeline {
     }
     stage('Image') {
       steps {
-        sh "tools/docker-smoke.sh gbif/ipt:${params.VERSION}"
+        sh 'tools/docker-smoke.sh "gbif/ipt:$VERSION"'
       }
     }
     stage('Push') {
       steps {
         withDockerRegistry([url: 'https://docker.gbif.org', credentialsId: 'gbif-docker']) {
-          sh "docker tag gbif/ipt:${params.VERSION} docker.gbif.org/ipt:${params.VERSION} && docker push docker.gbif.org/ipt:${params.VERSION}"
+          sh 'tools/push-image.sh docker.gbif.org/ipt "$VERSION"'
         }
         withDockerRegistry([credentialsId: 'gbif-dockerhub']) {
-          sh "docker push gbif/ipt:${params.VERSION}"
-          script {
-            if (params.LATEST) {
-              sh "docker tag gbif/ipt:${params.VERSION} gbif/ipt:latest && docker push gbif/ipt:latest"
-            }
-          }
+          sh 'tools/push-image.sh gbif/ipt "$VERSION"'
         }
       }
     }

@@ -204,8 +204,10 @@ reported at the time. The code and `docs/deviations.md` are the current state; t
 - RegistryManagerImpl shared SAXParser/handler and singleton feedback not thread-safe (IPT 3 parity).
 - ConcurrentUseTest uses MockMvc, no start barrier, no registry/DOI path.
 - ApplicationAuthorizationMatrixTest only anonymous/admin; filter endpoints (/login, /logout) and actuator not enumerated; logout without CSRF not asserted.
-- release workflow — version input not validated/passed via env, no permissions block, actions not SHA-pinned, no setup-node, no git tag.
-- Jenkinsfile — parameters interpolated into sh, empty VERSION not guarded, latest only on Docker Hub.
+- release workflow — actions not SHA-pinned, no setup-node. (Since fixed: started by a pushed tag v<version>, version
+  validated by tools/set-version.sh, permissions block.)
+- Jenkinsfile — (since fixed: version validated and passed via env, latest on both registries for final versions,
+  decided by the version as on GitHub, via tools/push-image.sh.)
 - UatRegistrationTest cleanup not in finally, UAT IPT installation not removed, registry type not asserted.
 - docs — ipt.base-url takes precedence over the admin setting for page links only; jar install has no published artifact; Docker migration needs the IPT 3 dir readable by the container user.
 - IptHttp.Credentials record toString includes the password.
