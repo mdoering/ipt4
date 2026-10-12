@@ -2,10 +2,10 @@ name: release
 
 # Pushing a tag v<version> releases that version:  git tag v4.0.0-RC1 && git push origin v4.0.0-RC1
 # The workflow builds and tests the tagged commit with the version taken from the tag and pushes the image to
-# docker.gbif.org and Docker Hub. A final version (no suffix, e.g. v4.0.0) is also tagged latest.
+# Docker Hub as gbif/ipt. A final version (no suffix, e.g. v4.0.0) is also tagged latest.
 # Started by hand (Actions tab or `gh workflow run release.yml`) it is a dry run: build, tests and image smoke test,
 # nothing pushed.
-# Needs the repository secrets GBIF_DOCKER_USER/GBIF_DOCKER_PASSWORD and DOCKERHUB_USER/DOCKERHUB_TOKEN.
+# Needs the repository secrets DOCKERHUB_USER and DOCKERHUB_TOKEN.
 on:
   push:
     tags: ['v*']
@@ -44,16 +44,8 @@ jobs:
       - uses: docker/login-action@v4
         if: github.ref_type == 'tag'
         with:
-          registry: docker.gbif.org
-          username: ${{ secrets.GBIF_DOCKER_USER }}
-          password: ${{ secrets.GBIF_DOCKER_PASSWORD }}
-      - uses: docker/login-action@v4
-        if: github.ref_type == 'tag'
-        with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push the image
         if: github.ref_type == 'tag'
-        run: |
-          tools/push-image.sh docker.gbif.org/ipt "$VERSION"
-          tools/push-image.sh gbif/ipt "$VERSION"
+        run: tools/push-image.sh gbif/ipt "$VERSION"

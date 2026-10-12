@@ -1,4 +1,5 @@
-// GBIF's release job for IPT4: builds, tests and pushes the image of the given version. Run by hand from Jenkins.
+// GBIF's release job for IPT4: builds, tests and pushes the image of the given version to Docker Hub as gbif/ipt.
+// Run by hand from Jenkins.
 // The GitHub release workflow (.github/workflows/release.yml, started by pushing a tag v<version>) does the same;
 // a final version (no suffix) is also tagged latest. The credential ids are those of GBIF's Jenkins; check them
 // before the first release.
@@ -30,9 +31,6 @@ pipeline {
     }
     stage('Push') {
       steps {
-        withDockerRegistry([url: 'https://docker.gbif.org', credentialsId: 'gbif-docker']) {
-          sh 'tools/push-image.sh docker.gbif.org/ipt "$VERSION"'
-        }
         withDockerRegistry([credentialsId: 'gbif-dockerhub']) {
           sh 'tools/push-image.sh gbif/ipt "$VERSION"'
         }
