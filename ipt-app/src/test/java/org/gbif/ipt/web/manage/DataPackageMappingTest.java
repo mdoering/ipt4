@@ -105,7 +105,7 @@ class DataPackageMappingTest {
     assertThat(mapping.getStatus()).isEqualTo(200);
     assertThat(mapping.getContentAsString()).contains("event_pk").doesNotContain("FreeMarker template error");
 
-    // the metadata editors (M4) set the licence; IPT 3 refuses to publish a data package without one
+    // the metadata editors set the licence; IPT 3 refuses to publish a data package without one
     resources.get("dp1").getEml().setIntellectualRights("This work is licensed under a Creative Commons Attribution "
         + "(CC-BY 4.0) License.");
     as(post("/manage/publish.do").param("r", "dp1").param("publish", "Publish"));

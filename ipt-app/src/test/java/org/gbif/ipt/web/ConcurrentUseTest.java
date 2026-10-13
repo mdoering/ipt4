@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Portal and manage reads, metadata and resource saves and a publication at the same time: no server errors, no
- * deadlock (M4's lock-order review finding), reasonable response times.
+ * deadlock (see ResourceLockOrderTest), reasonable response times.
  */
 @SpringBootTest
 @AutoConfigureMockMvc

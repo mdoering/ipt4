@@ -23,8 +23,10 @@ start; an IPT 3 data directory is refused (convert it with xref:migration.adoc[t
 `config/.secret.key`; keep that file with the data directory.
 
 |`ipt.base-url`
-|derived from requests
-|Public base URL, if not set in the administration pages.
+|none
+|Base URL of the links in pages. It takes precedence over the public URL set in the setup or the administration
+pages, but only for page links: the URLs given to the GBIF registry, in EML and in DOIs always use the administration
+setting. Without either, page links are derived from the request.
 
 |`ipt.trusted-proxies`
 |loopback and private networks

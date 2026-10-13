@@ -50,7 +50,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * M1 exit check: an IPT 3 data dir is migrated, IPT4 starts on the result and publishes a Darwin Core Archive equal to
+ * An IPT 3 data dir is migrated, IPT4 starts on the result and publishes a Darwin Core Archive equal to
  * what IPT 3 produced for the same resource (the expectations of IPT 3's GenerateDwcaTest).
  */
 @SpringBootTest

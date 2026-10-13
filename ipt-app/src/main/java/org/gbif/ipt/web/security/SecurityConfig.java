@@ -44,7 +44,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Replaces the IPT 3 RequireAdmin/RequireManager interceptors with URL rules, and adds CSRF protection to every form
- * (IPT 3 only protected the login form). Per-resource authorization arrives with the manage pages (M3).
+ * (IPT 3 only protected the login form). Per-resource authorization is {@link org.gbif.ipt.web.manage.ManageGuard}'s.
  */
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity

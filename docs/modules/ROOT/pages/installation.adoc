@@ -24,6 +24,9 @@ registry mode (test or production) and the public URL.
 IPT_DATA_DIR=/var/lib/ipt java -jar ipt-4.0.0.jar
 ----
 
+No jar is published yet: build it with `mvn -B -DskipTests package` (it is written to `ipt-app/target/`) or use the
+Docker image.
+
 The IPT listens on port 8080 (`--server.port=…` changes it). Run it as a service with your system's tools, for
 example a systemd unit with `Environment=IPT_DATA_DIR=/var/lib/ipt` and `User=ipt`.
 

@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Roboto is served by the IPT itself (M7), so pages make no requests to Google Fonts. */
+/** Roboto is served by the IPT itself, so pages make no requests to Google Fonts. */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SelfHostedFontsTest {

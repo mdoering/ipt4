@@ -20,12 +20,12 @@ out = [
     "= Differences from IPT 3",
     ":page-toclevels: 0",
     "",
-    "IPT 4 keeps IPT 3's pages, URLs and behaviour. These are the intentional differences, with the milestone that",
-    "introduced each. Generated from `docs/deviations.md` by `tools/docs/deviations-to-adoc.py`.",
+    "IPT 4 keeps IPT 3's pages, URLs and behaviour. These are the intentional differences.",
+    "Generated from `docs/deviations.md` by `tools/docs/deviations-to-adoc.py`.",
     "",
-    '[cols="2,3,3,3,1",options="header"]',
+    '[cols="2,3,3,3",options="header"]',
     "|===",
-    "|Area |IPT 3 |IPT 4 |Why |Since",
+    "|Area |IPT 3 |IPT 4 |Why",
 ]
 for cells in rows:
     out.append("")

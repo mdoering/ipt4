@@ -62,7 +62,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Follows every link and GET form within the IPT from the home page, logged out and as admin: no errors, no template
- * code in the HTML. The admin area (M5) and the metadata editors (M4) are not followed yet.
+ * code in the HTML. Covers the portal, the manage pages with the metadata editors, and the admin area.
  */
 @SpringBootTest
 @AutoConfigureMockMvc

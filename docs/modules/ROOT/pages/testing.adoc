@@ -5,6 +5,7 @@
 mvn -B verify                                   # all offline tests
 node --test 'ipt-app/src/test/js/*.test.js'     # JavaScript tests
 tools/docker-smoke.sh                           # build the image and check it starts
+tools/ftl-migrate/test.sh                       # the template migration tool
 ----
 
 Tests that reach outside services are excluded by default:
