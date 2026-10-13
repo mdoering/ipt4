@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM maven:3.9-eclipse-temurin-25 AS build
+# the jar is the same on every platform: build it once, natively, also when the image is built for another platform
+FROM --platform=$BUILDPLATFORM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /src
 COPY . .
 RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests package

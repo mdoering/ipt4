@@ -15,8 +15,8 @@ Registry, not to Docker Hub (`gbif/ipt`), and can be pulled without a login:
 | `ghcr.io/mdoering/ipt4:<version>` | a release, e.g. `4.0.0-RC1`, from a pushed tag `v<version>` |
 | `ghcr.io/mdoering/ipt4:latest` | the latest final release (no `-RC` or other suffix) |
 
-The images are built for `linux/amd64`; on Apple Silicon Docker runs them emulated, slower but working
-(`--platform linux/amd64` silences the warning).
+The images are built for `linux/amd64` and `linux/arm64` (Apple Silicon, ARM servers); Docker pulls the one for
+the machine it runs on.
 
 ```bash
 docker run -d --name ipt -p 8080:8080 -v ipt-data:/srv/ipt ghcr.io/mdoering/ipt4:main
